@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en-GB">
 <head>
   <meta charset="UTF-8">
@@ -36,7 +37,7 @@
       position: relative;
     }
 
-    /* Grounding Boot Ritual */
+    /* Grounding Boot Ritual Overlay */
     #os-boot-overlay {
       position: fixed; inset: 0; z-index: 999999;
       background-color: #060913;
@@ -81,13 +82,6 @@
     .boot-progress-track { width: 100%; height: 6px; background: #060913; border-radius: 99px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; }
     #boot-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #d4af37, #38bdf8); transition: width 0.12s linear; }
 
-    /* Non-Verbal Crisis Pass Modal */
-    #crisis-hud-modal {
-      position: fixed; inset: 0; z-index: 9999995; background: rgba(6, 9, 19, 0.95);
-      backdrop-filter: blur(12px); display: none; flex-direction: column; justify-content: space-between; padding: 24px;
-    }
-    #crisis-hud-modal.hud-active { display: flex; }
-
     /* Navigation Header */
     .audh-nav-wrapper { position: sticky; top: 0; z-index: 1000; width: 100%; margin: 0; box-sizing: border-box; }
     .audh-nav {
@@ -107,16 +101,55 @@
     #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 { display: none !important; visibility: hidden !important; }
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed { display: block !important; visibility: visible !important; }
 
-    @media (max-width: 900px) {
-      .audh-nav { padding: 0.5rem 1rem; }
-      .audh-logo img { height: 50px; max-width: 160px; }
-      .audh-hamburger { display: flex; }
-      .audh-links {
-        display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #0b0f19;
-        flex-direction: column; align-items: stretch; padding: 1.25rem 1.5rem; gap: 0.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.6);
-      }
-      .audh-links.active { display: flex; }
+    /* Cards & Grids Styling */
+    .cards-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+      gap: 18px !important;
+      width: 100%;
+    }
+    .flip-card {
+      background-color: transparent !important;
+      height: 190px !important;
+      perspective: 1000px !important;
+      cursor: pointer !important;
+      width: 100%;
+    }
+    .flip-card-inner {
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      text-align: center !important;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transform-style: preserve-3d !important;
+    }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg) !important; }
+    .flip-card-front, .flip-card-back {
+      position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
+      backface-visibility: hidden !important; -webkit-backface-visibility: hidden !important;
+      border-radius: 12px !important; padding: 16px !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important;
+    }
+    .flip-card-front {
+      background: rgba(15, 23, 42, 0.95) !important; border: 1px solid rgba(212, 175, 55, 0.35) !important;
+      align-items: center !important; justify-content: center !important; gap: 8px !important;
+    }
+    .flip-card-back {
+      background: #060913 !important; border: 1px solid #38bdf8 !important; transform: rotateY(180deg) !important;
+      text-align: left !important; justify-content: space-between !important;
+    }
+    .card-code-badge { font-size: 1.15rem !important; font-weight: 800 !important; color: #38bdf8 !important; font-family: 'JetBrains Mono', monospace !important; }
+    .card-title { font-size: 0.85rem !important; font-weight: 700 !important; color: #f8fafc !important; text-transform: uppercase !important; }
+    .tap-hint { font-size: 0.6rem !important; font-weight: 700 !important; color: #64748b !important; letter-spacing: 0.08em !important; }
+    .series-block-container {
+      background: rgba(11, 15, 25, 0.88) !important; border: 1px solid rgba(212, 175, 55, 0.3) !important;
+      border-radius: 14px !important; padding: 24px !important; margin-bottom: 30px !important; text-align: left !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+    }
+    .organic-badge, .initiative-badge {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 800; color: var(--brass);
+      background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); padding: 4px 10px; border-radius: 6px; display: inline-block; text-transform: uppercase;
+    }
+    .system-gold-divider {
+      width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 20%, rgba(212, 175, 55, 0.4) 80%, transparent); margin: 24px 0; border: none;
     }
   </style>
 </head>
@@ -132,7 +165,7 @@
         </div>
       </div>
       <div>
-        <span class="font-mono text-[11px] font-bold text-[#d4af37] uppercase tracking-wider bg-[#d4af37]/12 px-2.5 py-1 rounded border border-[#d4af37]/30">LOW-DEMAND SANCTUARY // ZERO MASKING TAX</span>
+        <span class="organic-badge">LOW-DEMAND SANCTUARY // ZERO MASKING TAX</span>
         <h2 class="text-xl font-black text-white mt-2 mb-1">Drop Your Shoulders. Unclench Your Jaw.</h2>
         <p class="text-sm text-slate-300 max-w-md mx-auto">You don't have to perform or mask here. Follow the breathing circle or tap the fidget bar below while your space loads.</p>
       </div>
@@ -161,21 +194,6 @@
     </div>
   </div>
 
-  <!-- Non-Verbal Crisis Pass Modal -->
-  <div id="crisis-hud-modal" role="dialog" aria-modal="true" aria-label="Non-Verbal Crisis Advocacy Pass">
-    <div class="max-w-3xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-      <span class="font-mono text-xs sm:text-sm font-extrabold text-[#d4af37] tracking-wider uppercase">AuDHMe™ NEURO-PASS // NON-VERBAL ADVOCACY CARD</span>
-      <button onclick="closeCrisisHud()" class="px-4 py-2 rounded-lg bg-slate-900 border border-[#38bdf8] text-[#38bdf8] font-mono text-xs font-extrabold cursor-pointer">CLOSE PASS [ESC]</button>
-    </div>
-    <div class="max-w-3xl w-full mx-auto my-auto py-6 text-center">
-      <div class="inline-block px-4 py-1.5 rounded-md bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] font-mono text-sm font-extrabold mb-3" id="hud-modal-code">NC-53 // ACTIVE STATE</div>
-      <h2 class="text-3xl sm:text-5xl font-black text-white mb-5">Non-Verbal State Active</h2>
-      <div class="p-6 sm:p-8 rounded-2xl bg-[#0b0f19] border-2 border-[#38bdf8] mb-6">
-        <p class="text-lg sm:text-2xl text-slate-100 font-semibold leading-relaxed">My speech is offline right now due to sensory or cognitive overload. I can hear and understand you, so please don't force me to talk.</p>
-      </div>
-    </div>
-  </div>
-
   <!-- Navigation Header -->
   <div class="audh-nav-wrapper">
     <nav class="audh-nav">
@@ -198,6 +216,37 @@
     </nav>
   </div>
 <!-- =========================================================================
+       NON-VERBAL CRISIS ADVOCACY PASS MODAL
+       ========================================================================= -->
+  <div id="crisis-hud-modal" role="dialog" aria-modal="true" aria-label="Non-Verbal Crisis Advocacy Pass" style="position:fixed; inset:0; z-index:9999995; background:rgba(6,9,19,0.95); backdrop-filter:blur(12px); display:none; flex-direction:column; justify-content:space-between; padding:24px;">
+    <div style="max-width:48rem; width:100%; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid #1e293b; padding-bottom:16px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:800; color:#d4af37; text-transform:uppercase; letter-spacing:0.05em;">
+        AuDHMe™ NEURO-PASS // NON-VERBAL ADVOCACY CARD
+      </span>
+      <button onclick="closeCrisisHud()" style="padding:8px 16px; border-radius:8px; background:#0f172a; border:1px solid #38bdf8; color:#38bdf8; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:800; cursor:pointer;">
+        CLOSE PASS [ESC]
+      </button>
+    </div>
+    <div style="max-width:48rem; width:100%; margin:auto; padding:24px 0; text-align:center;">
+      <div id="hud-modal-code" style="display:inline-block; padding:6px 14px; border-radius:6px; background:rgba(212,175,55,0.15); border:1px solid #d4af37; color:#d4af37; font-family:'JetBrains Mono',monospace; font-size:0.85rem; font-weight:800; margin-bottom:12px;">
+        NC-53 // ACTIVE STATE
+      </div>
+      <h2 id="hud-modal-title" style="font-size:2.5rem; font-weight:900; color:#fff; margin-bottom:20px;">
+        Non-Verbal State Active
+      </h2>
+      <div style="padding:24px; border-radius:16px; background:#0b0f19; border:2px solid #38bdf8; margin-bottom:24px;">
+        <p id="hud-modal-desc" style="font-size:1.25rem; color:#f1f5f9; font-weight:600; line-height:1.6; margin:0;">
+          My speech is offline right now due to sensory or cognitive overload. I can hear and understand you, so please don't force me to talk.
+        </p>
+      </div>
+    </div>
+    <div style="max-width:48rem; width:100%; margin:0 auto; border-top:1px solid #1e293b; padding-top:12px; display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:#94a3b8;">
+      <span>AuDHMe™ SOVEREIGN CREDENTIAL</span>
+      <span>LOW-DEMAND SUPPORT</span>
+    </div>
+  </div>
+
+  <!-- =========================================================================
        EMBED 03: HOME
        ========================================================================= -->
   <div id="embed03" class="active-embed">
@@ -213,32 +262,32 @@
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-top: 24px;">
-        <div class="orbital-card" onclick="switchPage('petition', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer;">
+        <div onclick="switchPage('petition', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s;">
           <span class="organic-badge">01 // PETITION</span>
           <h3 style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; margin: 6px 0 4px 0;">The Sanctuary Standard</h3>
           <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.5;">Pushing for legally recognised sensory-safe rooms and zero-subtext public zones.</p>
         </div>
-        <div class="orbital-card" onclick="switchPage('neuropedia', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer;">
+        <div onclick="switchPage('neuropedia', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s;">
           <span class="organic-badge">02 // NEUROPEDIA</span>
           <h3 style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; margin: 6px 0 4px 0;">Encyclopedia &amp; 24 Cards</h3>
           <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.5;">Explore shorthand Neuro-Codes and 24 full condition breakdown profiles.</p>
         </div>
-        <div class="orbital-card" onclick="switchPage('civic', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer;">
+        <div onclick="switchPage('civic', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s;">
           <span class="organic-badge">03 // CIVIC &amp; PASSES</span>
           <h3 style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; margin: 6px 0 4px 0;">Civic Registry &amp; Passes</h3>
           <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.5;">UK GDPR-compliant Neuro-Pass, Access Card, and Sunflower Scheme integration.</p>
         </div>
-        <div class="orbital-card" onclick="switchPage('neuroverse', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer;">
+        <div onclick="switchPage('neuroverse', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s;">
           <span class="organic-badge">04 // NEUROVERSE</span>
           <h3 style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; margin: 6px 0 4px 0;">Unity Ventures &amp; Apparel</h3>
           <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.5;">Pay-what-you-can sensory movie nights and heavyweight grounding hoodies.</p>
         </div>
-        <div class="orbital-card" onclick="switchPage('build', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer;">
+        <div onclick="switchPage('build', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s;">
           <span class="organic-badge">05 // THE BUILD</span>
           <h3 style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; margin: 6px 0 4px 0;">Material Launch Portal</h3>
           <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.5;">Workbench fabrication funding for 310gsm linen cards and tactile gear.</p>
         </div>
-        <div class="orbital-card" onclick="switchPage('creator', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer;">
+        <div onclick="switchPage('creator', true)" style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s;">
           <span class="organic-badge">06 // THE CREATOR</span>
           <h3 style="font-weight: 700; color: #f8fafc; font-size: 1.1rem; margin: 6px 0 4px 0;">Architect Dossier</h3>
           <p style="font-size: 0.9rem; color: #cbd5e1; margin: 0; line-height: 1.5;">Built by Jason Parish out of real daily AuDHD survival and lived experience.</p>
@@ -246,12 +295,11 @@
       </div>
     </div>
   </div>
-
-  <!-- =========================================================================
-       EMBED 35: NEUROVERSE
+<!-- =========================================================================
+       EMBED 35: THE NEUROVERSE
        ========================================================================= -->
   <div id="embed35">
-    <div id="pane-neuroverse" style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
+    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
       <div style="text-align: center; margin-bottom: 24px;">
         <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 0 0 8px 0;">The Neuroverse</h1>
         <div class="system-gold-divider"></div>
@@ -268,10 +316,10 @@
        EMBED 13: PETITION
        ========================================================================= -->
   <div id="embed13">
-    <div class="petition-master-container" style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
+    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
       <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 36px 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);">
         <span class="initiative-badge">CIVIC LEGISLATION &amp; INFRASTRUCTURE DIRECTIVE</span>
-        <h1 class="neuroverse-main-heading">The Sanctuary Standard</h1>
+        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 14px 0;">The Sanctuary Standard</h1>
         <p style="font-size: 1rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 24px auto; line-height: 1.6;">Challenging workplace and public norms at the root to establish legally recognised, low-demand, sensory-safe rooms and protocols.</p>
         <a href="https://www.change.org/MandatorySensoryRooms" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #d4af37; color: #060913; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.9rem; padding: 14px 28px; border-radius: 8px; text-decoration: none; text-transform: uppercase;">Sign Petition on Change.org &nearr;</a>
       </div>
@@ -284,7 +332,7 @@
     <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
       <div style="margin-bottom: 30px;">
         <span class="initiative-badge">SHORTHAND COMMUNICATION &amp; REAL-TALK ATLAS</span>
-        <h1 class="neuroverse-main-heading">Neuro-Code™ Encyclopedia</h1>
+        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 14px 0;">Neuro-Code™ Encyclopedia</h1>
         <p style="font-size: 0.95rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 20px auto; line-height: 1.6;">
           Switch between the <strong>Neuro-Code™ Encyclopedia Flip Cards</strong> and the <strong>24 Compact Condition &amp; Symptom Cards</strong>.
         </p>
@@ -303,7 +351,7 @@
       <!-- NEUROPEDIA SUB-VIEW A: ALL CODES SERIES (00 - 60) -->
       <div id="neuropedia-codes-view">
         <!-- Series 00 -->
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; margin-bottom: 30px; text-align: left;">
+        <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">FOUNDATION</span>
             <h2 style="font-size: 1.15rem; font-weight: 800; color: #38bdf8; margin: 0; text-transform: uppercase;">Series 00: Foundation</h2>
@@ -315,7 +363,7 @@
         </div>
 
         <!-- Series 10: Sensory -->
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; margin-bottom: 30px; text-align: left;">
+        <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">SENSORY</span>
             <h2 style="font-size: 1.15rem; font-weight: 800; color: #38bdf8; margin: 0; text-transform: uppercase;">Series 10: Sensory &amp; Input</h2>
@@ -331,7 +379,7 @@
         </div>
 
         <!-- Series 20: Processing -->
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; margin-bottom: 30px; text-align: left;">
+        <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">PROCESSING</span>
             <h2 style="font-size: 1.15rem; font-weight: 800; color: #38bdf8; margin: 0; text-transform: uppercase;">Series 20: Processing &amp; Communication</h2>
@@ -345,7 +393,7 @@
         </div>
 
         <!-- Series 30: Social -->
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; margin-bottom: 30px; text-align: left;">
+        <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">SOCIAL</span>
             <h2 style="font-size: 1.15rem; font-weight: 800; color: #38bdf8; margin: 0; text-transform: uppercase;">Series 30: Social Integration</h2>
@@ -359,7 +407,7 @@
         </div>
 
         <!-- Series 40, 50, 60 -->
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 24px; margin-bottom: 30px; text-align: left;">
+        <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">SAFETY &amp; GROWTH</span>
             <h2 style="font-size: 1.15rem; font-weight: 800; color: #38bdf8; margin: 0; text-transform: uppercase;">Series 40, 50 &amp; 60: Core Safety &amp; Growth</h2>
@@ -375,7 +423,7 @@
 
       <!-- NEUROPEDIA SUB-VIEW B: 24 CONDITION CARDS MOUNT -->
       <div id="neuropedia-conditions-view" style="display: none;">
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 22px; margin-bottom: 24px; text-align: left;">
+        <div class="series-block-container" style="padding: 22px; margin-bottom: 24px;">
           <div style="display: flex; flex-direction: column; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <input type="text" id="cond-search-input" oninput="renderConditionGuide()" placeholder="Search 24 profiles (e.g. 'Executive Age', 'Waiting Mode', 'ARFID')..." style="width: 100%; flex: 1; background: #060913; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.85rem; outline: none;">
             <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="cond-category-pills">
@@ -395,6 +443,11 @@
 
   <div id="embed41"></div>
   <div id="embed07"></div>
+
+  <!-- Expanded Condition Dossier Modal Container -->
+  <div id="condition-detail-modal" role="dialog" aria-modal="true" aria-label="Condition Profile Details" onclick="if(event.target === this) closeConditionModal()" style="position:fixed; inset:0; z-index:999998; background:rgba(6,9,19,0.9); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; padding:20px; overflow-y:auto;">
+    <div class="cond-modal-card" id="condition-modal-content" style="width:100%; max-width:840px; max-height:90vh; overflow-y:auto; background:#0b0f19; border:2px solid #d4af37; border-radius:16px; padding:28px; box-shadow:0 25px 60px rgba(0,0,0,0.85); text-align:left;"></div>
+  </div>
 <!-- =========================================================================
        EMBED 06: CIVIC ACCESS & PASSES
        ========================================================================= -->
@@ -402,7 +455,7 @@
     <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
       <div style="margin-bottom: 30px;">
         <span class="initiative-badge">CIVIC VERIFICATION // ACCESSIBILITY TOOLS</span>
-        <h1 class="neuroverse-main-heading">Civic Access &amp; Passes</h1>
+        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 14px 0;">Civic Access &amp; Passes</h1>
         <p style="font-size: 0.95rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 20px auto; line-height: 1.6;">Established UK verification systems providing recognised proof of accessibility needs without explaining private medical histories.</p>
         <div class="system-gold-divider"></div>
       </div>
@@ -443,8 +496,7 @@
       </div>
     </div>
   </div>
-
-  <!-- =========================================================================
+<!-- =========================================================================
        EMBED 04: THE CREATOR (JASON PARISH)
        ========================================================================= -->
   <div id="embed04">
@@ -466,10 +518,11 @@
       </div>
     </div>
   </div>
-<!-- =========================================================================
+
+  <!-- =========================================================================
        FLOATING VISUAL COMFORT WIDGET & NEURAL NETWORK CANVAS
        ========================================================================= -->
-  <canvas id="neuro-canvas"></canvas>
+  <canvas id="neuro-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none; display:block;"></canvas>
 
   <div id="audhme-widget-wrapper" style="position:fixed; bottom:24px; right:24px; z-index:999999;">
     <div id="audhme-widget-panel" style="display:none; position:absolute; bottom:60px; right:0; width:280px; background:#0b0f19; border:1px solid #d4af37; border-radius:12px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.8); text-align:left;">
@@ -495,7 +548,7 @@
   </div>
 
   <!-- =========================================================================
-       MASTER JAVASCRIPT ENGINE (ROUTER, BOOT RITUAL, 24 CONDITIONS & CANVAS)
+       MASTER JAVASCRIPT ENGINE
        ========================================================================= -->
   <script>
     var audioCtx = null;
@@ -712,13 +765,45 @@
       });
 
       mount.innerHTML = filtered.map(function(c) {
-        return '<div class="cond-compact-card" onclick="openConditionModal(\'' + c.code + '\')">' +
+        return '<div class="cond-compact-card" onclick="openConditionModal(\'' + c.code + '\')" style="background:#111827; border:1px solid rgba(212,175,55,0.35); border-bottom:3px solid #d4af37; border-radius:12px; padding:20px 16px; min-height:185px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; cursor:pointer;">' +
           '<span class="card-code-badge">' + c.code + '</span>' +
           '<span class="card-title">' + c.name + '</span>' +
-          '<span class="text-xs text-sky-300 font-medium">' + c.shortTag + '</span>' +
+          '<span style="font-size:0.75rem; color:#38bdf8; font-weight:500;">' + c.shortTag + '</span>' +
           '<span class="tap-hint">TAP TO OPEN PROFILE &rarr;</span>' +
         '</div>';
       }).join('');
+    }
+
+    function openConditionModal(code) {
+      var c = fullSpectrumConditions.find(function(item) { return item.code === code; });
+      if (!c) return;
+      var symList = c.symptoms.map(function(s) { return '<li style="display:flex; align-items:flex-start; gap:8px; font-size:0.85rem; color:#cbd5e1; margin-bottom:6px;"><span style="color:#d4af37;">◆</span><span>' + s + '</span></li>'; }).join('');
+      var content = document.getElementById('condition-modal-content');
+      content.innerHTML =
+        '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:12px; margin-bottom:16px;">' +
+          '<span class="organic-badge">' + c.code + ' // ' + c.category.toUpperCase() + '</span>' +
+          '<button onclick="closeConditionModal()" style="padding:6px 12px; border-radius:6px; background:#060913; color:#fff; font-family:\'JetBrains Mono\',monospace; font-size:0.75rem; cursor:pointer; border:1px solid #334155;">✕ CLOSE</button>' +
+        '</div>' +
+        '<h2 style="font-size:1.8rem; font-weight:900; color:#fff; margin-bottom:8px;">' + c.name + '</h2>' +
+        '<p style="color:#38bdf8; font-size:0.95rem; margin-bottom:16px; line-height:1.5;">' + c.summary + '</p>' +
+        '<div style="padding:16px; border-radius:12px; background:#060913; border:1px solid #1e293b; margin-bottom:16px;"><div style="font-size:0.75rem; font-family:\'JetBrains Mono\',monospace; color:#d4af37; margin-bottom:8px; font-weight:800;">SYMPTOMS &amp; REALITY:</div><ul style="margin:0; padding:0; list-style:none;">' + symList + '</ul></div>' +
+        '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:0.8rem;">' +
+          '<div style="padding:12px; border-radius:8px; background:#060913; border:1px solid rgba(56,189,248,0.3);"><strong style="color:#38bdf8; display:block; margin-bottom:4px;">INSIDE HEAD:</strong>' + c.internalReality + '</div>' +
+          '<div style="padding:12px; border-radius:8px; background:#060913; border:1px solid #1e293b;"><strong style="color:#94a3b8; display:block; margin-bottom:4px;">EXTERNAL VIEW:</strong>' + c.externalView + '</div>' +
+        '</div>';
+      document.getElementById('condition-detail-modal').style.display = 'flex';
+    }
+
+    function closeConditionModal() {
+      document.getElementById('condition-detail-modal').style.display = 'none';
+    }
+
+    function openCrisisHud(code, title, desc) {
+      document.getElementById('crisis-hud-modal').style.display = 'flex';
+    }
+
+    function closeCrisisHud() {
+      document.getElementById('crisis-hud-modal').style.display = 'none';
     }
 
     function toggleWidgetPanel() {
@@ -743,7 +828,6 @@
       var isLow = document.body.classList.contains('low-input-active');
       var canvas = document.getElementById('neuro-canvas');
       if (canvas) canvas.style.display = isLow ? 'none' : 'block';
-      alert(isLow ? 'Low-Sensory Mode Activated (Animations & Audio muted).' : 'High-Sensory Mode Active.');
     }
 
     /* Background Neural Canvas Animation */
@@ -806,5 +890,4 @@
       startGroundingBoot();
     });
   </script>
-</body>
 </html>
