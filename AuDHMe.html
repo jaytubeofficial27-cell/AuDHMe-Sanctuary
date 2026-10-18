@@ -1,0 +1,3172 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuDHMe™ // Neurodivergent Sanctuary &amp; Practical Infrastructure</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-linen: #0b0e14;
+      --bg-card: #121721;
+      --bg-card-elevated: #171e2b;
+      --border-subtle: rgba(201, 162, 77, 0.24);
+      --border-focus: #56b6c2;
+      --brass: #d4af37;
+      --sky-calm: #38bdf8;
+      --sage-calm: #6ee7b7;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background-color: var(--bg-linen) !important;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+        radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 0);
+      background-size: 100% 100%, 24px 24px;
+      color: var(--text-primary);
+      font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      line-height: 1.65;
+    }
+
+    body.theme-warm-slate {
+      --bg-linen: #141413;
+      --bg-card: #1c1c1a;
+      --bg-card-elevated: #242421;
+    }
+
+    body.dyslexia-spacing-active p,
+    body.dyslexia-spacing-active li,
+    body.dyslexia-spacing-active .card-desc,
+    body.dyslexia-spacing-active .cluster-desc {
+      letter-spacing: 0.04em !important;
+      word-spacing: 0.12em !important;
+      line-height: 1.9 !important;
+    }
+
+    body.low-input-active *,
+    body.low-input-active *::before,
+    body.low-input-active *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    /* ==========================================================================
+       1. NEURODIVERGENT GROUNDING BREATH & STIM ENTRY RITUAL
+       ========================================================================== */
+    #os-boot-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background-color: #0b0e14;
+      background-image: radial-gradient(circle at 50% 40%, rgba(212, 175, 55, 0.07) 0%, #0b0e14 70%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.55s ease, visibility 0.55s ease;
+    }
+
+    #os-boot-overlay.boot-complete {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .grounding-card {
+      width: 100%;
+      max-width: 540px;
+      background: #121721;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+    }
+
+    .breath-circle-wrap {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .breath-halo {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(212, 175, 55, 0.05) 70%, transparent 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      animation: neuroBreathe 6s ease-in-out infinite;
+    }
+
+    .breath-core-ring {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      background: #0b0e14;
+      border: 1.5px solid var(--brass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .breath-core-ring img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+    }
+
+    @keyframes neuroBreathe {
+      0%, 100% {
+        transform: scale(0.78);
+        border-color: rgba(212, 175, 55, 0.4);
+      }
+      50% {
+        transform: scale(1.12);
+        border-color: rgba(56, 189, 248, 0.75);
+      }
+    }
+
+    .stim-fidget-strip {
+      width: 100%;
+      background: #0b0e14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stim-fidget-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .stim-pill {
+      height: 38px;
+      border-radius: 8px;
+      background: #161d2a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .stim-pill:active {
+      transform: scale(0.9);
+    }
+
+    .stim-pill.popped {
+      background: rgba(212, 175, 55, 0.18);
+      border-color: var(--brass);
+      color: var(--brass);
+      transform: translateY(-2px);
+    }
+
+    .boot-progress-track {
+      width: 100%;
+      height: 8px;
+      background: #0b0e14;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    #boot-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #d4af37, #38bdf8);
+      transition: width 0.12s linear;
+    }
+
+    /* ==========================================================================
+       2. PREDICTABLE, LOW-FRICTION PAGE TRANSITIONS
+       ========================================================================== */
+    #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0;
+    }
+
+    #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
+      display: block !important;
+      visibility: visible !important;
+      animation: calmSanctuaryReveal 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    #embed03.leaving-embed, #embed35.leaving-embed, #embed13.leaving-embed, #embed09.leaving-embed, #embed41.leaving-embed, #embed07.leaving-embed, #embed06.leaving-embed, #embed11.leaving-embed, #embed04.leaving-embed {
+      display: block !important;
+      visibility: visible !important;
+      pointer-events: none;
+      animation: calmSanctuaryExit 0.22s ease-out forwards;
+    }
+
+    @keyframes calmSanctuaryExit {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-6px); }
+    }
+
+    @keyframes calmSanctuaryReveal {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .active-embed .orbital-card,
+    .active-embed .series-block-container,
+    .active-embed .demand-card,
+    .active-embed .civic-card,
+    .active-embed .backing-card,
+    .active-embed .nh-step {
+      animation: gentleCardSettle 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    .active-embed .orbital-card:nth-child(1) { animation-delay: 0.03s; }
+    .active-embed .orbital-card:nth-child(2) { animation-delay: 0.07s; }
+    .active-embed .orbital-card:nth-child(3) { animation-delay: 0.11s; }
+    .active-embed .orbital-card:nth-child(4) { animation-delay: 0.15s; }
+    .active-embed .orbital-card:nth-child(5) { animation-delay: 0.19s; }
+    .active-embed .orbital-card:nth-child(6) { animation-delay: 0.23s; }
+    .active-embed .orbital-card:nth-child(7) { animation-delay: 0.27s; }
+
+    @keyframes gentleCardSettle {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       3. STICKY HEADER WITH LOGO & CLEAR WAYFINDING
+       ========================================================================== */
+    .audh-nav-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      background: rgba(11, 14, 20, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .audh-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1.5rem;
+      max-width: 1380px;
+      margin: 0 auto;
+      width: 100%;
+      gap: 1rem;
+    }
+
+    .audh-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .audh-logo img {
+      height: 74px;
+      width: auto;
+      max-width: 280px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .audh-links {
+      display: flex;
+      gap: 0.5rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+
+    .audh-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      transition: all 0.18s ease;
+      cursor: pointer;
+      padding: 8px 13px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+    }
+
+    .audh-links a:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .audh-links a.active {
+      color: #0b0e14;
+      background: var(--brass);
+      border-color: var(--brass);
+      font-weight: 800;
+    }
+
+    .audh-hamburger {
+      display: none;
+      background: #161d2a;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+      padding: 10px;
+      z-index: 1001;
+    }
+
+    .audh-hamburger span {
+      display: block;
+      width: 24px;
+      height: 2.5px;
+      background: #f1f5f9;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 1024px) {
+      .audh-logo img { height: 56px; max-width: 190px; }
+      .audh-hamburger { display: flex; }
+      .audh-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #121721;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem 1.25rem;
+        gap: 0.5rem;
+        border-bottom: 2px solid var(--brass);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.8);
+      }
+      .audh-links.active { display: flex; }
+      .audh-links a { padding: 12px 14px; font-size: 1rem; }
+    }
+
+    /* ==========================================================================
+       4. TACTILE LINEN CARDS & PREDICTABLE GRID LAYOUTS
+       ========================================================================== */
+    .orbital-cluster-canvas {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 36px 20px 50px 20px;
+    }
+
+    .orbital-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-left: 4px solid var(--brass);
+      border-radius: 14px;
+      padding: 26px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .orbital-card:hover {
+      border-color: var(--sky-calm);
+      border-left-color: var(--sky-calm);
+      background: var(--bg-card-elevated);
+      transform: translateY(-3px);
+    }
+
+    .core-gateway-node {
+      grid-column: 1 / -1;
+      border-left: 1px solid rgba(212, 175, 55, 0.4);
+      border-top: 4px solid var(--brass);
+      text-align: center;
+      cursor: default;
+      padding: 34px 28px;
+      background: linear-gradient(180deg, #161d2a 0%, #121721 100%);
+    }
+
+    .core-gateway-node:hover {
+      transform: none;
+      border-color: rgba(212, 175, 55, 0.4);
+      border-top-color: var(--brass);
+    }
+
+    .hub-disclaimer-zone, .disclaimer-system-container {
+      grid-column: 1 / -1;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .organic-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--brass);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-block;
+      background: rgba(212, 175, 55, 0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      font-weight: 700;
+    }
+
+    .cluster-headline {
+      font-size: 2.35rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+      margin: 8px auto 12px auto;
+      letter-spacing: -0.02em;
+    }
+
+    .cluster-lead-text {
+      font-size: 1.06rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin: 0 auto;
+      max-width: 740px;
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cluster-card-title {
+      font-weight: 800;
+      color: #ffffff;
+      font-size: 1.2rem;
+      flex-grow: 1;
+    }
+
+    .node-arrow {
+      width: 34px;
+      height: 34px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      color: var(--sky-calm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      transition: all 0.2s ease;
+    }
+
+    .orbital-card:hover .node-arrow {
+      background: var(--sky-calm);
+      color: #0b0e14;
+    }
+
+    .cluster-desc {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.68;
+      margin: 0;
+    }
+
+    .system-gold-divider {
+      width: 100% !important;
+      height: 1px !important;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 20%, rgba(212, 175, 55, 0.4) 80%, transparent) !important;
+      margin: 24px 0 !important;
+      border: none !important;
+    }
+
+    .disclaimer-heading-sub, .disclaimer-main-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .disclaimer-paragraph, .disclaimer-core-text {
+      font-size: 0.84rem;
+      color: #94a3b8;
+      line-height: 1.65;
+      max-width: 820px;
+      margin: 0 auto 10px auto;
+    }
+
+    @media (max-width: 768px) {
+      .orbital-cluster-canvas { grid-template-columns: 1fr; padding: 24px 16px; }
+      .cluster-headline { font-size: 1.85rem; }
+    }
+
+    /* ==========================================================================
+       5. NEUROPEDIA: NEURO-CODES & COMPACT CONDITION CARDS (PERFECT FIT)
+       ========================================================================== */
+    .encyclopedia-master-container, #pane-neuropedia {
+      width: 100%;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .neuroverse-header-container { text-align: center !important; margin-bottom: 30px !important; }
+    .neuroverse-main-heading { font-size: 2.4rem !important; font-weight: 900 !important; color: #f8fafc !important; margin-bottom: 16px !important; }
+
+    .series-block-container {
+      background: rgba(11, 15, 25, 0.5) !important;
+      border: 1px solid rgba(212, 175, 55, 0.25) !important;
+      border-radius: 12px !important;
+      padding: 24px !important;
+      margin-bottom: 36px !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .series-header-bar {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
+      padding-bottom: 12px !important;
+      margin-bottom: 20px !important;
+    }
+
+    .series-tag {
+      font-size: 0.65rem !important;
+      font-weight: 800 !important;
+      color: #d4af37 !important;
+      background: rgba(212, 175, 55, 0.12) !important;
+      border: 1px solid rgba(212, 175, 55, 0.3) !important;
+      padding: 4px 8px !important;
+      border-radius: 4px !important;
+      letter-spacing: 0.1em !important;
+    }
+
+    .series-node-title {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      color: #38bdf8 !important;
+      margin: 0 !important;
+      letter-spacing: 0.03em !important;
+      text-transform: uppercase !important;
+    }
+
+    .cards-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+      gap: 18px !important;
+    }
+
+    .flip-card {
+      background-color: transparent !important;
+      height: 204px !important;
+      perspective: 1000px !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      position: relative !important;
+    }
+
+    .flip-card * {
+      user-select: none !important;
+    }
+
+    .flip-card-inner {
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      text-align: center !important;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transform-style: preserve-3d !important;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg) !important;
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute !important;
+      width: 100% !important;
+      height: 100% !important;
+      -webkit-backface-visibility: hidden !important;
+      backface-visibility: hidden !important;
+      border-radius: 8px !important;
+      box-sizing: border-box !important;
+      padding: 12px 14px !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* Front Face */
+    .flip-card-front {
+      background: rgba(15, 23, 42, 0.9) !important;
+      border: 1px solid rgba(212, 175, 55, 0.3) !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+    }
+
+    .flip-card:hover .flip-card-front {
+      border-color: var(--sky-calm) !important;
+      background: #1b2434 !important;
+    }
+
+    .card-code-badge {
+      font-size: 1.2rem !important;
+      font-weight: 800 !important;
+      color: #38bdf8 !important;
+      letter-spacing: 0.05em !important;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.3) !important;
+    }
+
+    .card-title {
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      color: #f8fafc !important;
+      line-height: 1.25 !important;
+      text-transform: uppercase !important;
+    }
+
+    .tap-hint {
+      font-size: 0.58rem !important;
+      font-weight: 700 !important;
+      color: #64748b !important;
+      letter-spacing: 0.08em !important;
+    }
+
+    /* Back Face - Optimized to fit text and action bar perfectly without scrolling */
+    .flip-card-back {
+      background: rgba(6, 9, 19, 0.95) !important;
+      border: 1px solid #38bdf8 !important;
+      transform: rotateY(180deg) !important;
+      text-align: left !important;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.15) !important;
+      justify-content: space-between !important;
+    }
+
+    .card-back-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25) !important;
+      padding-bottom: 6px !important;
+      margin-bottom: 6px !important;
+    }
+
+    .card-code-mini {
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      color: #d4af37 !important;
+    }
+
+    .card-title-mini {
+      font-size: 0.74rem !important;
+      font-weight: 700 !important;
+      color: #f8fafc !important;
+      flex-grow: 1 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .card-desc {
+      font-size: 0.71rem !important;
+      line-height: 1.35 !important;
+      color: #cbd5e1 !important;
+      margin: 0 !important;
+      flex-grow: 1 !important;
+      overflow: hidden !important;
+    }
+
+    .card-action-bar {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 6px !important;
+      padding-top: 6px !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      margin-top: 4px !important;
+    }
+
+    .pin-code-btn, .hud-pass-btn, .download-code-btn {
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.58rem !important;
+      font-weight: 800 !important;
+      padding: 4px 6px !important;
+      border-radius: 5px !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+
+    .pin-code-btn {
+      background: rgba(212, 175, 55, 0.15) !important;
+      border: 1px solid rgba(212, 175, 55, 0.45) !important;
+      color: var(--brass) !important;
+    }
+
+    .pin-code-btn.pinned {
+      background: var(--brass) !important;
+      color: #0b0e14 !important;
+    }
+
+    .hud-pass-btn {
+      background: rgba(56, 189, 248, 0.15) !important;
+      border: 1px solid rgba(56, 189, 248, 0.5) !important;
+      color: var(--sky-calm) !important;
+    }
+
+    .download-code-btn {
+      background: rgba(110, 231, 183, 0.15) !important;
+      border: 1px solid rgba(110, 231, 183, 0.5) !important;
+      color: var(--sage-calm) !important;
+      text-decoration: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 3px !important;
+    }
+
+    .download-code-btn:hover {
+      background: var(--sage-calm) !important;
+      color: #0b0e14 !important;
+    }
+
+    /* Compact Condition Tile Styling */
+    .cond-compact-card {
+      background: #161d2a;
+      border: 1px solid rgba(212, 175, 55, 0.32);
+      border-bottom: 3px solid var(--brass);
+      border-radius: 12px;
+      padding: 20px 16px;
+      min-height: 185px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cond-compact-card:hover {
+      border-color: var(--sky-calm);
+      border-bottom-color: var(--sky-calm);
+      background: #1b2434;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 768px) {
+      .series-block-container { padding: 16px !important; }
+      .series-header-bar { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
+      .cards-grid { grid-template-columns: 1fr !important; }
+    }
+
+    /* Expanded Condition Dossier Modal */
+    #condition-detail-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999998;
+      background: rgba(7, 10, 15, 0.88);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    #condition-detail-modal.modal-open {
+      display: flex;
+      animation: calmSanctuaryReveal 0.25s ease-out;
+    }
+
+    .cond-modal-card {
+      width: 100%;
+      max-width: 860px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #121721;
+      border: 2px solid var(--brass);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+      text-align: left;
+    }
+
+    /* Active Pinned Broadcast Bar */
+    #active-neurocode-hud {
+      background: #161d2a;
+      border-bottom: 1px solid var(--sky-calm);
+      padding: 8px 16px;
+      display: none;
+    }
+    #active-neurocode-hud.has-pins { display: block; }
+
+    /* ==========================================================================
+       6. OTHER MODULES (NEUROVERSE, PETITION, CIVIC, BUILD, CREATOR)
+       ========================================================================== */
+    #pane-neuroverse, .petition-master-container, .civic-master-container, #pane-build, .creator-master-container {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 20px 50px 20px;
+    }
+
+    .initiative-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--brass);
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 4px 12px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .nh-head { text-align: center; padding: 8px 0; }
+    .nh-head h1, .portal-main-heading { font-size: 2.3rem; font-weight: 900; color: #ffffff; margin: 0 0 12px 0; text-align: center; }
+    .nh-sub { font-size: 1rem; font-weight: 800; color: var(--brass); letter-spacing: 0.05em; margin: 0 0 14px 0; text-transform: uppercase; }
+    .nh-div, .system-gold-divider-bottom { width: 100%; height: 1px; background: rgba(212, 175, 55, 0.25); margin: 24px 0; }
+
+    .nh-roadmap { display: flex; flex-direction: column; gap: 14px; }
+    .nh-step { background: var(--bg-card); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid #475569; }
+    .nh-step.cur { border-left-color: var(--brass); background: var(--bg-card-elevated); }
+    .nh-sh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94a3b8; font-weight: 700; }
+    .nh-st { font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; }
+    .st-sky { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.4); }
+    .st-gld { background: rgba(212,175,55,0.15); color: #d4af37; border: 1px solid rgba(212,175,55,0.4); }
+    .st-slv { background: rgba(148,163,184,0.15); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.4); }
+    .nh-step h4 { font-size: 1.05rem; font-weight: 800; color: #ffffff; margin: 0 0 6px 0; }
+    .nh-step p { font-size: 0.92rem; margin: 0; color: #cbd5e1; }
+
+    .uv-hero-card { background: var(--bg-card); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 26px; }
+    .uv-badge-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .uv-title { font-size: 1.6rem; font-weight: 900; color: #ffffff; margin: 0 0 10px 0; }
+    .uv-lead { font-size: 0.96rem; color: #cbd5e1; margin: 0 0 20px 0; }
+    .uv-feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .uv-feat { display: flex; gap: 12px; align-items: flex-start; background: #0b0e14; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); }
+    .uv-feat-icon { font-size: 1.3rem; }
+    .uv-feat strong { display: block; font-size: 0.9rem; color: #ffffff; margin-bottom: 4px; }
+    .uv-feat p { font-size: 0.82rem; color: #cbd5e1; margin: 0; }
+    .uv-primary-btn { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 800; color: #0b0e14; background: var(--brass); padding: 11px 20px; border-radius: 8px; text-decoration: none; }
+
+    /* Storefront Carousel */
+    .nh-hint { text-align: center; margin: 8px 0 14px 0; }
+    .nh-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 800; color: var(--brass); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.35); padding: 4px 12px; border-radius: 99px; }
+    .hud-carousel-wrapper { max-width: 500px; margin: 0 auto 16px auto; }
+    .hud-slide { display: none; }
+    .hud-slide.active-slide { display: block; animation: calmSanctuaryReveal 0.3s ease-out; }
+    .hud-card { background: var(--bg-card); border-radius: 14px; border: 1px solid rgba(212,175,55,0.35); padding: 24px; }
+    .hud-img { height: 240px; background: #0b0e14; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; padding: 12px; }
+    .hud-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .hud-card h3 { font-size: 1.1rem; font-weight: 800; color: #ffffff; margin: 0 0 6px 0; }
+    .hud-card p { font-size: 0.9rem; margin: 0 0 10px 0; color: #cbd5e1; }
+    .nh-btn-gld { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; font-weight: 800; padding: 12px; border-radius: 8px; text-decoration: none; text-align: center; background: var(--brass); color: #0b0e14; text-transform: uppercase; margin-top: 12px; }
+    .nh-tag { color: var(--sky-calm); font-style: italic; font-weight: 700; }
+    .nh-meta, .nh-specs { font-size: 0.82rem; margin-bottom: 8px; color: #cbd5e1; }
+    .nh-specs { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; }
+    .nh-price { font-size: 1.35rem; font-weight: 800; color: var(--brass); margin: 10px 0 4px 0; }
+    .nh-price small { display: block; font-size: 0.75rem; color: #94a3b8; font-weight: normal; }
+    .carousel-indicators { display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(212,175,55,0.25); border: 1px solid var(--brass); cursor: pointer; }
+    .active-dot { background: var(--brass); transform: scale(1.2); }
+
+    /* Petition, Civic & Build Cards */
+    .telemetry-banner { display: flex; justify-content: space-around; background: var(--bg-card); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 16px 20px; margin-bottom: 28px; gap: 12px; flex-wrap: wrap; }
+    .telemetry-node { display: flex; flex-direction: column; align-items: center; }
+    .telemetry-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 800; color: #94a3b8; }
+    .telemetry-value { font-size: 0.95rem; font-weight: 800; color: #ffffff; margin-top: 2px; }
+    .demands-cards-grid, .civic-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 24px 0; text-align: left; }
+    .demand-card, .civic-card, .backing-card, .project-log, .transparency-framework, .tier-container {
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 12px;
+      padding: 22px;
+      text-align: left;
+    }
+    .civic-card { display: flex; flex-direction: column; justify-content: space-between; }
+    .card-num { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 800; color: var(--brass); background: rgba(212, 175, 55, 0.15); padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+    .demand-card-title, .civic-card-title { font-size: 1.15rem; font-weight: 800; color: #ffffff; margin: 0 0 8px 0; }
+    .demand-card-body, .civic-description { font-size: 0.9rem; color: #cbd5e1; margin: 0 0 14px 0; }
+    .petition-action-deck { background: var(--bg-card); border: 1px solid var(--brass); border-radius: 14px; padding: 28px; text-align: center; }
+    .petition-submit-btn, .action-trigger {
+      display: inline-block; background: var(--brass); color: #0b0e14 !important; font-family: 'JetBrains Mono', monospace;
+      font-weight: 800; font-size: 0.92rem; padding: 14px 28px; border-radius: 8px; text-decoration: none; text-transform: uppercase; margin-top: 12px;
+    }
+    .civic-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; color: var(--brass); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); }
+    .civic-subtitle { font-size: 0.82rem; color: #94a3b8; display: block; margin-bottom: 10px; font-weight: 600; }
+    .civic-features-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .civic-feature-item { display: flex; gap: 8px; font-size: 0.85rem; color: #cbd5e1; }
+    .feature-bullet { color: var(--brass); }
+    .civic-footer-row { padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 8px; text-align: center; }
+    .civic-cost-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #94a3b8; font-weight: 700; }
+    .civic-action-btn { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; font-weight: 800; padding: 10px; border-radius: 6px; text-decoration: none; background: #1e293b; color: #ffffff; border: 1px solid rgba(212,175,55,0.4); text-transform: uppercase; }
+    .civic-action-btn:hover { background: var(--brass); color: #0b0e14; }
+
+    .backing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .spec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+    .spec-list li { font-size: 0.9rem; color: #cbd5e1; padding-left: 16px; position: relative; }
+    .spec-list li::before { content: "•"; position: absolute; left: 0; color: var(--brass); font-weight: bold; }
+    .component-integrated-title { font-size: 1.5rem; font-weight: 800; color: #ffffff; margin: 0 0 14px 0; }
+
+    /* The Creator Profile Card */
+    .creator-profile-card { background: var(--bg-card); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 28px; text-align: left; }
+    .architect-feed-wrapper { display: grid; grid-template-columns: 260px 1fr; gap: 24px; margin-bottom: 24px; align-items: center; }
+    .portrait-clean-viewport { width: 100%; height: 280px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(212, 175, 55, 0.45); background: #0b0e14; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .portrait-clean-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .architect-telemetry-box { background: #0b0e14; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; }
+    .telemetry-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--brass); font-weight: 800; }
+    .telemetry-grid { display: flex; flex-direction: column; gap: 10px; }
+    .t-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #94a3b8; display: block; }
+    .t-val { font-size: 0.92rem; font-weight: 700; color: #ffffff; }
+
+    @media (max-width: 860px) {
+      .demands-cards-grid, .civic-cards-grid, .architect-feed-wrapper { grid-template-columns: 1fr; }
+    }
+
+    /* ==========================================================================
+       7. FULL-SCREEN NON-VERBAL ADVOCACY PASS & COMFORT WIDGET
+       ========================================================================== */
+    #crisis-hud-modal {
+      position: fixed; inset: 0; z-index: 9999995; background: #0b0e14;
+      display: none; flex-direction: column; justify-content: space-between; padding: 24px;
+    }
+    #crisis-hud-modal.hud-active { display: flex; animation: calmSanctuaryReveal 0.25s ease-out; }
+
+    #audhme-widget-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 999990; font-family: 'JetBrains Mono', monospace; }
+    #audhme-widget-bubble {
+      display: flex; align-items: center; gap: 8px; background: #161d2a; border: 1.5px solid var(--brass);
+      border-radius: 99px; padding: 10px 18px; cursor: pointer; color: #ffffff; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    #audhme-widget-panel {
+      position: absolute; bottom: 54px; right: 0; width: 310px; background: #121721; border: 1px solid var(--brass);
+      border-radius: 14px; padding: 18px; box-shadow: 0 16px 40px rgba(0,0,0,0.85);
+      display: flex; flex-direction: column; gap: 12px; opacity: 0; visibility: hidden; transform: translateY(8px); transition: all 0.2s ease;
+    }
+    #audhme-widget-wrapper.panel-open #audhme-widget-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       0. NEURODIVERGENT GROUNDING BREATH & TACTILE STIM ENTRY RITUAL
+       ========================================================================== -->
+  <div id="os-boot-overlay" role="dialog" aria-label="AuDHMe Sanctuary Arrival">
+    <div class="grounding-card">
+
+      <div class="breath-circle-wrap" onclick="triggerCalmHarmonic()" title="Tap to chime">
+        <div class="breath-halo"></div>
+        <div class="breath-core-ring">
+          <img src="https://lh3.googleusercontent.com/d/1KvMT6VSK6cTC1KRqfFNUXxxw5ad9jw4w" alt="AuDHMe Logo" onerror="this.onerror=null;this.src='https://placehold.co/80x80/0b0e14/d4af37?text=AuDHMe';">
+        </div>
+      </div>
+
+      <div>
+        <span class="organic-badge">LOW-DEMAND SANCTUARY // ZERO MASKING TAX</span>
+        <h2 class="text-xl font-black text-white mt-2 mb-1">Drop Your Shoulders. Unclench Your Jaw.</h2>
+        <p id="boot-status-line" class="text-sm text-slate-300 max-w-md mx-auto">
+          You don't have to perform or mask here. Follow the breathing circle for a few seconds, or tap the fidget bar below while your space loads.
+        </p>
+      </div>
+
+      <div class="stim-fidget-strip">
+        <span class="font-mono text-[11px] font-bold text-[#d4af37] uppercase tracking-wider">TACTILE STIM BAR // TAP TO POP &amp; CHIME</span>
+        <div class="stim-fidget-grid" id="boot-stim-grid">
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 261)"><i class="fa-solid fa-clock"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 293)"><i class="fa-solid fa-volume-xmark"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 329)"><i class="fa-solid fa-battery-half"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 392)"><i class="fa-solid fa-brain"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 440)"><i class="fa-solid fa-shield"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 523)"><i class="fa-solid fa-compass"></i></button>
+        </div>
+      </div>
+
+      <div class="w-full">
+        <div class="flex justify-between font-mono text-[11px] text-slate-400 mb-1.5">
+          <span id="boot-phase-text">Inhale slowly as the circle expands...</span>
+          <span id="boot-pct-label">0%</span>
+        </div>
+        <div class="boot-progress-track">
+          <div id="boot-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="w-full flex flex-wrap justify-between items-center gap-2 pt-1">
+        <button type="button" id="boot-pause-btn" onclick="toggleBootPause()" class="px-3.5 py-2 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-mono font-bold text-sky-300 hover:border-sky-400 transition">
+          ⏸ STAY &amp; BREATHE LONGER
+        </button>
+        <button type="button" onclick="dismissBootSequence()" class="px-4 py-2 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-mono font-extrabold uppercase tracking-wider hover:bg-amber-300 transition">
+          ENTER STRAIGHT AWAY &rarr;
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       1. FULL-SCREEN NON-VERBAL ADVOCACY PASS MODAL
+       ========================================================================== -->
+  <div id="crisis-hud-modal" role="dialog" aria-modal="true" aria-label="Non-Verbal Crisis Advocacy Pass">
+    <div class="max-w-3xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <span class="font-mono text-xs sm:text-sm font-extrabold text-[#d4af37] tracking-wider uppercase">
+        AuDHMe™ NEURO-PASS // NON-VERBAL ADVOCACY CARD
+      </span>
+      <div class="flex items-center gap-2">
+        <button onclick="downloadActiveCrisisHudImage()" class="px-4 py-2 rounded-lg bg-emerald-500/15 border border-emerald-400 text-emerald-300 font-mono text-xs font-extrabold hover:bg-emerald-400 hover:text-[#0b0e14] transition">
+          <i class="fa-solid fa-image"></i> SAVE STICKER PNG
+        </button>
+        <button onclick="closeCrisisHud()" class="px-4 py-2 rounded-lg bg-slate-900 border border-[#38bdf8] text-[#38bdf8] font-mono text-xs font-extrabold">
+          CLOSE PASS [ESC]
+        </button>
+      </div>
+    </div>
+
+    <div class="max-w-3xl w-full mx-auto my-auto py-6 text-center">
+      <div class="inline-block px-4 py-1.5 rounded-md bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] font-mono text-sm font-extrabold mb-3" id="hud-modal-code">
+        NC-53 // ACTIVE STATE
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-black text-white mb-5" id="hud-modal-title">
+        Non-Verbal State Active
+      </h2>
+      <div class="p-6 sm:p-8 rounded-2xl bg-[#121721] border-2 border-[#38bdf8] mb-6">
+        <p class="text-lg sm:text-2xl text-slate-100 font-semibold leading-relaxed" id="hud-modal-desc">
+          My speech is offline right now due to sensory or cognitive overload. I can hear and understand you, so please don't force me to talk.
+        </p>
+      </div>
+
+      <div class="font-mono text-xs font-bold text-slate-400 uppercase mb-3">
+        TAP ANY BOX BELOW TO HIGHLIGHT WHAT I NEED RIGHT NOW:
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">🤫</div>
+          <div class="font-bold text-white text-xs sm:text-sm">Quiet Space</div>
+          <div class="text-[11px] text-slate-400">Away from noise/crowds</div>
+        </button>
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">📱</div>
+          <div class="font-bold text-white text-xs sm:text-sm">Written Only</div>
+          <div class="text-[11px] text-slate-400">Text or show notes</div>
+        </button>
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">✋</div>
+          <div class="font-bold text-white text-xs sm:text-sm">No Touch</div>
+          <div class="text-[11px] text-slate-400">Give physical space</div>
+        </button>
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">⏳</div>
+          <div class="font-bold text-white text-xs sm:text-sm">Extra Time</div>
+          <div class="text-[11px] text-slate-400">Processing delay active</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="max-w-3xl w-full mx-auto border-t border-slate-800 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
+      <span>AuDHMe™ SOVEREIGN CREDENTIAL // JASON PARISH &copy; 2026</span>
+      <span>THANK YOU FOR YOUR PATIENCE &amp; LOW-DEMAND SUPPORT</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       1B. EXPANDED CONDITION DOSSIER MODAL
+       ========================================================================== -->
+  <div id="condition-detail-modal" role="dialog" aria-modal="true" aria-label="Condition Profile Details" onclick="if(event.target === this) closeConditionModal()">
+    <div class="cond-modal-card" id="condition-modal-content"></div>
+  </div>
+
+  <!-- ==========================================================================
+       2. STICKY NAVIGATION HEADER WITH LOGO
+       ========================================================================== -->
+  <div class="audh-nav-wrapper">
+    <nav class="audh-nav" aria-label="AuDHMe Primary System Navigation">
+      <a onclick="switchPage('home', true)" class="audh-logo">
+        <img src="https://lh3.googleusercontent.com/d/1KvMT6VSK6cTC1KRqfFNUXxxw5ad9jw4w" alt="AuDHMe Logo" onerror="this.onerror=null;this.src='https://placehold.co/220x80/0b0e14/d4af37?text=AuDHMe';">
+      </a>
+
+      <ul class="audh-links">
+        <li><a onclick="switchPage('home', true)" class="nav-item active" data-target="home">Home</a></li>
+        <li><a onclick="switchPage('neuropedia', true)" class="nav-item" data-target="neuropedia">Neuropedia</a></li>
+        <li><a onclick="switchPage('build', true)" class="nav-item" data-target="build">The Build</a></li>
+        <li><a onclick="switchPage('petition', true)" class="nav-item" data-target="petition">Petition</a></li>
+        <li><a onclick="switchPage('neuroverse', true)" class="nav-item" data-target="neuroverse">Neuroverse</a></li>
+        <li><a onclick="switchPage('civic', true)" class="nav-item" data-target="civic">Civic</a></li>
+        <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openCrisisHud('NC-53', 'Non-Verbal State', 'I have lost access to spoken language. I can still communicate via writing, gestures, or AAC. Do not force speech.')" class="px-3 py-2 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-xs font-extrabold uppercase transition">
+          🛡️ I Need Space Pass
+        </button>
+        <button class="audh-hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Pinned Neuro-Codes Bar -->
+    <div id="active-neurocode-hud">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="font-mono text-xs font-bold text-[#d4af37]">PINNED RIGHT NOW:</span>
+          <div id="pinned-codes-list" class="flex flex-wrap gap-1.5"></div>
+        </div>
+        <button onclick="clearPinnedCodes()" class="font-mono text-xs text-slate-300 hover:text-white border border-slate-700 px-2.5 py-0.5 rounded">
+          CLEAR ALL [X]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBED 03: HOME
+       ========================================================================= -->
+  <div id="embed03" class="active-embed">
+    <div id="pane-home" class="neuro-pane">
+      <div class="orbital-cluster-canvas">
+
+        <div class="orbital-card core-gateway-node">
+          <div><span class="organic-badge">Built By &amp; For Neurodivergent Minds</span></div>
+          <h1 class="cluster-headline">AuDHMe™ Sanctuary Hub</h1>
+          <p class="cluster-lead-text bionic-text">
+            We aren't broken neurotypicals, we're running a completely different operating system. AuDHMe is built from real lived experience to eliminate the "Masking Tax", translate executive dysfunction, executive age, and sensory overload into plain English, and put actual physical tools in your hands when your words run out.
+          </p>
+          <div class="flex flex-wrap justify-center gap-3 mt-4">
+            <button onclick="switchPage('neuropedia', true); switchNeuropediaMode('conditions');" class="px-5 py-3 rounded-xl bg-[#d4af37] text-[#0b0e14] font-extrabold text-xs font-mono uppercase tracking-wider hover:bg-amber-300 transition">
+              Open Condition &amp; Symptom Cards (24 Profiles) &rarr;
+            </button>
+            <button onclick="switchPage('neuropedia', true); switchNeuropediaMode('codes');" class="px-5 py-3 rounded-xl bg-[#161d2a] border border-sky-400/50 text-sky-300 font-bold text-xs font-mono uppercase tracking-wider hover:bg-sky-400 hover:text-[#0b0e14] transition">
+              Browse Neuro-Code™ Cards &rarr;
+            </button>
+          </div>
+        </div>
+
+        <div class="orbital-card" onclick="switchPage('petition', true)">
+          <div class="card-top-row"><span class="organic-badge">01 // THE PETITION</span><span class="node-arrow">&rarr;</span></div>
+          <div class="cluster-card-title">The Sanctuary Standard</div>
+          <p class="cluster-desc bionic-text">Challenging workplace and public norms at the root. We're pushing for legally recognised sensory-safe rooms, zero-subtext signage, and low-demand public zones so nobody has to burn out their nervous system just to earn a pay cheque.</p>
+        </div>
+
+        <div class="orbital-card" onclick="switchPage('neuropedia', true)">
+          <div class="card-top-row"><span class="organic-badge">02 // NEUROPEDIA</span><span class="node-arrow">&rarr;</span></div>
+          <div class="cluster-card-title">Neuro-Code™ Encyclopedia &amp; 24 Condition Cards</div>
+          <p class="cluster-desc bionic-text">Our core knowledge base. Flip through shorthand Neuro-Codes for when speech is too expensive (and download die-cut PNG stickers), or tap through 24 compact Condition &amp; Symptom cards covering AuDHD, Autism, ADHD, Executive Age, Waiting Mode, RSD, ARFID, OCD, Dyslexia, and more.</p>
+        </div>
+
+        <div class="orbital-card" onclick="switchPage('civic', true)">
+          <div class="card-top-row"><span class="organic-badge">03 // CIVIC &amp; PASSES</span><span class="node-arrow">&rarr;</span></div>
+          <div class="cluster-card-title">Civic Registry &amp; Neuro-Pass</div>
+          <p class="cluster-desc bionic-text">Getting reasonable adjustments shouldn't require handing over private medical letters. Explore our UK GDPR-compliant Neuro-Pass alongside tools like the Nimbus Access Card and Sunflower Scheme.</p>
+        </div>
+
+        <div class="orbital-card" onclick="switchPage('neuroverse', true)">
+          <div class="card-top-row"><span class="organic-badge">04 // NEUROVERSE</span><span class="node-arrow">&rarr;</span></div>
+          <div class="cluster-card-title">Community, Unity Ventures &amp; Apparel</div>
+          <p class="cluster-desc bionic-text">Real-world safe harbours and low-friction gear. See what we're doing with Unity Ventures (pay-what-you-can sensory movie nights) and check out our heavyweight AuDHMe hoodies.</p>
+        </div>
+
+        <div class="orbital-card" onclick="switchPage('build', true)">
+          <div class="card-top-row"><span class="organic-badge">05 // THE BUILD</span><span class="node-arrow">&rarr;</span></div>
+          <div class="cluster-card-title">Material Launch Portal</div>
+          <p class="cluster-desc bionic-text">The digital Neuropedia will always stay free. Backing The Build directly funds raw materials on my workbench: 310gsm matte black-core linen cardstock, CR80 Neuro-Passes, and quiet industrial tin cases.</p>
+        </div>
+
+        <div class="orbital-card" onclick="switchPage('creator', true)">
+          <div class="card-top-row"><span class="organic-badge">06 // THE CREATOR</span><span class="node-arrow">&rarr;</span></div>
+          <div class="cluster-card-title">Architect Dossier: Jason Parish</div>
+          <p class="cluster-desc bionic-text">AuDHMe was built by Jason Parish out of daily AuDHD survival, hyperfocus, and pattern-matching, turning lived friction into practical tools for the whole neurodivergent community.</p>
+        </div>
+
+        <div class="hub-disclaimer-zone">
+          <div class="system-gold-divider"></div>
+          <h2 class="disclaimer-heading-sub">Legal Notice &amp; Disclaimer</h2>
+          <p class="disclaimer-paragraph">All original frameworks displayed here, including the Neuro-Code Protocol and Neuro-Pass credentialing, are the exclusive intellectual property of Jason Parish &copy; 2026.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBEDS 09, 41, 07: NEUROPEDIA (EXACT USER NEURO-CODES + PNG STICKER DOWNLOAD)
+       ========================================================================= -->
+  <div id="embed09">
+    <div id="pane-neuropedia" class="neuro-pane">
+
+      <!-- Header -->
+      <div class="neuroverse-header-container">
+        <div class="initiative-badge">SHORTHAND COMMUNICATION &amp; REAL-TALK SYMPTOM ATLAS</div>
+        <h1 class="neuroverse-main-heading">Neuro-Code™ Encyclopedia</h1>
+        <p class="text-slate-300 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-5 bionic-text">
+          Switch between the <strong>Neuro-Code™ Encyclopedia Flip Cards</strong> (each with a downloadable transparent PNG sticker showing only the NC code and description) and the <strong>24 Compact Condition &amp; Symptom Cards</strong>.
+        </p>
+
+        <div class="inline-flex flex-wrap justify-center gap-2 p-1.5 rounded-xl bg-[#0b0e14] border border-[#d4af37]/40 mb-2">
+          <button id="tab-btn-codes" onclick="switchNeuropediaMode('codes')" class="px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider bg-[#d4af37] text-[#0b0e14] transition">
+            01 // Neuro-Code™ Encyclopedia
+          </button>
+          <button id="tab-btn-conditions" onclick="switchNeuropediaMode('conditions')" class="px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white transition">
+            02 // 24 Condition &amp; Symptom Cards (Tap to Open)
+          </button>
+        </div>
+        <div class="system-gold-divider"></div>
+      </div>
+
+      <div id="neuropedia-codes-controls" class="mb-6 bg-[#121721] border border-slate-700 rounded-xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <input 
+          type="text" 
+          id="nc-search-input" 
+          oninput="filterNeuroCodes()" 
+          placeholder="Search Neuro-Codes (e.g. 'NC-10', 'NC-56', 'overload', 'tone', 'shutdown')..." 
+          class="flex-1 bg-[#0b0e14] border border-slate-700 focus:border-[#d4af37] rounded-lg px-3.5 py-2.5 text-sm text-white outline-none"
+        >
+        <div class="flex flex-wrap gap-2">
+          <button onclick="flipAllNeuroCodes(true)" class="px-3.5 py-2.5 rounded-lg bg-[#161d2a] border border-sky-400/50 text-sky-300 font-mono text-xs font-bold hover:bg-sky-400 hover:text-[#0b0e14] transition">
+            FLIP ALL CARDS (READ MODE)
+          </button>
+          <button onclick="flipAllNeuroCodes(false)" class="px-3.5 py-2.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/50 text-[#d4af37] font-mono text-xs font-bold hover:bg-[#d4af37] hover:text-[#0b0e14] transition">
+            RESET CARDS
+          </button>
+        </div>
+      </div>
+
+      <div id="neuropedia-codes-view">
+        <!-- SERIES 00 -->
+        <div class="series-block-container">
+          <div class="series-header-bar">
+            <span class="series-tag">FOUNDATION</span>
+            <h2 class="series-node-title">Series 00: Foundation</h2>
+          </div>
+          <div class="cards-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="card-code-badge">NC-01</span>
+                  <span class="card-title">Secure Signal</span>
+                  <span class="tap-hint">TAP TO REVEAL</span>
+                </div>
+                <div class="flip-card-back">
+                  <div class="card-back-header">
+                    <span class="card-code-mini">NC-01</span>
+                    <span class="card-title-mini">Secure Signal</span>
+                  </div>
+                  <p class="card-desc">You are a safe/trusted person. I am comfortable being unmasked and honest about my needs with you.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="card-code-badge">NC-02</span>
+                  <span class="card-title">Body Double Required</span>
+                  <span class="tap-hint">TAP TO REVEAL</span>
+                </div>
+                <div class="flip-card-back">
+                  <div class="card-back-header">
+                    <span class="card-code-mini">NC-02</span>
+                    <span class="card-title-mini">Body Double Required</span>
+                  </div>
+                  <p class="card-desc">My ability to sustain focus is tied to the presence of another person (physical or virtual). Their presence acts as a grounding anchor for my nervous system.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SERIES 10 -->
+        <div class="series-block-container">
+          <div class="series-header-bar">
+            <span class="series-tag">SENSORY</span>
+            <h2 class="series-node-title">Series 10: Sensory &amp; Input</h2>
+          </div>
+          <div class="cards-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-10</span><span class="card-title">Sensory Overload</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-10</span><span class="card-title-mini">Sensory Overload</span></div><p class="card-desc">My sensory system is maxed out. Lights, sounds, or textures are too intense right now. I need a reduced-input environment to regulate.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-11</span><span class="card-title">Sensory Seeking</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-11</span><span class="card-title-mini">Sensory Seeking</span></div><p class="card-desc">My nervous system is understimulated. I need movement, pressure, texture, or sound input to feel grounded and present.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-12</span><span class="card-title">Noise Threshold Reached</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-12</span><span class="card-title-mini">Noise Threshold Reached</span></div><p class="card-desc">Background noise has hit my limit. I can't filter conversation from ambient sound. Quiet or headphones are required.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-13</span><span class="card-title">Tactile &amp; Surface Sensitivity</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-13</span><span class="card-title-mini">Tactile Sensitivity</span></div><p class="card-desc">My skin is hypersensitive or a texture/fabric in the environment is causing physical distress. Please avoid unexpected touch.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-14</span><span class="card-title">Visual Noise &amp; Glare</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-14</span><span class="card-title-mini">Visual Noise</span></div><p class="card-desc">Cluttered environments, flickering lights, busy screens, or harsh glares are disrupting my focus. I need a visually calm space.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-15</span><span class="card-title">Scent Sensitivity</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-15</span><span class="card-title-mini">Scent Sensitivity</span></div><p class="card-desc">A smell in this environment is causing physical distress. I may need to relocate or the scent source needs to be removed.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-16</span><span class="card-title">Cognitive Interface Overwhelm</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-16</span><span class="card-title-mini">Interface Overwhelm</span></div><p class="card-desc">The layout of the digital or physical system/info I am interacting with is too cluttered or illogical to process accurately right now.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-17</span><span class="card-title">Thermal Regulation Distress</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-17</span><span class="card-title-mini">Thermal Distress</span></div><p class="card-desc">My internal "thermostat" is failing. High ambient heat is causing a rapid drain on my cognitive resources.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-18</span><span class="card-title">Auditory Echo Interference</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-18</span><span class="card-title-mini">Echo Interference</span></div><p class="card-desc">Multiple competing sound sources are creating an "auditory wall" that prevents me from isolating specific information.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-19</span><span class="card-title">Selective Mutism Active</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-19</span><span class="card-title-mini">Selective Mutism</span></div><p class="card-desc">An anxiety-based physical inability to speak in specific social or high-pressure contexts. This is distinct from a total loss of language.</p></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEUROPEDIA SUB-VIEW B: 24 COMPACT CONDITION CARDS -->
+      <div id="neuropedia-conditions-view" style="display: none;">
+        <div class="bg-[#121721] border border-slate-700 rounded-xl p-5 mb-6">
+          <div class="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-3">
+            <input 
+              type="text" 
+              id="cond-search-input" 
+              oninput="renderConditionGuide()" 
+              placeholder="Search 24 profiles (e.g. 'Executive Age', 'Waiting Mode', 'ARFID', 'RSD', 'Misophonia', 'Burnout', 'AuDHD', 'PDA')..." 
+              class="flex-1 bg-[#0b0e14] border border-slate-700 focus:border-[#d4af37] rounded-lg px-4 py-2.5 text-sm text-white outline-none"
+            >
+            <div class="flex flex-wrap gap-1.5" id="cond-category-pills">
+              <button onclick="setCondCategory('all')" data-cat="all" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#d4af37] text-[#0b0e14]">ALL (24)</button>
+              <button onclick="setCondCategory('Executive')" data-cat="Executive" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700">EXECUTIVE &amp; NEUROTYPE</button>
+              <button onclick="setCondCategory('Learning')" data-cat="Learning" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700">LEARNING &amp; COGNITION</button>
+              <button onclick="setCondCategory('Motor')" data-cat="Motor" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700">MOTOR &amp; BODY</button>
+              <button onclick="setCondCategory('Sensory')" data-cat="Sensory" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700">SENSORY &amp; NERVOUS SYSTEM</button>
+            </div>
+          </div>
+          <p class="text-xs font-mono text-[#d4af37] m-0">
+            COMPACT DECK VIEW // Tap any small condition card below to open its full breakdown, symptoms, and linked Neuro-Codes.
+          </p>
+        </div>
+
+        <div id="condition-cards-mount" class="cards-grid mb-8"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="embed41">
+    <div class="encyclopedia-master-container">
+
+      <!-- SERIES 20 -->
+      <div class="series-block-container">
+        <div class="series-header-bar">
+          <span class="series-tag">COMMUNICATION</span>
+          <h2 class="series-node-title">Series 20: Processing &amp; Communication</h2>
+        </div>
+        <div class="cards-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-20</span><span class="card-title">Processing Delay</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-20</span><span class="card-title-mini">Processing Delay</span></div><p class="card-desc">I heard you, but my brain needs extra time to interpret what was said. Please wait before repeating or continuing.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-21</span><span class="card-title">Cognitive Load Full</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-21</span><span class="card-title-mini">Cognitive Load Full</span></div><p class="card-desc">My working memory is at capacity. Adding more information right now will cause dropout. I need a pause to offload.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-22</span><span class="card-title">Context Switch Cost</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-22</span><span class="card-title-mini">Context Switch Cost</span></div><p class="card-desc">Switching tasks requires significant mental rampup time. Interruptions now will cost 20-plus minutes of re-entry.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-23</span><span class="card-title">Hyperfocus</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-23</span><span class="card-title-mini">Hyperfocus</span></div><p class="card-desc">I am in a deep focus state. Interrupting now is costly. My peripheral awareness of my environment/to-do list is currently offline.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-24</span><span class="card-title">Executive Function Low</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-24</span><span class="card-title-mini">Executive Function Low</span></div><p class="card-desc">Starting tasks, switching, or sequencing is difficult right now. I may need a clear first step or external structure to begin.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-25</span><span class="card-title">Written Over Verbal</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-25</span><span class="card-title-mini">Written Over Verbal</span></div><p class="card-desc">My verbal processing is impaired. Please send this in writing. I will respond more accurately via text than speech.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-26</span><span class="card-title">Mono-Channel Processing</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-26</span><span class="card-title-mini">Mono-Channel</span></div><p class="card-desc">I am capable of high-level output in one channel (e.g., Task OR Talk) but cannot split my focus between two simultaneous inputs.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-27</span><span class="card-title">Pattern Recognition</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-27</span><span class="card-title-mini">Pattern Recognition</span></div><p class="card-desc">I have spotted a recurring logic, error, or efficiency in the current system. I need a moment to map out this connection.</p></div></div></div>
+        </div>
+      </div>
+
+      <!-- SERIES 30 -->
+      <div class="series-block-container">
+        <div class="series-header-bar">
+          <span class="series-tag">SOCIAL</span>
+          <h2 class="series-node-title">Series 30: Social Integration</h2>
+        </div>
+        <div class="cards-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-30</span><span class="card-title">Masking Fatigue</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-30</span><span class="card-title-mini">Masking Fatigue</span></div><p class="card-desc">I have been performing neurotypical social norms for extended time. My social battery is depleted. I need to be authentic or alone.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-31</span><span class="card-title">Direct Mode Requested</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-31</span><span class="card-title-mini">Direct Mode</span></div><p class="card-desc">I cannot sustain surface-level conversation or social filler right now. I am available for meaningful exchange but not subtext.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-32</span><span class="card-title">Literal Interpretation</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-32</span><span class="card-title-mini">Literal Mode</span></div><p class="card-desc">I am processing language literally right now. Sarcasm, metaphor, or indirect requests may be misread. Please be direct.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-33</span><span class="card-title">Eye Contact Cost</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-33</span><span class="card-title-mini">Eye Contact Cost</span></div><p class="card-desc">Maintaining eye contact is using significant cognitive resources. I may look away to think; this is attentiveness, not disrespect.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-34</span><span class="card-title">Social Recharge</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-34</span><span class="card-title-mini">Social Recharge</span></div><p class="card-desc">I need solitary, low-demand time to recover from social interaction. This is not rejection. I will re-engage when regulated.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-35</span><span class="card-title">Script Not Available</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-35</span><span class="card-title-mini">Script Unavailable</span></div><p class="card-desc">This is an unexpected social situation and I do not have a prepared response. Please give me a moment to formulate.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-36</span><span class="card-title">Transition Buffer</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-36</span><span class="card-title-mini">Transition Buffer</span></div><p class="card-desc">I am moving between states (e.g., task to social). I am physically present, but my internal data is still "uploading" to the new context.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-37</span><span class="card-title">Regulatory Movement</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-37</span><span class="card-title-mini">Regulatory Movement</span></div><p class="card-desc">I am using physical movement or vocalisation to process high energy and maintain my internal baseline.</p></div></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="embed07">
+    <div class="encyclopedia-master-container">
+
+      <!-- SERIES 40 -->
+      <div class="series-block-container">
+        <div class="series-header-bar">
+          <span class="series-tag">COGNITION</span>
+          <h2 class="series-node-title">Series 40: Maintenance &amp; Cognition</h2>
+        </div>
+        <div class="cards-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-40</span><span class="card-title">Body Cue Missed</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-40</span><span class="card-title-mini">Body Cue Missed</span></div><p class="card-desc">I have not noticed hunger, thirst, or a need for movement. I may need an external prompt for basic self-maintenance.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-41</span><span class="card-title">Task Initiation Block</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-41</span><span class="card-title-mini">Initiation Block</span></div><p class="card-desc">I know what needs to be done but cannot start. This is not avoidance. I need a body double, a timer, or a micro first step.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-42</span><span class="card-title">Time Blindness Active</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-42</span><span class="card-title-mini">Time Blindness</span></div><p class="card-desc">My sense of time is distorted right now. I cannot accurately estimate how long things take or how much time has passed.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-43</span><span class="card-title">Sleep Debt Impact</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-43</span><span class="card-title-mini">Sleep Debt Impact</span></div><p class="card-desc">I am operating under sleep deficit. My regulation, processing, and output capacity are significantly reduced.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-44</span><span class="card-title">Demand Avoidance State</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-44</span><span class="card-title-mini">Demand Avoidance</span></div><p class="card-desc">External demands are triggering an autonomic resistance response. Reduce pressure and increase perceived choice to support re-engagement.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-45</span><span class="card-title">Routine Disruption</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-45</span><span class="card-title-mini">Routine Disruption</span></div><p class="card-desc">An expected routine has been broken. My nervous system needs time to adjust.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-46</span><span class="card-title">Proprioception Failure</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-46</span><span class="card-title-mini">Proprioception</span></div><p class="card-desc">Temporary loss of "body in space" awareness. I may be clumsy, bump into objects, or misjudge physical distances.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-47</span><span class="card-title">Persistence Deficit</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-47</span><span class="card-title-mini">Persistence Deficit</span></div><p class="card-desc">If a person, task, or object is not in my direct field of vision, my brain has de-indexed its existence.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-48</span><span class="card-title">Decision Paralysis</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-48</span><span class="card-title-mini">Decision Paralysis</span></div><p class="card-desc">Faced with multiple options of equal weight, my internal "sorting" system has stalled. I cannot determine priority and need an external tie-breaker.</p></div></div></div>
+        </div>
+      </div>
+
+      <!-- SERIES 50 (Includes NC-56 Tone Triggered) -->
+      <div class="series-block-container">
+        <div class="series-header-bar">
+          <span class="series-tag">EMERGENCY</span>
+          <h2 class="series-node-title">Series 50: Emergency &amp; Advocacy</h2>
+        </div>
+        <div class="cards-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-50</span><span class="card-title">Shutdown Imminent</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-50</span><span class="card-title-mini">Shutdown Imminent</span></div><p class="card-desc">I am approaching a full neurological shutdown. I need immediate removal from stimulation and space to be non-verbal and still.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-51</span><span class="card-title">Meltdown Risk</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-51</span><span class="card-title-mini">Meltdown Risk</span></div><p class="card-desc">I am at the edge of a stress response that may appear as an emotional outburst. This is involuntary. Reduce demands and stimulation now.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-52</span><span class="card-title">Safe Space Required</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-52</span><span class="card-title-mini">Safe Space Required</span></div><p class="card-desc">I need to access a physically safe, low-stimulation environment immediately. Please help remove barriers to this.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-53</span><span class="card-title">Non-Verbal State</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-53</span><span class="card-title-mini">Non-Verbal State</span></div><p class="card-desc">I have lost access to spoken language. I can still communicate via writing, gestures, or AAC. Do not force speech.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-54</span><span class="card-title">Freeze Response Active</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-54</span><span class="card-title-mini">Freeze Response</span></div><p class="card-desc">My nervous system has entered a freeze state. I appear unresponsive but I am aware. Calm, low-demand presence helps.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-55</span><span class="card-title">Support Person Needed</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-55</span><span class="card-title-mini">Support Person</span></div><p class="card-desc">I need my identified support person contacted immediately. I am not able to advocate for myself in this moment.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <span class="card-code-badge">NC-56</span>
+                <span class="card-title">Tone Triggered</span>
+                <span class="tap-hint">TAP TO REVEAL</span>
+              </div>
+              <div class="flip-card-back">
+                <div class="card-back-header">
+                  <span class="card-code-mini">NC-56</span>
+                  <span class="card-title-mini">Tone Triggered</span>
+                </div>
+                <p class="card-desc">The current communication style (shaming/threatening) has triggered a survival response, making logical processing impossible.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-57</span><span class="card-title">Observed Friction</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-57</span><span class="card-title-mini">Observed Friction</span></div><p class="card-desc">My cognitive or motor skills are degrading specifically because I am being watched or evaluated.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-58</span><span class="card-title">External Redirection</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-58</span><span class="card-title-mini">Redirection</span></div><p class="card-desc">I am "locked" in a loop (thought, action, or social). I require a neutral, direct prompt to shift my focus without emotional escalation.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-59</span><span class="card-title">Auditory Processing</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-59</span><span class="card-title-mini">APD Active</span></div><p class="card-desc">I can hear the sound perfectly, but my brain cannot "decode" the words. They currently sound garbled or unintelligible.</p></div></div></div>
+        </div>
+      </div>
+
+      <!-- SERIES 60 -->
+      <div class="series-block-container">
+        <div class="series-header-bar">
+          <span class="series-tag">GROWTH</span>
+          <h2 class="series-node-title">Series 60: Growth &amp; Connection</h2>
+        </div>
+        <div class="cards-grid">
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-60</span><span class="card-title">Reinforcement Deficit</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-60</span><span class="card-title-mini">Reinforcement Deficit</span></div><p class="card-desc">My motivation system requires a genuine "win" or positive acknowledgement to restart after a high-stress period.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-61</span><span class="card-title">Info-Dump Mode</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-61</span><span class="card-title-mini">Info-Dump</span></div><p class="card-desc">I am sharing a deep interest to regulate and bond. This is an act of connection; please join my flow.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-62</span><span class="card-title">Synchronised Flow</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-62</span><span class="card-title-mini">Synchronised Flow</span></div><p class="card-desc">I am in a state of high-harmony with my environment or a partner. Let us maintain this rhythm without unnecessary interruption.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-63</span><span class="card-title">Positive Stimming</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-63</span><span class="card-title-mini">Positive Stimming</span></div><p class="card-desc">I am processing high-positive energy. I may use physical movement or vocalisation to celebrate and process this energy.</p></div></div></div>
+          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-64</span><span class="card-title">Metacognitive Fatigue</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-64</span><span class="card-title-mini">Metacognitive Fatigue</span></div><p class="card-desc">My executive monitoring system has stalled. I cannot plan, prioritize, or process my own status until I have had a period of zero-demand rest to reboot the system.</p></div></div></div>
+        </div>
+      </div>
+
+      <!-- Disclaimer Footer -->
+      <div class="disclaimer-system-container">
+        <div class="system-gold-divider"></div>
+        <h2 class="disclaimer-main-title">Legal Notice &amp; Disclaimer</h2>
+        <p class="disclaimer-core-text">All original frameworks displayed here, including the Neuro-Code™ Protocol, Endocrine Code™ Protocol, Neuro-Pass™ credentialing, and the AuDHMe™ ecosystem, are the exclusive intellectual property of Jason Parish &copy; 2026.</p>
+        <p class="disclaimer-core-text">Commercial use or corporate training integration requires an active licensing agreement. Real-time access is freely permitted for individual self-advocacy and grassroots community use. AuDHMe™ provides environmental and communication logistics frameworks rooted in lived experience. These structures do not constitute, nor are they a substitute for, professional medical advice, clinical diagnosis, or treatment.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBED 35: THE NEUROVERSE
+       ========================================================================= -->
+  <div id="embed35">
+    <div id="pane-neuroverse" class="neuro-pane">
+      <div class="nh-head"><h1>The Neuroverse</h1><div class="nh-div"></div></div>
+
+      <h2 class="nh-sub">What We're Building Next</h2>
+      <div class="nh-roadmap">
+        <div class="nh-step cur">
+          <div class="nh-sh"><span>PHASE 01</span><span class="nh-st st-sky">CURRENT FOCUS</span></div>
+          <h4>The Neuro-Pass, Physical Core Decks &amp; Burnout Toolkits</h4>
+          <p class="bionic-text">Cutting and assembling physical Neuro-Pass credentials, zero-verbal tactile card decks, Ally-Edition guidance modules, Endo-Code tracking, and QR passes directly from my workbench.</p>
+        </div>
+        <div class="nh-step">
+          <div class="nh-sh"><span>PHASE 02</span><span class="nh-st st-gld">STOREFRONT LIVE</span></div>
+          <h4>Sensory-Friendly Heavyweight Apparel</h4>
+          <p class="bionic-text">Heavyweight, grounding hoodies and low-friction everyday gear that doesn't itch, choke, or overwhelm your skin.</p>
+        </div>
+        <div class="nh-step">
+          <div class="nh-sh"><span>PHASE 03</span><span class="nh-st st-slv">UPCOMING LAYER</span></div>
+          <h4>The Civic Registry</h4>
+          <p class="bionic-text">Rolling out sovereign registration protocols, Neuro-Pass accommodations, and real-world venue partnerships across public spaces.</p>
+        </div>
+      </div>
+
+      <div class="nh-div"></div>
+
+      <h2 class="nh-sub">Real-World Safe Harbours // Community Outreach</h2>
+      <div class="uv-hero-card">
+        <div class="uv-badge-row">
+          <span class="nh-st st-sky font-mono">COMMUNITY INITIATIVE</span>
+          <span class="nh-st st-gld font-mono">PAY WHAT YOU CAN MODEL</span>
+        </div>
+
+        <h3 class="uv-title">Unity Ventures</h3>
+
+        <p class="uv-lead bionic-text">
+          Accessibility has to live in the real world, not just on a screen. Unity Ventures runs accessible local gatherings, sensory-conscious movie nights, and community events designed to get rid of both financial barriers and the pressure to mask.
+        </p>
+
+        <div class="uv-feature-grid">
+          <div class="uv-feat">
+            <span class="uv-feat-icon">🎟️</span>
+            <div>
+              <strong>Pay What You Can</strong>
+              <p>No financial gatekeeping. Every event runs on a flexible contribution model so nobody gets priced out of community.</p>
+            </div>
+          </div>
+          <div class="uv-feat">
+            <span class="uv-feat-icon">🎬</span>
+            <div>
+              <strong>Inclusive Movie Nights</strong>
+              <p>Sensory-aware screenings where you can stim, sit comfortably, and exist without being shushed or judged.</p>
+            </div>
+          </div>
+          <div class="uv-feat">
+            <span class="uv-feat-icon">🛡️</span>
+            <div>
+              <strong>Zero-Subtext Safe Harbours</strong>
+              <p>Social spaces built around literal communication, parallel play/body-doubling, and unmasked acceptance.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="uv-action-row">
+          <a href="https://unityventures.carrd.co/#about" target="_blank" rel="noopener noreferrer" class="uv-primary-btn">Explore Unity Ventures &nearr;</a>
+        </div>
+      </div>
+
+      <div class="nh-div"></div>
+
+      <div class="nh-head"><h1>Storefront</h1></div>
+      <div class="nh-hint"><span class="nh-badge">&lrarr; SWIPE OR CLICK DOTS TO SWITCH HOODIES</span></div>
+
+      <div class="hud-carousel-wrapper" id="hoodie-swipe-area">
+        <div class="hud-carousel-slides">
+          <div class="hud-slide active-slide">
+            <div class="hud-card">
+              <div class="hud-img"><img src="https://www.image2url.com/r2/default/files/1781708703645-894d977d-af16-47ef-b2c6-d44925e5373d.png" alt="AuDHMe Core Hoodie" onerror="this.onerror=null;this.src='https://placehold.co/320x240/0b0e14/d4af37?text=AuDHMe+Core+Hoodie';"></div>
+              <h3>The AuDHMe™ Core Hoodie</h3>
+              <p>A heavyweight, comforting statement piece designed to bring our mission into everyday life, featuring the geometric AuDHMe™ compass emblem on the chest.</p>
+              <div class="nh-meta"><b>Available Shades:</b> Black, Navy Blazer, Charcoal Heather, Vintage Black, Forest Green, White</div>
+              <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight grounding fabric (8.5 oz) | Unisex</div>
+              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
+              <a href="https://buy.stripe.com/14A00l1qdcYYfBL9iLeQM03" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
+            </div>
+          </div>
+
+          <div class="hud-slide">
+            <div class="hud-card">
+              <div class="hud-img"><img src="https://www.image2url.com/r2/default/files/1781708814875-2d29dc18-e51e-4b59-ab22-18b8abf64ca4.png" alt="Spectrum Hoodie Black" onerror="this.onerror=null;this.src='https://placehold.co/320x240/0b0e14/38bdf8?text=Spectrum+Hoodie+Black';"></div>
+              <h3>The Spectrum Hoodie (Black)</h3>
+              <p class="nh-tag">"The Spectrum Starts With Me!"</p>
+              <p>A bold frontline piece celebrating neurodivergent agency, with our flagship tagline across the chest in high-contrast typography.</p>
+              <div class="nh-meta"><b>Base Colour:</b> Deep Obsidian Black</div>
+              <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight grounding fabric (8.5 oz) | Unisex</div>
+              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
+              <a href="https://buy.stripe.com/6oUfZj2uhcYY4X70MfeQM02" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
+            </div>
+          </div>
+
+          <div class="hud-slide">
+            <div class="hud-card">
+              <div class="hud-img"><img src="https://www.image2url.com/r2/default/files/1781708839989-e77e976e-6eeb-41c1-83fa-867dcf360c80.png" alt="Spectrum Hoodie White" onerror="this.onerror=null;this.src='https://placehold.co/320x240/f8fafc/0b0e14?text=Spectrum+Hoodie+White';"></div>
+              <h3>The Spectrum Hoodie (White)</h3>
+              <p class="nh-tag">"The Spectrum Starts With Me!"</p>
+              <p>A bold frontline piece celebrating neurodivergent agency, with our flagship tagline across the chest in high-contrast typography.</p>
+              <div class="nh-meta"><b>Base Colour:</b> Pure Platinum White</div>
+              <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight grounding fabric (8.5 oz) | Unisex</div>
+              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
+              <a href="https://buy.stripe.com/8x2fZjfh36AA2OZ66zeQM04" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-indicators">
+        <span class="dot active-dot" data-target="0"></span>
+        <span class="dot" data-target="1"></span>
+        <span class="dot" data-target="2"></span>
+      </div>
+
+      <div class="nh-div"></div>
+      <div class="hub-disclaimer-zone">
+        <h2 class="disclaimer-heading-sub">Legal Notice &amp; Disclaimer</h2>
+        <p class="disclaimer-paragraph">All original frameworks displayed here, including the Neuro-Code™ Protocol, Endocrine Code™ Protocol, Neuro-Pass™ credentialing, and the AuDHMe™ ecosystem, are the exclusive intellectual property of Jason Parish &copy; 2026.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBED 13: PETITION (THE SANCTUARY STANDARD)
+       ========================================================================= -->
+  <div id="embed13">
+    <div id="pane-petition" class="neuro-pane">
+      <div class="petition-master-container">
+
+        <div class="neuroverse-header-container">
+          <div class="initiative-badge">CIVIC LEGISLATION &amp; INFRASTRUCTURE DIRECTIVE</div>
+          <h1 class="neuroverse-main-heading">The Sanctuary Standard</h1>
+          <p class="text-slate-300 max-w-2xl mx-auto text-base leading-relaxed mb-4 bionic-text">
+            A campaign to establish legally recognised, low-demand, sensory-safe rooms and protocols in public and civic buildings, so neurodivergent people aren't forced to pay the Masking Tax just to access everyday life.
+          </p>
+          <div class="system-gold-divider"></div>
+        </div>
+
+        <div class="telemetry-banner">
+          <div class="telemetry-node">
+            <span class="telemetry-label">CAMPAIGN STATUS</span>
+            <span class="telemetry-value text-sky-400">ACTIVE ADVOCACY</span>
+          </div>
+          <div class="telemetry-node">
+            <span class="telemetry-label">TARGET</span>
+            <span class="telemetry-value">UK PUBLIC &amp; CIVIC SPACES</span>
+          </div>
+          <div class="telemetry-node">
+            <span class="telemetry-label">CORE GOAL</span>
+            <span class="telemetry-value text-[#d4af37]">MANDATORY SENSORY ROOMS</span>
+          </div>
+        </div>
+
+        <div class="demands-cards-grid">
+          <div class="demand-card">
+            <div class="card-num">PILLAR 01</div>
+            <h3 class="demand-card-title">Acoustic &amp; Visual Regulation</h3>
+            <p class="demand-card-body bionic-text">
+              Mandatory low-sensory rooms and quiet zones inside public buildings, flicker-free lighting, and cutting out relentless background music and announcements in essential services.
+            </p>
+          </div>
+
+          <div class="demand-card">
+            <div class="card-num">PILLAR 02</div>
+            <h3 class="demand-card-title">Literal, Zero-Subtext Signage</h3>
+            <p class="demand-card-body bionic-text">
+              Clear, literal wayfinding and direct assistance options so navigating a hospital, station, or council building doesn't burn through your entire executive function battery before you even arrive.
+            </p>
+          </div>
+
+          <div class="demand-card">
+            <div class="card-num">PILLAR 03</div>
+            <h3 class="demand-card-title">Non-Verbal &amp; Low-Demand Access</h3>
+            <p class="demand-card-body bionic-text">
+              Written/text service channels, zero-eye-contact penalties, and physical retreat spaces to prevent sensory overload from turning into a public meltdown or shutdown.
+            </p>
+          </div>
+        </div>
+
+        <div class="petition-action-deck">
+          <h2 class="text-xl font-black text-[#d4af37] mb-2">SIGN THE OFFICIAL CAMPAIGN ON CHANGE.ORG</h2>
+          <p class="text-sm text-slate-300 max-w-xl mx-auto mb-4">
+            Our petition is hosted on Change.org so every signature is verified and logged for legislative submission.
+          </p>
+          <a href="https://www.change.org/MandatorySensoryRooms" target="_blank" rel="noopener noreferrer" class="petition-submit-btn">
+            SIGN THE PETITION ON CHANGE.ORG &nearr;
+          </a>
+        </div>
+
+        <div class="hub-disclaimer-zone">
+          <div class="system-gold-divider"></div>
+          <p class="disclaimer-paragraph">The Sanctuary Standard is a civic advocacy blueprint created by Jason Parish &copy; 2026 under the AuDHMe™ framework.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBED 06: CIVIC (CIVIC ACCESS & PASSES)
+       ========================================================================= -->
+  <div id="embed06">
+    <div id="pane-civic" class="neuro-pane">
+      <div class="civic-master-container">
+
+        <div class="neuroverse-header-container">
+          <div class="initiative-badge">UK ACCESSIBILITY PASSES &amp; VERIFICATION</div>
+          <h1 class="neuroverse-main-heading">Civic Access &amp; Passes</h1>
+          <p class="text-slate-300 max-w-2xl mx-auto text-base leading-relaxed mb-4 bionic-text">
+            Asking for adjustments in public shouldn't mean explaining your entire medical history to a stranger at a ticket desk. These established UK cards give you recognised visual proof of your access needs.
+          </p>
+          <div class="system-gold-divider"></div>
+        </div>
+
+        <div class="civic-cards-grid">
+
+          <div class="civic-card">
+            <div>
+              <div class="civic-badge">VENUE &amp; TICKETING INTEGRATION</div>
+              <h2 class="civic-card-title">Nimbus Access Card</h2>
+              <span class="civic-subtitle">Translates Needs into Universal Symbols</span>
+              <p class="civic-description bionic-text">
+                Links directly with major UK ticketing platforms and theatres so you can book companion tickets or queue adjustments online without awkward phone calls.
+              </p>
+              <div class="civic-features-list">
+                <div class="civic-feature-item"><span class="feature-bullet">◆</span><div><strong>Essential Companion (+1):</strong> Unlocks companion concessions at venues and events.</div></div>
+                <div class="civic-feature-item"><span class="feature-bullet">◆</span><div><strong>Queue &amp; Crowd Symbols:</strong> Proves you cannot stand in long, loud queues without sensory overload.</div></div>
+              </div>
+            </div>
+            <div class="civic-footer-row">
+              <div class="civic-cost-tag">Validity: 3 Years // £15</div>
+              <a href="https://www.accesscard.online" class="civic-action-btn" target="_blank" rel="noopener noreferrer">Apply via Access Card &nearr;</a>
+            </div>
+          </div>
+
+          <div class="civic-card">
+            <div>
+              <div class="civic-badge">EVERYDAY PHOTO ID</div>
+              <h2 class="civic-card-title">National Disability Card</h2>
+              <span class="civic-subtitle">Visual Proof Without PIP Paperwork</span>
+              <p class="civic-description bionic-text">
+                A clear photo ID card for retail, transport, and public venues so you never have to carry private diagnosis letters or benefit paperwork in your bag.
+              </p>
+              <div class="civic-features-list">
+                <div class="civic-feature-item"><span class="feature-bullet">◆</span><div><strong>Instant Recognition:</strong> Signals verified disability status to transport and venue staff.</div></div>
+                <div class="civic-feature-item"><span class="feature-bullet">◆</span><div><strong>Protects Privacy:</strong> Keeps your specific clinical letters private while confirming your right to support.</div></div>
+              </div>
+            </div>
+            <div class="civic-footer-row">
+              <div class="civic-cost-tag">Validity: 2 Years // £20 (+£3.50 P&amp;P)</div>
+              <a href="https://www.nationaldisabilitycard.co.uk" class="civic-action-btn" target="_blank" rel="noopener noreferrer">Apply via Disability Card &nearr;</a>
+            </div>
+          </div>
+
+          <div class="civic-card">
+            <div>
+              <div class="civic-badge">HIDDEN DISABILITIES IDENTIFIER</div>
+              <h2 class="civic-card-title">Sunflower Lanyard &amp; ID</h2>
+              <span class="civic-subtitle">Discreet Signposting in Airports, Shops &amp; Rail</span>
+              <p class="civic-description bionic-text">
+                The globally recognised green sunflower lanyard and custom ID cards that let staff know you may need extra processing time, patience, or sensory space.
+              </p>
+              <div class="civic-features-list">
+                <div class="civic-feature-item"><span class="feature-bullet">◆</span><div><strong>Lanyard (£6.00) or Custom ID (£11.50):</strong> Add your photo, support notes, and emergency contact.</div></div>
+                <div class="civic-feature-item"><span class="feature-bullet">◆</span><div><strong>NFC Tap Edition (£15.00):</strong> Taps to open your digital support profile on a phone.</div></div>
+              </div>
+            </div>
+            <div class="civic-footer-row">
+              <div class="civic-cost-tag">Options: £6.00 to £15.00 (+£3.60 P&amp;P)</div>
+              <a href="https://hdsunflower.com/uk/" class="civic-action-btn" target="_blank" rel="noopener noreferrer">Visit Sunflower Scheme &nearr;</a>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="hub-disclaimer-zone">
+          <div class="system-gold-divider"></div>
+          <p class="disclaimer-paragraph">AuDHMe™ signposts these independent UK services to support real-world self-advocacy and is not affiliated with Nimbus Disability, National Disability Card Ltd, or HD Sunflower Scheme Limited.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBED 11: THE BUILD (MATERIAL LAUNCH PORTAL)
+       ========================================================================= -->
+  <div id="embed11">
+    <div id="pane-build" class="neuro-pane">
+      <div class="launch-portal-header-container">
+        <div class="initiative-badge">WORKBENCH HARDWARE &amp; PRODUCTION PIPELINE</div>
+        <h1 class="portal-main-heading">Material Launch Portal</h1>
+        <div class="system-gold-divider"></div>
+      </div>
+
+      <div class="space-y-8">
+        <div class="project-log">
+          <div class="log-meta">
+            <span class="log-tag">PROJECT LOG: MATERIAL FUND</span>
+            <span class="log-ver">VER 1.4</span>
+          </div>
+          <h3 class="text-lg font-extrabold text-white m-0">From Digital Screen to Physical Cards You Can Hold in a Crisis</h3>
+          <div class="p-4 rounded-xl bg-sky-500/10 border border-sky-400/40">
+            <div class="font-mono text-xs font-extrabold text-sky-300 uppercase mb-1">THE ACCESSIBILITY PROMISE</div>
+            <p class="text-sm font-bold text-white m-0">The digital AuDHMe™ Neuropedia and Neuro-Codes will always stay 100% free and open-access.</p>
+          </div>
+          <p class="text-sm text-slate-300 m-0 bionic-text">
+            When you're in the middle of a shutdown or sensory overload, unlocking your phone, navigating apps, and typing is often impossible. Physical cards work when your battery, or your voice, is dead. Backing this portal buys the raw linen cardstock, matte finishes, and CR80 blanks so I can fabricate the first production runs directly at my workbench.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="component-integrated-title">What Your Backing Actually Builds</h2>
+          <div class="backing-grid">
+            <div class="backing-card">
+              <h4 class="text-base font-extrabold text-[#d4af37] uppercase mb-3">1. The Core Deck</h4>
+              <ul class="spec-list">
+                <li><strong>Material:</strong> 310gsm Black-Core Linen Cardstock.</li>
+                <li><strong>Matte Finish:</strong> Zero harsh glare under fluorescent lights (bypasses NC-14 Visual Noise).</li>
+                <li><strong>Built for Stimming:</strong> Textured linen weave that holds up to high-stress handling.</li>
+              </ul>
+            </div>
+            <div class="backing-card">
+              <h4 class="text-base font-extrabold text-[#d4af37] uppercase mb-3">2. The Neuro-Pass</h4>
+              <ul class="spec-list">
+                <li><strong>Format:</strong> Official CR80 ID card size.</li>
+                <li><strong>12-Icon Bar:</strong> Non-verbal accommodation icons along the bottom edge.</li>
+                <li><strong>Emergency Reverse:</strong> Next-of-kin contact and verification notice on the back.</li>
+              </ul>
+            </div>
+            <div class="backing-card">
+              <h4 class="text-base font-extrabold text-[#d4af37] uppercase mb-3">3. The Sensory Tin</h4>
+              <ul class="spec-list">
+                <li><strong>Material:</strong> Matte-finished industrial tinware.</li>
+                <li><strong>Acoustic Safe:</strong> Engineered not to clatter loudly in your bag or pocket.</li>
+                <li><strong>Everyday Carry:</strong> Protects your active Neuro-Codes and small fidgets.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="tier-container justify-between">
+            <div>
+              <div class="tier-header-row mb-3">
+                <div class="tier-model-badge">SLIDING SCALE</div>
+                <div class="text-xl font-black text-white">Pay What You Can</div>
+              </div>
+              <p class="text-sm text-slate-300">Keeps the live Neuropedia 100% ad-free and open-access for grassroots self-advocacy, and logs your name in the founding patron registry.</p>
+            </div>
+            <a href="https://buy.stripe.com/cNieVdf3p0Rq7nu5vPfrW00" class="action-trigger w-full text-center" target="_blank" rel="noopener noreferrer">Support Infrastructure &nearr;</a>
+          </div>
+
+          <div class="tier-container justify-between">
+            <div>
+              <div class="tier-header-row mb-3">
+                <div class="tier-model-badge">DIGITAL STATUS PACK</div>
+                <div class="text-xl font-black text-white">£10</div>
+              </div>
+              <p class="text-sm text-slate-300">Unlocks copy-ready Neuro-Code status formats built for Discord, Slack, university emails, and workplace signatures.</p>
+            </div>
+            <a href="https://jasonparish.gumroad.com/l/krcaug" class="action-trigger w-full text-center" target="_blank" rel="noopener noreferrer">Get Digital Pass &nearr;</a>
+          </div>
+
+          <div class="tier-container justify-between">
+            <div>
+              <div class="tier-header-row mb-3">
+                <div class="tier-model-badge">FIRST WORKBENCH BATCH</div>
+                <div class="text-xl font-black text-white">£25</div>
+              </div>
+              <p class="text-sm text-slate-300">Reserves your physical 310gsm linen Neuro-Code™ V1.4 Core Deck plus physical QR Bridge Passes from the first production run.</p>
+            </div>
+            <a href="https://buy.stripe.com/00wbJ12gDeIgazGaQ9frW01" class="action-trigger w-full text-center" target="_blank" rel="noopener noreferrer">Pre-Order Physical Deck &nearr;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hub-disclaimer-zone">
+        <div class="system-gold-divider"></div>
+        <p class="disclaimer-paragraph">100% of funds raised through this portal go directly into raw cardstock, print materials, and workbench fabrication. Created by Jason Parish &copy; 2026.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EMBED 04: THE CREATOR (JASON PARISH)
+       ========================================================================= -->
+  <div id="embed04">
+    <div id="pane-creator" class="neuro-pane">
+      <div class="creator-master-container">
+
+        <div class="neuroverse-header-container">
+          <div class="initiative-badge">SOLO ARCHITECT // BUILT FROM LIVED AuDHD EXPERIENCE</div>
+          <h1 class="neuroverse-main-heading">The Creator</h1>
+          <p class="text-slate-300 max-w-2xl mx-auto text-base leading-relaxed mb-4 bionic-text">
+            AuDHMe™ wasn't designed in a corporate boardroom. It was built out of daily survival, pattern-recognition, and the need for tools that actually work when your brain is running on empty.
+          </p>
+          <div class="system-gold-divider"></div>
+        </div>
+
+        <div class="creator-profile-card">
+          <div class="architect-feed-wrapper">
+            <div>
+              <div class="flex items-center justify-between bg-[#0b0e14] border border-slate-700 rounded-t-lg px-3 py-1.5">
+                <span class="font-mono text-[11px] font-bold text-[#d4af37]">JASON PARISH // FOUNDER</span>
+              </div>
+              <div class="portrait-clean-viewport rounded-t-none">
+                <img class="portrait-clean-img" src="https://lh3.googleusercontent.com/d/1znEIszd19WqZbz-bVzLUL1YCHcXJTYGe" alt="Jason Parish - Founder of AuDHMe" onerror="this.onerror=null;this.src='https://placehold.co/280x280/0b0e14/d4af37?text=Jason+Parish';" />
+              </div>
+            </div>
+
+            <div class="architect-telemetry-box">
+              <div class="telemetry-header">
+                <span>ARCHITECT DOSSIER</span>
+                <span>FOUNDER // JASON PARISH</span>
+              </div>
+              <div class="telemetry-grid">
+                <div>
+                  <span class="t-label">NEUROTYPE OPERATING SYSTEM:</span>
+                  <span class="t-val text-sky-400">AuDHD (Autism + ADHD Combined Presentation)</span>
+                </div>
+                <div>
+                  <span class="t-label">CORE ENGINE:</span>
+                  <span class="t-val text-[#d4af37]">Hyperfocus, Pattern-Matching &amp; Lived Experience</span>
+                </div>
+                <div>
+                  <span class="t-label">DESIGN RULE:</span>
+                  <span class="t-val">Zero Subtext / No Masking Tax / Practical Autonomy</span>
+                </div>
+                <div>
+                  <span class="t-label">FABRICATION:</span>
+                  <span class="t-val">Solo Workbench Production</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4 text-slate-200 text-base leading-relaxed">
+            <h2 class="text-xl font-black text-white">Living at the AuDHD Intersection</h2>
+            <p class="bionic-text">
+              Living as a confirmed <strong>AuDHD</strong> person means your brain is in a constant tug-of-war with itself. My autistic side needs routine, quiet predictability, and literal, zero-subtext honesty. My ADHD side craves novelty, kinetic stimulation, and runs on an interest-based nervous system where mundane admin feels physically impossible until the last-minute panic kicks in.
+            </p>
+            <p class="bionic-text">
+              When you try to force that dual operating system into a neurotypical world, while dealing with <strong>executive dysfunction</strong>, the gap between your chronological age and your <strong>executive age</strong>, sensory overload, and time blindness, you pay a massive, invisible <strong>Masking Tax</strong> every single day.
+            </p>
+            <div class="p-5 rounded-xl bg-[#0b0e14] border-l-4 border-[#d4af37] my-4">
+              <div class="font-mono text-xs font-extrabold text-[#d4af37] uppercase mb-1">WHY I STARTED MAPPING THIS</div>
+              <p class="italic font-semibold text-white m-0">
+                "Instead of spending the rest of my life apologising for having an operating system the world wasn't built for, I started writing the manual for it. Every Neuro-Code in this library and every card cut on my workbench comes straight from real life."
+              </p>
+            </div>
+            <p class="bionic-text">
+              I build AuDHMe as a solo founder because our community doesn't need more patronising corporate pamphlets or paywalled clinical jargon. Whether you're autistic, ADHD, AuDHD, dyslexic, dyspraxic, OCD, or navigating sensory and processing differences, this space and the tools we build are here so you can advocate for yourself without having to apologise for how your brain works.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       FLOATING SENSORY, AUDIO & READING COMFORT WIDGET
+       ========================================================================= -->
+  <div id="audhme-widget-wrapper">
+    <div id="audhme-widget-panel">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+        <span class="text-xs font-extrabold text-[#d4af37]">SENSORY &amp; READING COMFORT</span>
+        <button onclick="toggleWidgetPanel()" class="text-slate-400 hover:text-white text-sm font-bold px-1">&#10005;</button>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] text-slate-400 font-bold">BUILT-IN ACOUSTIC SHIELD (NOISE GENERATOR)</label>
+        <select id="audio-sanctuary-select" onchange="setSanctuaryAudio(this.value)" class="bg-[#0b0e14] text-white border border-slate-700 rounded-lg p-2 text-xs">
+          <option value="off">Off (Silent)</option>
+          <option value="brown">Warm Brown Noise (Quiets Busy Brains)</option>
+          <option value="pink">Soft Pink Rain Filter</option>
+          <option value="gamma">40Hz Focus Hum</option>
+        </select>
+        <div class="flex items-center justify-between mt-1">
+          <span class="text-[10px] text-slate-400">VOLUME</span>
+          <input type="range" id="sanctuary-vol" min="0.02" max="0.35" step="0.01" value="0.12" oninput="updateSanctuaryVolume(this.value)" class="w-36 accent-[#d4af37]">
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 pt-2 border-t border-slate-800 text-xs text-slate-200">
+        <label class="flex items-center justify-between cursor-pointer">
+          <span>Bionic Reading Bold Anchors</span>
+          <input type="checkbox" onchange="toggleBionicReading(this.checked)" class="accent-[#d4af37] w-4 h-4">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span>Dyslexia Wide Line Spacing</span>
+          <input type="checkbox" onchange="document.body.classList.toggle('dyslexia-spacing-active', this.checked)" class="accent-[#d4af37] w-4 h-4">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span>Warm Paper Slate Tone</span>
+          <input type="checkbox" onchange="document.body.classList.toggle('theme-warm-slate', this.checked)" class="accent-[#d4af37] w-4 h-4">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span>Zero-Motion Mode (Instant Switches)</span>
+          <input type="checkbox" id="chk-low-motion" onchange="toggleLowInputMode(this.checked)" class="accent-[#d4af37] w-4 h-4">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span>Soft Tactile Click Sounds</span>
+          <input type="checkbox" id="chk-ui-sound" checked class="accent-[#d4af37] w-4 h-4">
+        </label>
+        <button onclick="replayGroundingBoot()" class="mt-1 w-full py-2 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-[#d4af37] text-[11px] font-bold hover:bg-[#d4af37] hover:text-[#0b0e14] transition">
+          🫁 OPEN BREATHING &amp; STIM SCREEN
+        </button>
+      </div>
+    </div>
+
+    <button id="audhme-widget-bubble" onclick="toggleWidgetPanel()" aria-label="Open Sensory Comfort Settings">
+      <span>⚙️</span>
+      <span class="text-xs font-extrabold tracking-wider">SENSORY TOOLS</span>
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       SCRIPTS: BREATHING RITUAL, ROUTER, DIE-CUT STICKER GENERATOR & 24 PROFILES
+       ========================================================================== -->
+  <script>
+    var audioCtx = null;
+    var sanctuaryNode = null;
+    var sanctuaryGain = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTactileClick(freq, duration) {
+      var chk = document.getElementById('chk-ui-sound');
+      if (chk && !chk.checked) return;
+      if (document.body.classList.contains('low-input-active')) return;
+      try {
+        var ctx = getAudioContext();
+        if (!ctx) return;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq || 260, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + (duration || 0.045));
+        gain.gain.setValueAtTime(0.035, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.045));
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + (duration || 0.045));
+      } catch (e) {}
+    }
+
+    function popStimButton(btn, freq) {
+      btn.classList.toggle('popped');
+      playTactileClick(freq, 0.075);
+    }
+
+    function triggerCalmHarmonic() {
+      var pills = document.querySelectorAll('#boot-stim-grid .stim-pill');
+      pills.forEach(function(p, idx) {
+        setTimeout(function() { p.classList.toggle('popped'); }, idx * 45);
+      });
+      playTactileClick(392, 0.12);
+    }
+
+    var bootProgress = 0;
+    var bootInterval = null;
+    var bootPaused = false;
+
+    function startGroundingBoot() {
+      var overlay = document.getElementById('os-boot-overlay');
+      var fill = document.getElementById('boot-bar-fill');
+      var pct = document.getElementById('boot-pct-label');
+      var phase = document.getElementById('boot-phase-text');
+      if (!overlay) return;
+
+      overlay.classList.remove('boot-complete');
+      bootProgress = 0;
+      bootPaused = false;
+      if (bootInterval) clearInterval(bootInterval);
+
+      bootInterval = setInterval(function() {
+        if (bootPaused) return;
+        bootProgress += 1.1;
+        if (bootProgress > 100) bootProgress = 100;
+
+        var r = Math.floor(bootProgress);
+        if (fill) fill.style.width = r + '%';
+        if (pct) pct.textContent = r + '%';
+
+        if (phase) {
+          if (r < 35) phase.textContent = 'Breathe in slowly as the circle expands...';
+          else if (r < 70) phase.textContent = 'Hold gently... no rush, no pressure.';
+          else phase.textContent = 'Breathe out slowly... entering sanctuary.';
+        }
+
+        if (bootProgress >= 100) {
+          clearInterval(bootInterval);
+          setTimeout(dismissBootSequence, 300);
+        }
+      }, 50);
+    }
+
+    function toggleBootPause() {
+      bootPaused = !bootPaused;
+      var btn = document.getElementById('boot-pause-btn');
+      if (btn) {
+        btn.textContent = bootPaused ? '▶ RESUME AUTO-ENTRY' : '⏸ STAY & BREATHE LONGER';
+      }
+      playTactileClick(bootPaused ? 240 : 360, 0.06);
+    }
+
+    function dismissBootSequence() {
+      if (bootInterval) clearInterval(bootInterval);
+      var overlay = document.getElementById('os-boot-overlay');
+      if (overlay) overlay.classList.add('boot-complete');
+      playTactileClick(440, 0.08);
+    }
+
+    function replayGroundingBoot() {
+      document.getElementById('audhme-widget-wrapper').classList.remove('panel-open');
+      startGroundingBoot();
+    }
+
+    var currentPageKey = 'home';
+    var pageSwitchLock = false;
+
+    function toggleMobileMenu() {
+      var links = document.querySelector('.audh-links');
+      if (links) links.classList.toggle('active');
+    }
+
+    function switchPage(pageKey, updateHistory) {
+      if (pageSwitchLock) return;
+      playTactileClick(310, 0.04);
+
+      var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
+      var targetEmbeds = [];
+
+      if (pageKey === 'home') targetEmbeds = ['embed03'];
+      else if (pageKey === 'neuroverse') targetEmbeds = ['embed35'];
+      else if (pageKey === 'petition') targetEmbeds = ['embed13'];
+      else if (pageKey === 'neuropedia') {
+        targetEmbeds = (currentNeuropediaMode === 'conditions') ? ['embed09'] : ['embed09', 'embed41', 'embed07'];
+      }
+      else if (pageKey === 'civic') targetEmbeds = ['embed06'];
+      else if (pageKey === 'build') targetEmbeds = ['embed11'];
+      else if (pageKey === 'creator') targetEmbeds = ['embed04'];
+
+      document.querySelectorAll('.nav-item').forEach(function(item) {
+        item.classList.toggle('active', item.getAttribute('data-target') === pageKey);
+      });
+
+      var links = document.querySelector('.audh-links');
+      if (links) links.classList.remove('active');
+
+      if (document.body.classList.contains('low-input-active') || !updateHistory) {
+        allEmbeds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.remove('active-embed', 'leaving-embed');
+        });
+        targetEmbeds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.add('active-embed');
+        });
+        currentPageKey = pageKey;
+        return;
+      }
+
+      pageSwitchLock = true;
+      var currentlyActive = document.querySelectorAll('.active-embed');
+      currentlyActive.forEach(function(el) {
+        el.classList.remove('active-embed');
+        el.classList.add('leaving-embed');
+      });
+
+      setTimeout(function() {
+        allEmbeds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.remove('active-embed', 'leaving-embed');
+        });
+
+        targetEmbeds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.add('active-embed');
+        });
+
+        if (updateHistory) {
+          try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        currentPageKey = pageKey;
+        pageSwitchLock = false;
+      }, 210);
+    }
+
+    function handleInitialRoute() {
+      var hash = window.location.hash.replace('#', '').toLowerCase();
+      var validPages = ['home', 'neuropedia', 'build', 'petition', 'neuroverse', 'civic', 'creator'];
+      var initialPage = validPages.includes(hash) ? hash : 'home';
+      switchPage(initialPage, false);
+    }
+
+    window.addEventListener('popstate', handleInitialRoute);
+    window.addEventListener('hashchange', handleInitialRoute);
+
+    /* ==========================================================================
+       DIE-CUT TRANSPARENT PNG STICKER GENERATOR (ONLY NC CODE & DESCRIPTION)
+       ========================================================================== */
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function downloadNeuroCodeImage(code, desc) {
+      playTactileClick(460, 0.06);
+
+      // 1. Pre-measure wrapped lines so the sticker height fits the text snugly
+      var tempCanvas = document.createElement('canvas');
+      var tempCtx = tempCanvas.getContext('2d');
+      var descFont = '600 32px "Atkinson Hyperlegible", "Inter", sans-serif';
+      tempCtx.font = descFont;
+
+      var maxTextWidth = 680;
+      var words = desc.split(' ');
+      var lines = [];
+      var currentLine = '';
+
+      for (var n = 0; n < words.length; n++) {
+        var testLine = currentLine + words[n] + ' ';
+        if (tempCtx.measureText(testLine).width > maxTextWidth && n > 0) {
+          lines.push(currentLine.trim());
+          currentLine = words[n] + ' ';
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine.trim()) lines.push(currentLine.trim());
+
+      var lineHeight = 46;
+      var stickerWidth = 800;
+      var stickerHeight = 195 + (lines.length * lineHeight) + 45;
+      var pad = 24; // Transparent margin for die-cut shadow & border
+
+      var canvas = document.createElement('canvas');
+      canvas.width = stickerWidth + (pad * 2);
+      canvas.height = stickerHeight + (pad * 2);
+      var ctx = canvas.getContext('2d');
+
+      // Ensure 100% transparent exterior for true sticker usage
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 2. Die-Cut Outer Sticker Body with Soft Drop Shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetY = 8;
+
+      drawRoundedRect(ctx, pad, pad, stickerWidth, stickerHeight, 44);
+      var bgGrad = ctx.createLinearGradient(pad, pad, pad, pad + stickerHeight);
+      bgGrad.addColorStop(0, '#0f172a');
+      bgGrad.addColorStop(1, '#060913');
+      ctx.fillStyle = bgGrad;
+      ctx.fill();
+      ctx.restore();
+
+      // 3. Crisp Sky-Blue Sticker Cut-Line Border
+      drawRoundedRect(ctx, pad, pad, stickerWidth, stickerHeight, 44);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.stroke();
+
+      // 4. Inner Gold Accent Ring
+      drawRoundedRect(ctx, pad + 14, pad + 14, stickerWidth - 28, stickerHeight - 28, 32);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
+      ctx.stroke();
+
+      // 5. NC Code Badge Pill (Centred at Top of Sticker)
+      var centerX = canvas.width / 2;
+      var pillW = 220;
+      var pillH = 68;
+      var pillX = centerX - (pillW / 2);
+      var pillY = pad + 38;
+
+      drawRoundedRect(ctx, pillX, pillY, pillW, pillH, 34);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.14)';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.75)';
+      ctx.stroke();
+
+      ctx.font = '800 38px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#38bdf8';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(code, centerX, pillY + (pillH / 2) + 2);
+
+      // 6. Subtle Gold Divider
+      var divY = pillY + pillH + 26;
+      ctx.beginPath();
+      ctx.moveTo(pad + 90, divY);
+      ctx.lineTo(pad + stickerWidth - 90, divY);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.35)';
+      ctx.stroke();
+
+      // 7. Centred Description Text (Only NC Code + Description)
+      ctx.font = descFont;
+      ctx.fillStyle = '#f8fafc';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+
+      var textY = divY + 52;
+      for (var i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], centerX, textY);
+        textY += lineHeight;
+      }
+
+      // Trigger PNG Sticker Download
+      var dataUrl = canvas.toDataURL('image/png');
+      var link = document.createElement('a');
+      link.download = code + '-sticker.png';
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadActiveCrisisHudImage() {
+      var rawCode = document.getElementById('hud-modal-code').textContent || 'NC-53';
+      var code = rawCode.split('//')[0].trim();
+      var desc = document.getElementById('hud-modal-desc').textContent.trim();
+      downloadNeuroCodeImage(code, desc);
+    }
+
+    function enhanceAllFlipCards() {
+      document.querySelectorAll('.flip-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          playTactileClick(card.classList.contains('flipped') ? 350 : 230, 0.045);
+        });
+
+        var back = card.querySelector('.flip-card-back');
+        if (!back || back.querySelector('.card-action-bar')) return;
+
+        var frontTitleEl = card.querySelector('.card-title');
+        var codeEl = back.querySelector('.card-code-mini');
+        var titleEl = back.querySelector('.card-title-mini');
+        var descEl = back.querySelector('.card-desc');
+
+        var code = codeEl ? codeEl.textContent.trim() : 'NC-00';
+        var fullTitle = frontTitleEl ? frontTitleEl.textContent.trim() : (titleEl ? titleEl.textContent.trim() : 'Neuro-Code');
+        var desc = descEl ? descEl.textContent.trim() : '';
+
+        var bar = document.createElement('div');
+        bar.className = 'card-action-bar';
+
+        var pinBtn = document.createElement('button');
+        pinBtn.type = 'button';
+        pinBtn.className = 'pin-code-btn';
+        pinBtn.textContent = 'PIN';
+        pinBtn.onclick = function(e) {
+          e.stopPropagation();
+          togglePinCode(code, fullTitle, pinBtn);
+        };
+
+        var downloadBtn = document.createElement('button');
+        downloadBtn.type = 'button';
+        downloadBtn.className = 'download-code-btn';
+        downloadBtn.innerHTML = '<i class="fa-solid fa-note-sticky"></i> STICKER';
+        downloadBtn.title = 'Download Die-Cut PNG Sticker for ' + code;
+        downloadBtn.onclick = function(e) {
+          e.stopPropagation();
+          downloadNeuroCodeImage(code, desc);
+        };
+
+        var hudBtn = document.createElement('button');
+        hudBtn.type = 'button';
+        hudBtn.className = 'hud-pass-btn';
+        hudBtn.innerHTML = '🛡️ FULLSCREEN';
+        hudBtn.onclick = function(e) {
+          e.stopPropagation();
+          openCrisisHud(code, fullTitle, desc);
+        };
+
+        bar.appendChild(pinBtn);
+        bar.appendChild(downloadBtn);
+        bar.appendChild(hudBtn);
+        back.appendChild(bar);
+      });
+    }
+
+    function openCrisisHud(code, title, desc) {
+      playTactileClick(420, 0.07);
+      document.getElementById('hud-modal-code').textContent = code + ' // ACTIVE ADVOCACY PASS';
+      document.getElementById('hud-modal-title').textContent = title;
+      document.getElementById('hud-modal-desc').textContent = desc;
+      document.getElementById('crisis-hud-modal').classList.add('hud-active');
+    }
+
+    function closeCrisisHud() {
+      playTactileClick(220, 0.05);
+      document.getElementById('crisis-hud-modal').classList.remove('hud-active');
+    }
+
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeCrisisHud();
+        closeConditionModal();
+      }
+    });
+
+    var currentNeuropediaMode = 'codes';
+    var pinnedNeuroCodes = [];
+
+    function switchNeuropediaMode(mode) {
+      playTactileClick(330, 0.04);
+      currentNeuropediaMode = mode;
+      var codesView = document.getElementById('neuropedia-codes-view');
+      var codesControls = document.getElementById('neuropedia-codes-controls');
+      var condView = document.getElementById('neuropedia-conditions-view');
+      var embed41 = document.getElementById('embed41');
+      var embed07 = document.getElementById('embed07');
+      var btnCodes = document.getElementById('tab-btn-codes');
+      var btnCond = document.getElementById('tab-btn-conditions');
+
+      if (mode === 'conditions') {
+        codesView.style.display = 'none';
+        codesControls.style.display = 'none';
+        condView.style.display = 'block';
+        embed41.classList.remove('active-embed');
+        embed07.classList.remove('active-embed');
+        btnCond.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider bg-[#d4af37] text-[#0b0e14] transition';
+        btnCodes.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white transition';
+        renderConditionGuide();
+      } else {
+        codesView.style.display = 'block';
+        codesControls.style.display = 'flex';
+        condView.style.display = 'none';
+        embed41.classList.add('active-embed');
+        embed07.classList.add('active-embed');
+        btnCodes.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider bg-[#d4af37] text-[#0b0e14] transition';
+        btnCond.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white transition';
+      }
+    }
+
+    function flipAllNeuroCodes(flipState) {
+      playTactileClick(280, 0.05);
+      document.querySelectorAll('.flip-card').forEach(function(card) {
+        card.classList.toggle('flipped', flipState);
+      });
+    }
+
+    function filterNeuroCodes() {
+      var q = (document.getElementById('nc-search-input').value || '').toLowerCase().trim();
+      document.querySelectorAll('.flip-card').forEach(function(card) {
+        var text = card.textContent.toLowerCase();
+        card.style.display = (!q || text.includes(q)) ? 'block' : 'none';
+      });
+    }
+
+    function togglePinCode(code, title, btnEl) {
+      playTactileClick(390, 0.04);
+      var idx = pinnedNeuroCodes.findIndex(function(c) { return c.code === code; });
+      if (idx > -1) {
+        pinnedNeuroCodes.splice(idx, 1);
+        if (btnEl) { btnEl.classList.remove('pinned'); btnEl.textContent = 'PIN'; }
+      } else {
+        pinnedNeuroCodes.push({ code: code, title: title });
+        if (btnEl) { btnEl.classList.add('pinned'); btnEl.textContent = 'PINNED'; }
+      }
+      renderPinnedHud();
+    }
+
+    function clearPinnedCodes() {
+      pinnedNeuroCodes = [];
+      document.querySelectorAll('.pin-code-btn').forEach(function(b) {
+        b.classList.remove('pinned');
+        b.textContent = 'PIN';
+      });
+      renderPinnedHud();
+    }
+
+    function renderPinnedHud() {
+      var hud = document.getElementById('active-neurocode-hud');
+      var list = document.getElementById('pinned-codes-list');
+      if (!pinnedNeuroCodes.length) {
+        hud.classList.remove('has-pins');
+        list.innerHTML = '';
+        return;
+      }
+      hud.classList.add('has-pins');
+      list.innerHTML = pinnedNeuroCodes.map(function(item) {
+        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#0b0e14] border border-[#d4af37] text-white font-mono text-xs font-bold">' +
+          '<strong class="text-[#d4af37]">' + item.code + '</strong> ' + item.title +
+          '</span>';
+      }).join('');
+    }
+
+    /* 24-Profile Compact Condition & Symptom Atlas Data */
+    var fullSpectrumConditions = [
+      {
+        code: 'ND-01',
+        name: 'Executive Age (The 30% Rule)',
+        shortTag: 'Chronological vs Executive Battery',
+        category: 'Executive',
+        summary: 'Why an intellectually sharp 26-year-old neurodivergent adult can have the working memory, impulse pacing, or task-initiation battery of an 18-year-old when tired.',
+        symptoms: [
+          'Your intellectual intelligence matches or exceeds your birth certificate, but your executive regulation age lags roughly 30% behind',
+          'Being able to design complex systems or university-level projects, yet feeling completely overwhelmed by tidying your room or booking a dentist appointment',
+          'Emotional floodgates and frustration tolerance dropping rapidly once your daily executive battery hits zero'
+        ],
+        internalReality: 'Having a Formula 1 engine for deep thinking bolted onto the fuel tank and brakes of a much younger nervous system.',
+        externalView: 'People say "You\'re so smart, how can you struggle with something so basic?"',
+        maskingTax: 'Hiding your executive exhaustion and feeling like an impostor adult every time daily life admin piles up.',
+        sanctuaryAdjustment: 'Respecting the 30% rule without shame: externalise reminders, use body-doubling (NC-02), and separate intellectual respect from executive support.',
+        relatedCodes: ['NC-24', 'NC-41', 'NC-64']
+      },
+      {
+        code: 'ND-02',
+        name: 'Executive Dysfunction & Paralysis',
+        shortTag: 'Why "Just Do It" Fails',
+        category: 'Executive',
+        summary: 'When knowing what to do and actually starting it are disconnected, sitting frozen for hours screaming at yourself internally to stand up.',
+        symptoms: [
+          'Task Initiation Block (NC-41): wanting to do the task, knowing how to do it, and still being physically unable to cross the starting line',
+          'Decision Paralysis (NC-48): two equal options crashing your brain\'s sorting system completely',
+          'Out of Sight, De-Indexed (NC-47): the second an object or bill goes inside a drawer, your brain deletes its existence'
+        ],
+        internalReality: 'Revving a car engine to the redline while the clutch is snapped, loads of noise and smoke, zero forward motion.',
+        externalView: 'Mislabelled as laziness, procrastination, or "not caring enough".',
+        maskingTax: 'Pulling frantic 3:00 AM panic-adrenaline marathons to hide how frozen you were all afternoon.',
+        sanctuaryAdjustment: 'Shrink the first step until it feels ridiculous ("just touch the laptop"), use a body double (NC-02), or flip a coin to break decision paralysis.',
+        relatedCodes: ['NC-02', 'NC-24', 'NC-41', 'NC-47', 'NC-48']
+      },
+      {
+        code: 'ND-03',
+        name: 'Waiting Mode & Time Blindness',
+        shortTag: '"Now" vs "Not Now" Time',
+        category: 'Executive',
+        summary: 'Why a 4:00 PM appointment paralyses your entire day from 9:00 AM onwards.',
+        symptoms: [
+          'Experiencing time in only two buckets: "Right Now" and "Not Now"',
+          'Waiting Mode: your brain locks itself into standby all morning because it knows if you start a task, you\'ll hyperfocus and miss the 4:00 PM event',
+          'Underestimating travel and prep time consistently'
+        ],
+        internalReality: 'Clocks don\'t feel real inside your head, you either watch the clock like a hawk all day or fall through a time trapdoor.',
+        externalView: 'People ask "Why didn\'t you get your work done this morning?"',
+        maskingTax: 'Arriving 45 minutes early terrified of being late, or sprinting in apologising.',
+        sanctuaryAdjustment: 'Book appointments first thing in the morning whenever possible, set "leave the house" alarms, and use visual countdown timers.',
+        relatedCodes: ['NC-23', 'NC-41', 'NC-42']
+      },
+      {
+        code: 'ND-04',
+        name: 'AuDHD (Autism + ADHD Combined)',
+        shortTag: 'The Dual-Engine Tug-of-War',
+        category: 'Executive',
+        summary: 'Living with two opposite roommates in one head: your autistic side craves routine and quiet, while your ADHD side gets bored in 48 hours.',
+        symptoms: [
+          'Building an elaborate colour-coded planner in hyperfocus, then abandoning it two days later',
+          'Simultaneous sensory seeking and sensory overload: needing music or movement, then suddenly hitting a wall',
+          'Social contradiction: chatty and high-energy for an hour, then needing three days alone in the dark'
+        ],
+        internalReality: 'Whatever you do to feed your ADHD side accidentally overwhelms your autistic side.',
+        externalView: 'People assume you\'re "fine" because your ADHD masks your autism in public.',
+        maskingTax: 'Policing both sensory distress and physical restlessness at the same time.',
+        sanctuaryAdjustment: 'Flexible "menu routines" and pairing quiet spaces with tactile stims.',
+        relatedCodes: ['NC-10', 'NC-11', 'NC-23', 'NC-30', 'NC-64']
+      },
+      {
+        code: 'ND-05',
+        name: 'Autism (Monotropism & Sensory Intake)',
+        shortTag: 'Deep Focus & Literal Clarity',
+        category: 'Executive',
+        summary: 'A bottom-up, deep-channel operating system built on pattern recognition, raw sensory intake, and zero-subtext honesty.',
+        symptoms: [
+          'Monotropic focus tunnels: pulling 100% of focus into one deep channel, making interruptions jarring',
+          'Bottom-up thinking: needing all foundational details and "why" before a rule makes sense',
+          'Zero-subtext communication: saying exactly what you mean and getting exhausted by social riddles'
+        ],
+        internalReality: 'Manually calculating eye contact, facial expressions, and tone while every light and noise in the room comes in unfiltered.',
+        externalView: 'Misread as "blunt" or "aloof" when you\'re simply being direct.',
+        maskingTax: 'Rehearsing scripts and forcing eye contact (NC-33) until speech goes offline (NC-53).',
+        sanctuaryAdjustment: 'Say what you mean directly, give advance notice of changes (NC-45), and respect solitary recharge (NC-34).',
+        relatedCodes: ['NC-10', 'NC-22', 'NC-31', 'NC-32', 'NC-33', 'NC-50']
+      },
+      {
+        code: 'ND-06',
+        name: 'ADHD (Interest-Based Nervous System)',
+        shortTag: 'Novelty, Urgency & Hyperfocus',
+        category: 'Executive',
+        summary: 'Not a deficit of attention, but a nervous system regulated by interest, novelty, urgency, and challenge.',
+        symptoms: [
+          'Unable to force focus on boring admin, yet able to hyperfocus for 12 hours straight on a creative build',
+          'Working memory drop-outs and internal or physical restlessness',
+          'Dopamine crashes when high-stimulation projects finish'
+        ],
+        internalReality: 'Thirty browser tabs open at once with no mouse cursor until deadline panic or fascination locks the lens.',
+        externalView: 'Labelled "inconsistent" because you can solve a crisis effortlessly but forget basic admin.',
+        maskingTax: 'Running on pure anxiety and last-minute adrenaline to meet neurotypical deadlines.',
+        sanctuaryAdjustment: 'Body-doubling (NC-02), sprint-based work, and visualised boards.',
+        relatedCodes: ['NC-02', 'NC-21', 'NC-23', 'NC-40', 'NC-41', 'NC-42']
+      },
+      {
+        code: 'ND-07',
+        name: 'PDA (Pervasive Drive for Autonomy)',
+        shortTag: 'Autonomic Demand Avoidance',
+        category: 'Executive',
+        summary: 'When any demand, expectation, or loss of choice triggers an involuntary nervous-system threat response.',
+        symptoms: [
+          'Being about to do a task, and the second someone tells you to do it, your body locks up',
+          'Internal demand avoidance: basic biological needs registering as threatening demands',
+          'Needing equal, collaborative communication rather than top-down authority'
+        ],
+        internalReality: 'Your nervous system mistakes a routine expectation for a physical trap.',
+        externalView: 'Mislabelled as "stubborn" or "defiant".',
+        maskingTax: 'People-pleasing until you hit total autonomy burnout.',
+        sanctuaryAdjustment: 'Low-pressure, declarative phrasing ("Food is there if you fancy it") and real choices (NC-44).',
+        relatedCodes: ['NC-41', 'NC-44', 'NC-54', 'NC-56', 'NC-57']
+      },
+      {
+        code: 'ND-08',
+        name: 'RSD (Rejection Sensitive Dysphoria)',
+        shortTag: 'Acute Rejection / Critique Pain',
+        category: 'Sensory',
+        summary: 'An intense, physical nervous-system gut-punch triggered by perceived rejection, criticism, or failure.',
+        symptoms: [
+          'A short text like "K." or "We need to talk" setting off an immediate adrenaline spike and chest pain',
+          'Replaying a minor awkward social moment for days',
+          'Perfectionism and people-pleasing to avoid critique at all costs'
+        ],
+        internalReality: 'Small social friction hits your nervous system like a physical burn.',
+        externalView: 'Told you\'re "taking things too personally" or "overreacting".',
+        maskingTax: 'Hiding physical panic behind a calm face while your heart races.',
+        sanctuaryAdjustment: 'Clear tone tags, direct reassurance, and zero vague cliffhanger messages.',
+        relatedCodes: ['NC-01', 'NC-56', 'NC-60']
+      },
+      {
+        code: 'ND-09',
+        name: 'Autistic & AuDHD Burnout',
+        shortTag: 'Skill Regression & System Crash',
+        category: 'Sensory',
+        summary: 'A full neurological system crash caused by years of over-masking, sensory overload, and pushing past limits.',
+        symptoms: [
+          'Skill regression: losing access to skills you used to have (cooking, speaking smoothly, managing noise)',
+          'Sensory thresholds dropping so every light and sound feels unbearable',
+          'Sleep doesn\'t fix it, waking up exhausted'
+        ],
+        internalReality: 'Your brain has pulled the main circuit breaker to stop you from frying the wiring.',
+        externalView: 'Often misdiagnosed as depression, when standard advice to "go socialise" makes burnout worse.',
+        maskingTax: 'The ultimate bill for years of paying the Masking Tax.',
+        sanctuaryAdjustment: 'Radical demand reduction, dropping the mask completely, and sensory darkness/quiet.',
+        relatedCodes: ['NC-30', 'NC-50', 'NC-64']
+      },
+      {
+        code: 'ND-10',
+        name: 'Revenge Bedtime Procrastination & DSPS',
+        shortTag: 'Circadian Drift & Night Peace',
+        category: 'Sensory',
+        summary: 'When your brain only finally feels quiet, unmasked, and in control at 1:30 AM.',
+        symptoms: [
+          'Staying awake late scrolling or doing hobbies because night-time is the only hour with zero demands',
+          'Delayed Sleep Phase: feeling exhausted all afternoon, then getting a second wind at 11:00 PM',
+          'Racing thoughts at bedtime because your brain finally has silence'
+        ],
+        internalReality: 'Staying up late feels like reclaiming your own existence from a day full of demands.',
+        externalView: 'Told to "just go to bed earlier".',
+        maskingTax: 'Running on chronic sleep debt (NC-43) to fit an 8:00 AM world.',
+        sanctuaryAdjustment: 'Guilt-free daytime decompression time and bedtime brown noise anchors.',
+        relatedCodes: ['NC-34', 'NC-43', 'NC-64']
+      },
+      {
+        code: 'ND-11',
+        name: 'OCD (Intrusive Doubt Loops)',
+        shortTag: 'Ego-Dystonic Alarms & Rituals',
+        category: 'Sensory',
+        summary: 'A threat-detection loop that throws unwanted "what if" thoughts at you and demands rituals for certainty.',
+        symptoms: [
+          'Intrusive thoughts attacking the values you care about most',
+          'Checking, counting, or mental reviewing loops',
+          '"Just Right" physical symmetry urges'
+        ],
+        internalReality: 'A faulty fire alarm screaming in your head over a 0.001% possibility.',
+        externalView: 'Trivialised as "liking things tidy".',
+        maskingTax: 'Performing mental rituals silently while acting normal.',
+        sanctuaryAdjustment: 'Neutral external redirection (NC-58) without shame.',
+        relatedCodes: ['NC-21', 'NC-48', 'NC-58', 'NC-64']
+      },
+      {
+        code: 'ND-12',
+        name: 'Dyslexia (3D Spatial vs 2D Text)',
+        shortTag: 'Big-Picture Systems Thinking',
+        category: 'Learning',
+        summary: 'A 3D, interconnected spatial brain forced to squeeze ideas through flat, 2D lines of phonetic spelling.',
+        symptoms: [
+          'Visual glare and letter crowding when reading dense paragraphs (NC-14)',
+          'Seeing the whole system architecture instantly, but losing stamina when spelling sequentially',
+          'Reading slower under timed pressure despite high conceptual intelligence'
+        ],
+        internalReality: 'Thinking in 3D IMAX cinema, then pushing it through a tiny letterbox one letter at a time.',
+        externalView: 'Unfairly judged by spelling speed rather than idea depth.',
+        maskingTax: 'Triple-checking messages and swapping big words for smaller ones.',
+        sanctuaryAdjustment: 'Atkinson Hyperlegible font, wide spacing, Bionic bold anchors, and matte dark backgrounds.',
+        relatedCodes: ['NC-14', 'NC-16', 'NC-20', 'NC-27']
+      },
+      {
+        code: 'ND-13',
+        name: 'Dyscalculia (Number & Time Slippage)',
+        shortTag: 'Numerical Working Memory',
+        category: 'Learning',
+        summary: 'When numbers, quantities, and time estimates refuse to hold a solid shape in working memory.',
+        symptoms: [
+          'Needing to count items one-by-one because quantities don\'t group automatically',
+          'Digits flipping or vanishing during mental maths',
+          'Struggling to judge distances or how many minutes have passed (NC-42)'
+        ],
+        internalReality: 'Numbers feel like wet soap, try to hold two together and one slips out.',
+        externalView: 'Told you "aren\'t a maths person".',
+        maskingTax: 'Panic when put on the spot for figures or prices (NC-57).',
+        sanctuaryAdjustment: 'Visual progress bars and zero-shame calculator access.',
+        relatedCodes: ['NC-16', 'NC-21', 'NC-42', 'NC-57']
+      },
+      {
+        code: 'ND-14',
+        name: 'Dysgraphia (Brain-to-Pen Bottleneck)',
+        shortTag: 'Fine-Motor Transcription',
+        category: 'Learning',
+        summary: 'When thoughts run at 100mph in full sentences, but the physical wire to a pen scrambles and cramps your hand.',
+        symptoms: [
+          'Physical hand and forearm pain after writing just a few lines',
+          'Inconsistent letter sizes because your brain is three sentences ahead of your pen',
+          'Fluent expression when typing or speaking'
+        ],
+        internalReality: 'Your mind is a laser printer, but your hand is stuck buffering.',
+        externalView: 'Judged for "messy handwriting".',
+        maskingTax: 'Gripping pens until your hand aches to force neatness.',
+        sanctuaryAdjustment: 'Digital-first forms, keyboard access, and voice-to-text parity.',
+        relatedCodes: ['NC-25', 'NC-46', 'NC-57']
+      },
+      {
+        code: 'ND-15',
+        name: 'Dyspraxia / DCD (Motor & Spatial GPS)',
+        shortTag: '"Body in Space" Calibration',
+        category: 'Motor',
+        summary: 'A calibration gap between your brain planning a movement and your body executing it smoothly.',
+        symptoms: [
+          'Proprioception gaps (NC-46): bumping into doorframes or misjudging grip force',
+          'Consciously thinking through physical sequences that others do on autopilot',
+          'Postural fatigue from standing still'
+        ],
+        internalReality: 'Knowing the move you want, but the Wi-Fi signal to your limbs drops packets.',
+        externalView: 'Written off as "clumsy".',
+        maskingTax: 'Hyper-monitoring every movement in public.',
+        sanctuaryAdjustment: 'Uncluttered walkways and supportive seating.',
+        relatedCodes: ['NC-24', 'NC-36', 'NC-46', 'NC-57']
+      },
+      {
+        code: 'ND-16',
+        name: 'Tourette Syndrome & Tic Disorders',
+        shortTag: 'Premonitory Urges & Tics',
+        category: 'Motor',
+        summary: 'Involuntary motor and vocal tics driven by a mounting physical urge that resets only upon release.',
+        symptoms: [
+          'Premonitory sensory urge: an internal physical itch or pressure before a tic',
+          'Motor and vocal tics spiking under stress, fluorescent lights, or when stared at (NC-57)',
+          'Exhaustion after suppressing tics in public'
+        ],
+        internalReality: 'Holding in a tic takes 90% of your brainpower.',
+        externalView: 'Stared at or treated like a voluntary habit.',
+        maskingTax: 'Muscle pain and exhaustion from holding tics back.',
+        sanctuaryAdjustment: 'Total normalisation of regulatory movement (NC-37), don\'t stare, just carry on.',
+        relatedCodes: ['NC-11', 'NC-30', 'NC-37', 'NC-57', 'NC-63']
+      },
+      {
+        code: 'ND-17',
+        name: 'Auditory Processing Disorder (APD)',
+        shortTag: 'Hearing vs Decoding Speech',
+        category: 'Sensory',
+        summary: 'Your ears work fine, but your brain\'s sound-mixing desk can\'t isolate a voice from background noise.',
+        symptoms: [
+          'The "Auditory Wall" (NC-18): background noise merges at the same volume as speech',
+          'The 3-Second Lag (NC-20): saying "What?" then answering before they repeat it',
+          'Needing subtitles on TV'
+        ],
+        internalReality: 'Every sound arrives on one flat audio track, speech sounds like garbled Sims language.',
+        externalView: 'Accused of "not listening".',
+        maskingTax: 'Nodding and guessing from facial expressions.',
+        sanctuaryAdjustment: 'Written-over-verbal communication (NC-25) and waiting 5 seconds.',
+        relatedCodes: ['NC-12', 'NC-18', 'NC-20', 'NC-25', 'NC-59']
+      },
+      {
+        code: 'ND-18',
+        name: 'Misophonia (Sound Panic)',
+        shortTag: 'Autonomic Trigger Sounds',
+        category: 'Sensory',
+        summary: 'When specific repetitive sounds bypass logic and trigger instant fight-or-flight panic.',
+        symptoms: [
+          'Instant surge of visceral rage or skin-crawling distress at mouth or tapping sounds',
+          'Unable to think of anything else while the sound happens',
+          'Intense guilt afterwards'
+        ],
+        internalReality: 'The sound hot-wires straight into your amygdala\'s survival alarm.',
+        externalView: 'Told to "just ignore it".',
+        maskingTax: 'Digging nails into palms to hide panic.',
+        sanctuaryAdjustment: 'Zero-shame headphone/earplug use and background brown noise.',
+        relatedCodes: ['NC-10', 'NC-12']
+      },
+      {
+        code: 'ND-19',
+        name: 'ARFID & Sensory Safe-Food Profiles',
+        shortTag: 'Sensory Food Safety',
+        category: 'Sensory',
+        summary: 'When unpredictable food textures, smells, or temperatures trigger an involuntary gag or threat reflex.',
+        symptoms: [
+          'Relying on "samefoods" that taste and feel the exact same every time',
+          'One unexpected texture in a meal making it impossible to continue',
+          'Preferring starvation over unsafe textures'
+        ],
+        internalReality: 'Your sensory system flags an unpredictable texture the same way neurotypicals flag eating gravel.',
+        externalView: 'Shamed as "fussy".',
+        maskingTax: 'Anxiety around social meals and restaurants.',
+        sanctuaryAdjustment: 'Never comment on someone\'s plate, provide predictable options.',
+        relatedCodes: ['NC-13', 'NC-15', 'NC-40']
+      },
+      {
+        code: 'ND-20',
+        name: 'Sensory Processing Disorder (SPD)',
+        shortTag: 'Hypersensitive & Sensory Seeking',
+        category: 'Sensory',
+        summary: 'When your sensory volume knobs are turned up to 11 with no limiter.',
+        symptoms: [
+          'Tactile pain from clothing tags or seams (NC-13)',
+          'Visual & olfactory overload from strip lights (NC-14) or perfumes (NC-15)',
+          'Thermal drain (NC-17) wiping out cognitive battery'
+        ],
+        internalReality: 'Living without sensory calluses in a loud, bright world.',
+        externalView: 'Called "dramatic" for needing sunglasses or headphones.',
+        maskingTax: 'Enduring physical sensory pain silently.',
+        sanctuaryAdjustment: 'Tagless clothing, dimmable warm lights, and fragrance-free zones.',
+        relatedCodes: ['NC-10', 'NC-11', 'NC-13', 'NC-14', 'NC-15', 'NC-17']
+      },
+      {
+        code: 'ND-21',
+        name: 'Alexithymia & Interoception',
+        shortTag: 'Missed Body & Emotion Cues',
+        category: 'Sensory',
+        summary: 'When internal dashboard gauges for hunger, thirst, temperature, and emotions don\'t ping until 0%.',
+        symptoms: [
+          'Not noticing hunger or bathroom needs for hours until shakiness hits (NC-40)',
+          'Delayed emotional processing (taking days to realise how you felt)',
+          'Feeling emotions as physical body sensations'
+        ],
+        internalReality: 'Your body skips warnings and jumps straight to shutdown.',
+        externalView: 'Pressured to "tell me how you feel right now".',
+        maskingTax: 'Inventing fake emotional answers.',
+        sanctuaryAdjustment: 'Use concrete Neuro-Codes instead of vague questions.',
+        relatedCodes: ['NC-17', 'NC-20', 'NC-36', 'NC-40', 'NC-64']
+      },
+      {
+        code: 'ND-22',
+        name: 'BFRBs (Skin Picking & Hair Pulling)',
+        shortTag: 'Body-Focused Repetitive Stims',
+        category: 'Motor',
+        summary: 'Automatic, sensory-driven grooming/regulation loops triggered by understimulation or stress.',
+        symptoms: [
+          'Scanning skin or hair on autopilot while reading or stressed',
+          'Seeking tactile feedback to keep your brain anchored',
+          'Shame spirals from unhelpful comments'
+        ],
+        internalReality: 'An unconscious sensory-motor regulation loop keeping your brain anchored.',
+        externalView: 'Misunderstood as self-harm.',
+        maskingTax: 'Hiding hands and carrying guilt.',
+        sanctuaryAdjustment: 'Keep tactile fidgets in every pocket.',
+        relatedCodes: ['NC-11', 'NC-13', 'NC-37', 'NC-58']
+      },
+      {
+        code: 'ND-23',
+        name: 'Hyperlexia & Aphantasia',
+        shortTag: 'Visual & Linguistic Extremes',
+        category: 'Learning',
+        summary: 'Operating at the extremes of pattern-reading and mental imagery, from precocious decoding to a picture-free mind\'s eye.',
+        symptoms: [
+          'Hyperlexia: precocious reading and pattern decoding',
+          'Aphantasia: having zero visual pictures in your mind\'s eye, thinking purely in abstract concepts and words'
+        ],
+        internalReality: 'Assuming everyone else\'s head works the same way.',
+        externalView: 'Teaching methods assuming universal visualisation.',
+        maskingTax: 'Translating internal concepts into linear explanations.',
+        sanctuaryAdjustment: 'Multi-modal tools combining text and concrete structures.',
+        relatedCodes: ['NC-25', 'NC-27', 'NC-32']
+      },
+      {
+        code: 'ND-24',
+        name: 'Synaesthesia & CPTSD Overlap',
+        shortTag: 'Cross-Wired Senses & Vigilance',
+        category: 'Sensory',
+        summary: 'How cross-wired sensory channels and the cumulative trauma of growing up unaccommodated shape the nervous system.',
+        symptoms: [
+          'Synaesthesia: letters having colours, sounds having shapes',
+          'CPTSD & Tone Trigger (NC-56): hyper-vigilance from years of being punished for unchangeable traits'
+        ],
+        internalReality: 'Your nervous system remembers every time you were penalised for stimming.',
+        externalView: 'Wondering why you are guarded around authority.',
+        maskingTax: 'Living in chronic fight-or-flight.',
+        sanctuaryAdjustment: 'Explicit safety signals (NC-01) and full bodily autonomy.',
+        relatedCodes: ['NC-01', 'NC-30', 'NC-54', 'NC-56']
+      }
+    ];
+
+    var currentCondCategory = 'all';
+
+    function setCondCategory(cat) {
+      playTactileClick(300, 0.035);
+      currentCondCategory = cat;
+      document.querySelectorAll('.cond-pill').forEach(function(btn) {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#d4af37] text-[#0b0e14]';
+        } else {
+          btn.className = 'cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700';
+        }
+      });
+      renderConditionGuide();
+    }
+
+    function renderConditionGuide() {
+      var mount = document.getElementById('condition-cards-mount');
+      if (!mount) return;
+      var q = (document.getElementById('cond-search-input').value || '').toLowerCase().trim();
+
+      var filtered = fullSpectrumConditions.filter(function(c) {
+        var matchCat = (currentCondCategory === 'all') || (c.category === currentCondCategory);
+        var matchQ = !q ||
+          c.code.toLowerCase().includes(q) ||
+          c.name.toLowerCase().includes(q) ||
+          c.shortTag.toLowerCase().includes(q) ||
+          c.summary.toLowerCase().includes(q) ||
+          c.internalReality.toLowerCase().includes(q) ||
+          c.maskingTax.toLowerCase().includes(q) ||
+          c.sanctuaryAdjustment.toLowerCase().includes(q) ||
+          c.symptoms.some(function(s) { return s.toLowerCase().includes(q); });
+        return matchCat && matchQ;
+      });
+
+      if (!filtered.length) {
+        mount.innerHTML = '<div class="col-span-full p-8 text-center bg-[#121721] border border-slate-800 rounded-xl font-mono text-sm text-slate-400">NO MATCHING PROFILES FOUND // Try clearing your search box.</div>';
+        return;
+      }
+
+      mount.innerHTML = filtered.map(function(c) {
+        return '<div class="cond-compact-card" onclick="openConditionModal(\'' + c.code + '\')">' +
+          '<span class="card-code-badge">' + c.code + '</span>' +
+          '<span class="card-title">' + c.name + '</span>' +
+          '<span class="text-xs text-sky-300 font-medium leading-snug px-1">' + c.shortTag + '</span>' +
+          '<span class="tap-hint">TAP TO OPEN FULL PROFILE &rarr;</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    function openConditionModal(code) {
+      var c = fullSpectrumConditions.find(function(item) { return item.code === code; });
+      if (!c) return;
+      playTactileClick(380, 0.05);
+
+      var symList = c.symptoms.map(function(s) {
+        return '<li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#d4af37] mt-0.5">◆</span><span>' + s + '</span></li>';
+      }).join('');
+
+      var codeBadges = c.relatedCodes.map(function(rc) {
+        return '<button onclick="closeConditionModal(); switchNeuropediaMode(\'codes\'); document.getElementById(\'nc-search-input\').value=\'' + rc + '\'; filterNeuroCodes();" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/50 text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-xs font-bold transition">' + rc + ' &rarr;</button>';
+      }).join('');
+
+      var content = document.getElementById('condition-modal-content');
+      content.innerHTML =
+        '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">' +
+          '<span class="organic-badge">' + c.code + ' // ' + c.category.toUpperCase() + ' PROFILE</span>' +
+          '<button onclick="closeConditionModal()" class="px-3.5 py-1.5 rounded-lg bg-[#0b0e14] border border-slate-700 text-slate-300 hover:text-white hover:border-[#d4af37] font-mono text-xs font-extrabold transition">' +
+            '✕ CLOSE PROFILE [ESC]' +
+          '</button>' +
+        '</div>' +
+        '<h2 class="text-2xl sm:text-3xl font-black text-white mb-2">' + c.name + '</h2>' +
+        '<p class="text-sky-300 text-base font-medium leading-relaxed mb-5">' + c.summary + '</p>' +
+        '<div class="mb-5 p-4 rounded-xl bg-[#0b0e14] border border-slate-800">' +
+          '<div class="font-mono text-xs font-extrabold text-[#d4af37] uppercase tracking-wider mb-2.5">WHAT IT ACTUALLY LOOKS &amp; FEELS LIKE:</div>' +
+          '<ul class="space-y-2.5 m-0 p-0 list-none">' + symList + '</ul>' +
+        '</div>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-sky-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-sky-400 uppercase mb-1">01 // INSIDE YOUR HEAD</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.internalReality + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-slate-800">' +
+            '<div class="font-mono text-xs font-extrabold text-slate-400 uppercase mb-1">02 // HOW OTHERS MISREAD IT</div>' +
+            '<p class="text-slate-300 text-xs sm:text-sm leading-relaxed m-0">' + c.externalView + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-rose-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-rose-400 uppercase mb-1">03 // THE MASKING TAX</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.maskingTax + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-emerald-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-emerald-400 uppercase mb-1">04 // WHAT ACTUALLY HELPS (SANCTUARY FIX)</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.sanctuaryAdjustment + '</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">' +
+          '<span class="font-mono text-xs text-slate-400">USE THESE NEURO-CODES WHEN THIS HITS:</span>' +
+          '<div class="flex flex-wrap gap-1.5">' + codeBadges + '</div>' +
+        '</div>';
+
+      document.getElementById('condition-detail-modal').classList.add('modal-open');
+    }
+
+    function closeConditionModal() {
+      var modal = document.getElementById('condition-detail-modal');
+      if (modal && modal.classList.contains('modal-open')) {
+        playTactileClick(240, 0.04);
+        modal.classList.remove('modal-open');
+      }
+    }
+
+    /* Storefront Hoodie Carousel */
+    (function() {
+      function switchSlide(dir, idx) {
+        playTactileClick(290, 0.04);
+        var s = document.querySelectorAll('#pane-neuroverse .hud-slide'),
+            t = document.querySelectorAll('#pane-neuroverse .dot');
+        if (!s.length) return;
+        var c = 0;
+        s.forEach(function(x, i) { if (x.classList.contains('active-slide')) c = i; });
+        var i = (idx !== undefined) ? idx : (c + dir + s.length) % s.length;
+        s.forEach(function(x, k) { x.classList.toggle('active-slide', k === i); });
+        t.forEach(function(x, k) { x.classList.toggle('active-dot', k === i); });
+      }
+      document.addEventListener('click', function(e) {
+        var d = e.target.closest('.dot');
+        if (d) switchSlide(0, parseInt(d.getAttribute('data-target'), 10));
+      });
+      var startX = 0, startY = 0;
+      document.addEventListener('touchstart', function(e) {
+        var a = e.target.closest('#hoodie-swipe-area');
+        if (a) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }
+      }, { passive: true });
+      document.addEventListener('touchend', function(e) {
+        var a = e.target.closest('#hoodie-swipe-area');
+        if (!a || !startX) return;
+        var dX = e.changedTouches[0].clientX - startX,
+            dY = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dX) > 30 && Math.abs(dX) > Math.abs(dY)) { switchSlide(dX < 0 ? 1 : -1); }
+        startX = 0;
+      }, { passive: true });
+    })();
+
+    window.setSanctuaryAudio = function(mode) {
+      try {
+        if (sanctuaryNode) {
+          try { sanctuaryNode.stop(); } catch(e) {}
+          try { sanctuaryNode.disconnect(); } catch(e) {}
+          sanctuaryNode = null;
+        }
+        if (mode === 'off') return;
+
+        var ctx = getAudioContext();
+        if (!ctx) return;
+
+        sanctuaryGain = ctx.createGain();
+        var volEl = document.getElementById('sanctuary-vol');
+        var vol = volEl ? parseFloat(volEl.value) : 0.12;
+        sanctuaryGain.gain.setValueAtTime(vol, ctx.currentTime);
+        sanctuaryGain.connect(ctx.destination);
+
+        if (mode === 'gamma') {
+          var osc1 = ctx.createOscillator();
+          var osc2 = ctx.createOscillator();
+          var merger = ctx.createGain();
+          osc1.type = 'sine';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(160, ctx.currentTime);
+          osc2.frequency.setValueAtTime(200, ctx.currentTime);
+          osc1.connect(merger);
+          osc2.connect(merger);
+          merger.gain.setValueAtTime(0.4, ctx.currentTime);
+          merger.connect(sanctuaryGain);
+          osc1.start();
+          osc2.start();
+          sanctuaryNode = {
+            stop: function() { osc1.stop(); osc2.stop(); },
+            disconnect: function() { merger.disconnect(); }
+          };
+        } else {
+          var bufferSize = 2 * ctx.sampleRate;
+          var noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          var output = noiseBuffer.getChannelData(0);
+          var lastOut = 0.0;
+          for (var i = 0; i < bufferSize; i++) {
+            var white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= (mode === 'brown' ? 3.2 : 1.8);
+          }
+          var whiteNoise = ctx.createBufferSource();
+          whiteNoise.buffer = noiseBuffer;
+          whiteNoise.loop = true;
+
+          var filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(mode === 'brown' ? 420 : 950, ctx.currentTime);
+
+          whiteNoise.connect(filter);
+          filter.connect(sanctuaryGain);
+          whiteNoise.start(0);
+          sanctuaryNode = whiteNoise;
+        }
+      } catch (e) {}
+    };
+
+    window.updateSanctuaryVolume = function(val) {
+      if (sanctuaryGain && audioCtx) {
+        sanctuaryGain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+      }
+    };
+
+    window.toggleWidgetPanel = function() {
+      playTactileClick(320, 0.04);
+      var wrapper = document.getElementById('audhme-widget-wrapper');
+      if (wrapper) wrapper.classList.toggle('panel-open');
+    };
+
+    window.toggleLowInputMode = function(enabled) {
+      document.body.classList.toggle('low-input-active', enabled);
+    };
+
+    function toggleBionicReading(enable) {
+      document.querySelectorAll('.bionic-text').forEach(function(el) {
+        if (!el.getAttribute('data-orig')) {
+          el.setAttribute('data-orig', el.innerHTML);
+        }
+        if (!enable) {
+          el.innerHTML = el.getAttribute('data-orig');
+        } else {
+          var raw = el.getAttribute('data-orig');
+          el.innerHTML = raw.replace(/(^|>)\s*([^<]+)/g, function(m, pfx, txt) {
+            var words = txt.split(' ').map(function(w) {
+              if (w.length <= 2) return '<b>' + w + '</b>';
+              var cut = Math.ceil(w.length * 0.45);
+              return '<b class="text-white font-extrabold">' + w.slice(0, cut) + '</b>' + w.slice(cut);
+            }).join(' ');
+            return pfx + words;
+          });
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      enhanceAllFlipCards();
+      handleInitialRoute();
+      renderConditionGuide();
+      startGroundingBoot();
+    });
+  </script>
+</body>
+</html>
