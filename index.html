@@ -2282,20 +2282,47 @@
           openCrisisHud(code, title, desc);
         };
 
-        var downloadBtn = document.createElement('a');
-        downloadBtn.className = 'download-code-btn';
-        downloadBtn.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('=== AUDHME NEURO-CODE (' + code + ') ===\nTitle: ' + title + '\n\nDescription:\n' + desc + '\n\nSovereign Framework © Jason Parish 2026');
-        downloadBtn.download = code + '-' + title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.txt';
-        downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> TXT';
-        downloadBtn.title = 'Download Material for ' + code;
-        downloadBtn.onclick = function(e) {
+        function enhanceAllFlipCards() {
+      document.querySelectorAll('.flip-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          playTactileClick(card.classList.contains('flipped') ? 350 : 230, 0.045);
+        });
+
+        var back = card.querySelector('.flip-card-back');
+        if (!back || back.querySelector('.card-action-bar')) return;
+
+        var codeEl = back.querySelector('.card-code-mini');
+        var titleEl = back.querySelector('.card-title-mini');
+        var descEl = back.querySelector('.card-desc');
+
+        var code = codeEl ? codeEl.textContent.trim() : 'NC-00';
+        var title = titleEl ? titleEl.textContent.trim() : 'Neuro-Code';
+        var desc = descEl ? descEl.textContent.trim() : '';
+
+        var bar = document.createElement('div');
+        bar.className = 'card-action-bar';
+
+        var pinBtn = document.createElement('button');
+        pinBtn.className = 'pin-code-btn';
+        pinBtn.textContent = 'PIN TO TOP';
+        pinBtn.onclick = function(e) {
           e.stopPropagation();
-          playTactileClick(450, 0.05);
+          togglePinCode(code, title, pinBtn);
+        };
+
+        var hudBtn = document.createElement('button');
+        hudBtn.className = 'hud-pass-btn';
+        hudBtn.innerHTML = '🛡️ FULLSCREEN';
+        hudBtn.onclick = function(e) {
+          e.stopPropagation();
+          openCrisisHud(code, title, desc);
         };
 
         bar.appendChild(pinBtn);
-        bar.appendChild(downloadBtn);
         bar.appendChild(hudBtn);
+        back.appendChild(bar);
+      });
+    }
         back.appendChild(bar);
       });
     }
