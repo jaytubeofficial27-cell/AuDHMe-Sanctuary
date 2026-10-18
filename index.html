@@ -1,1075 +1,235 @@
-<html lang="en-GB">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AuDHMe™ // System Hub &amp; Neurodivergent Sanctuary</title>
-  <style>
-    /* ==========================================================================
-       1. GLOBAL RESET & ANTI-GHOST-SCROLLBAR ENGINE
-       ========================================================================== */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    html {
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100%;
-      overflow-x: hidden;
-      overflow-y: scroll; /* Permanent scrollbar gutter stops layout jumping */
-      scroll-behavior: smooth;
-      background-color: #060913 !important;
-    }
-
-    body {
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100%;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-color: #060913 !important;
-      background-image: radial-gradient(circle at 50% 20%, #0b0f19 0%, #060913 100%) !important;
-      color: #f1f5f9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      position: relative;
-    }
-
-    /* ==========================================================================
-       2. NAVIGATION HEADER (STANDALONE CLEANED - NO 100VW OVERFLOW)
-       ========================================================================== */
-    .audh-nav-wrapper {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      width: 100%;
-      margin: 0;
-      box-sizing: border-box;
-    }
-
-    .audh-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 2rem;
-      background: rgba(11, 15, 25, 0.96);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      width: 100%;
-      box-sizing: border-box;
-      position: relative;
-    }
-
-    .audh-logo { display: flex; align-items: center; text-decoration: none; cursor: pointer; }
-    .audh-logo img { height: 90px; width: auto; max-width: 340px; object-fit: contain; display: block; }
-
-    .audh-links { display: flex; gap: 1.5rem; list-style: none; margin: 0; padding: 0; align-items: center; }
-    .audh-links a { color: #f1f5f9; text-decoration: none; font-size: 0.95rem; font-family: system-ui, sans-serif; transition: color 0.2s; cursor: pointer; font-weight: 600; }
-    .audh-links a:hover, .audh-links a.active { color: #06b6d4; }
-
-    .audh-hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 6px; padding: 10px; z-index: 1001; }
-    .audh-hamburger span { display: block; width: 28px; height: 3px; background: #f1f5f9; border-radius: 2px; }
-
-    /* Hide all managed embeds completely from layout by default */
-    #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
-      display: none !important;
-      visibility: hidden !important;
-    }
-
-    /* Force active embeds to render fully */
-    #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
-      display: block !important;
-      visibility: visible !important;
-    }
-
-    @media (max-width: 1199px) and (min-width: 901px) {
-      .audh-links { gap: 1rem; }
-      .audh-links a { font-size: 0.85rem; }
-    }
-
-    @media (max-width: 900px) {
-      .audh-nav { padding: 0.5rem 1rem; }
-      .audh-logo img { height: 55px; max-width: 180px; }
-      .audh-hamburger { display: flex; }
-
-      .audh-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: #0b0f19;
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1.25rem 1.5rem;
-        gap: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
-        box-sizing: border-box;
-      }
-      .audh-links.active { display: flex; }
-    }
-
-    /* ==========================================================================
-       3. HOME PANE & ORBITAL CLUSTER STYLES
-       ========================================================================== */
-    .orbital-cluster-canvas {
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-      width: 100%;
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 99;
-    }
-
-    .orbital-card {
-      background: rgba(11, 15, 25, 0.9);
-      border: 1px solid rgba(212, 175, 55, 0.28);
-      border-radius: 18px;
-      padding: 26px;
-      cursor: pointer;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      text-align: left;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      user-select: none;
-      width: 100%;
-    }
-    .orbital-card * { pointer-events: none; user-select: none; }
-
-    .orbital-card:hover {
-      border-color: #38bdf8;
-      transform: translateY(-6px) scale(1.015) rotate(0deg) !important;
-      background: rgba(15, 23, 42, 0.98);
-      box-shadow: 0 18px 45px rgba(56, 189, 248, 0.25);
-      z-index: 20;
-    }
-
-    .core-gateway-node {
-      transform: rotate(-0.4deg);
-      background: radial-gradient(circle at center, rgba(16, 24, 40, 0.96) 0%, rgba(8, 12, 20, 0.92) 100%);
-      text-align: center;
-      border-color: rgba(212, 175, 55, 0.4);
-      cursor: default;
-    }
-    .node-offset-one { transform: translateX(-20px) rotate(0.8deg); max-width: 90%; align-self: flex-start; }
-    .node-offset-two { transform: translateX(22px) rotate(-0.9deg); max-width: 90%; align-self: flex-end; }
-    .node-offset-three { transform: translateX(-15px) rotate(-1.1deg); max-width: 90%; align-self: flex-start; }
-    .node-offset-four { transform: translateX(18px) rotate(1.2deg); max-width: 90%; align-self: flex-end; }
-    .node-offset-five { transform: translateX(-22px) rotate(0.6deg); max-width: 90%; align-self: flex-start; }
-    .node-offset-six { transform: translateX(15px) rotate(-0.7deg); max-width: 90%; align-self: flex-end; }
-
-    .organic-badge {
-      font-size: 0.75rem;
-      color: #d4af37;
-      letter-spacing: 0.12em;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      display: inline-block;
-      background: rgba(212, 175, 55, 0.12);
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      font-weight: 600;
-    }
-    .cluster-headline {
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #f8fafc;
-      line-height: 1.2;
-      margin: 0 auto 12px auto;
-      letter-spacing: -0.02em;
-    }
-    .cluster-lead-text {
-      font-size: 1.05rem;
-      color: #38bdf8;
-      line-height: 1.6;
-      margin: 0 auto;
-      max-width: 680px;
-      font-weight: 600;
-    }
-    .card-top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .cluster-card-title { font-weight: 700; color: #f8fafc; font-size: 1.2rem; flex-grow: 1; letter-spacing: -0.01em; }
-    .node-arrow {
-      width: 32px;
-      height: 32px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 50%;
-      color: #38bdf8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-    }
-    .orbital-card:hover .node-arrow { background: #38bdf8; color: #0b0f19; transform: translateX(4px); }
-    .cluster-desc { font-size: 0.92rem; color: #cbd5e1; line-height: 1.7; margin: 0; }
-
-    .hub-disclaimer-zone {
-      width: 100%;
-      max-width: 920px;
-      margin: 25px auto 40px auto;
-      padding: 0 20px;
-      text-align: center;
-      position: relative;
-      z-index: 99;
-    }
-    .system-gold-divider {
-      width: 100% !important;
-      height: 1px !important;
-      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 20%, rgba(212, 175, 55, 0.4) 80%, transparent) !important;
-      margin: 24px 0 !important;
-      border: none !important;
-    }
-    .disclaimer-heading-sub {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #94a3b8;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .disclaimer-paragraph {
-      font-size: 0.84rem;
-      color: #94a3b8;
-      line-height: 1.65;
-      max-width: 800px;
-      margin: 0 auto 12px auto;
-    }
-
-    @media (max-width: 768px) {
-      .orbital-card, .node-offset-one, .node-offset-two, .node-offset-three, .node-offset-four, .node-offset-five, .node-offset-six {
-        max-width: 100% !important;
-        transform: none !important;
-        align-self: stretch !important;
-      }
-      .cluster-headline { font-size: 1.85rem; }
-    }
-
-    /* ==========================================================================
-       4. THE NEUROVERSE STYLES
-       ========================================================================== */
-    #pane-neuroverse {
-      display: block !important;
-      width: 100% !important;
-      max-width: 920px !important;
-      margin: 0 auto !important;
-      padding: 20px 20px 40px 20px !important;
-      background: transparent !important;
-      color: #f1f5f9 !important;
-      text-align: left !important;
-      position: relative !important;
-      z-index: 99 !important;
-    }
-    .nh-head { text-align: center !important; padding: 8px 0 !important; }
-    .nh-head h1 { font-size: 2.1rem !important; font-weight: 900 !important; color: #f8fafc !important; margin: 0 0 12px 0 !important; }
-    .nh-sub { font-size: 1.05rem !important; font-weight: 800 !important; color: #38bdf8 !important; letter-spacing: .06em !important; margin: 0 0 16px 0 !important; text-transform: uppercase !important; }
-    .nh-div { width: 100% !important; height: 1px !important; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, .4) 20%, rgba(212, 175, 55, .4) 80%, transparent) !important; margin: 12px 0 !important; }
-
-    .nh-roadmap { display: flex !important; flex-direction: column !important; gap: 12px !important; width: 100% !important; }
-    .nh-step { background: rgba(11, 15, 25, .85) !important; border-radius: 8px !important; padding: 16px !important; backdrop-filter: blur(10px) !important; border-left: 4px solid rgba(51, 65, 85, .4) !important; box-sizing: border-box !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
-    .nh-step.cur { border-left-color: #38bdf8 !important; background: rgba(11, 15, 25, .95) !important; }
-    .nh-sh { display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 6px !important; flex-wrap: wrap !important; gap: 6px !important; }
-    .nh-st { font-size: .65rem !important; font-weight: 800 !important; padding: 2px 6px !important; border-radius: 4px !important; }
-    .st-sky { background: rgba(56, 189, 248, .15) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.4) !important; }
-    .st-gld { background: rgba(214, 175, 55, .15) !important; color: #d4af37 !important; border: 1px solid rgba(212, 175, 55, .4) !important; }
-    .st-slv { background: rgba(148, 163, 184, .15) !important; color: #94a3b8 !important; border: 1px solid rgba(148, 163, 184, 0.4) !important; }
-    .nh-step h4 { font-size: .95rem !important; font-weight: 800 !important; color: #f8fafc !important; margin: 0 0 6px 0 !important; }
-    .nh-step p { font-size: .82rem !important; line-height: 1.5 !important; margin: 0 !important; color: #f1f5f9 !important; }
-
-    .uv-hero-card { background: linear-gradient(135deg, rgba(11, 15, 25, 0.95), rgba(15, 23, 42, 0.9)) !important; border: 1px solid rgba(56, 189, 248, 0.4) !important; border-radius: 12px !important; padding: 24px !important; backdrop-filter: blur(12px) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important; box-sizing: border-box !important; }
-    .uv-badge-row { display: flex !important; gap: 8px !important; margin-bottom: 12px !important; flex-wrap: wrap !important; }
-    .uv-title { font-size: 1.6rem !important; font-weight: 900 !important; color: #f8fafc !important; margin: 0 0 10px 0 !important; letter-spacing: -0.01em !important; }
-    .uv-lead { font-size: .92rem !important; line-height: 1.6 !important; color: #f1f5f9 !important; margin: 0 0 20px 0 !important; max-width: 85ch !important; }
-    .uv-feature-grid { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important; gap: 16px !important; margin-bottom: 24px !important; padding-top: 16px !important; border-top: 1px solid rgba(56, 189, 248, 0.2) !important; }
-    .uv-feat { display: flex !important; gap: 12px !important; align-items: flex-start !important; background: rgba(6, 9, 19, 0.6) !important; padding: 12px !important; border-radius: 8px !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; }
-    .uv-feat-icon { font-size: 1.3rem !important; line-height: 1 !important; }
-    .uv-feat strong { display: block !important; font-size: .85rem !important; color: #f8fafc !important; margin-bottom: 4px !important; }
-    .uv-feat p { font-size: .78rem !important; color: #f1f5f9 !important; line-height: 1.45 !important; margin: 0 !important; }
-    .uv-action-row { display: flex !important; justify-content: flex-start !important; }
-    .uv-primary-btn { display: inline-block !important; font-family: monospace !important; font-size: .85rem !important; font-weight: 800 !important; color: #060913 !important; background: #38bdf8 !important; border: 1px solid #38bdf8 !important; padding: 10px 20px !important; border-radius: 6px !important; text-decoration: none !important; transition: all 0.2s ease !important; }
-    .uv-primary-btn:hover { background: #7dd3fc !important; box-shadow: 0 0 16px rgba(56, 189, 248, 0.6) !important; transform: translateY(-1px) !important; }
-
-    .nh-hint { text-align: center !important; margin: 8px 0 !important; }
-    .nh-badge { font-family: monospace !important; font-size: .68rem !important; font-weight: 800 !important; color: #38bdf8 !important; background: rgba(56, 189, 248, .15) !important; border: 1px solid rgba(56, 189, 248, .35) !important; padding: 3px 10px !important; border-radius: 16px !important; }
-    .hud-carousel-wrapper { max-width: 480px !important; margin: 0 auto 16px auto !important; position: relative !important; touch-action: pan-y !important; }
-    .hud-slide { display: none !important; }
-    .hud-slide.active-slide { display: block !important; animation: sFade .3s ease-out !important; }
-    @keyframes sFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .hud-card { background: rgba(11, 15, 25, .85) !important; border-radius: 8px !important; backdrop-filter: blur(10px) !important; border: 1px solid rgba(212, 175, 55, .4) !important; padding: 20px !important; box-sizing: border-box !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
-    .hud-img { height: 240px !important; background: rgba(6, 9, 19, .7) !important; border-radius: 6px !important; display: flex !important; align-items: center !important; justify-content: center !important; margin-bottom: 14px !important; padding: 10px !important; }
-    .hud-img img { max-width: 100% !important; max-height: 100% !important; object-fit: contain !important; }
-    .hud-card h3 { font-size: .95rem !important; font-weight: 800 !important; color: #f8fafc !important; margin: 0 0 6px 0 !important; }
-    .hud-card p { font-size: .82rem !important; line-height: 1.5 !important; margin: 0 0 10px 0 !important; color: #f1f5f9 !important; }
-    .nh-btn-gld { display: inline-block !important; font-family: monospace !important; font-size: .8rem !important; font-weight: 800 !important; padding: 8px 14px !important; border-radius: 6px !important; text-decoration: none !important; text-align: center !important; background: rgba(212, 175, 55, .15) !important; color: #d4af37 !important; border: 1px solid rgba(212, 175, 55, .6) !important; text-transform: uppercase !important; width: 100% !important; margin-top: 10px !important; }
-    .nh-btn-gld:hover { background: rgba(212, 175, 55, .25) !important; }
-    .nh-tag { color: #38bdf8 !important; font-style: italic !important; font-weight: 700 !important; margin-bottom: 6px !important; }
-    .nh-meta, .nh-specs { font-size: .78rem !important; margin-bottom: 8px !important; color: #cbd5e1 !important; }
-    .nh-specs { border-top: 1px solid rgba(212, 175, 55, .2) !important; padding-top: 8px !important; }
-    .nh-price { font-size: 1.3rem !important; font-weight: 800 !important; color: #d4af37 !important; margin: 10px 0 4px 0 !important; }
-    .nh-price small { display: block !important; font-size: .72rem !important; color: #94a3b8 !important; font-weight: normal !important; }
-    .carousel-indicators { display: flex !important; justify-content: center !important; gap: 6px !important; margin-bottom: 16px !important; }
-    .dot { width: 8px !important; height: 8px !important; border-radius: 50% !important; background: rgba(212, 175, 55, .3) !important; border: 1px solid rgba(212, 175, 55, .5) !important; cursor: pointer !important; }
-    .active-dot { background: #38bdf8 !important; border-color: #38bdf8 !important; transform: scale(1.2) !important; }
-    .nh-disc { text-align: center !important; padding: 10px 0 !important; }
-    .nh-disc h2 { font-size: 1.15rem !important; color: #f8fafc !important; margin-bottom: 10px !important; }
-    .nh-disc p { font-size: .82rem !important; line-height: 1.55 !important; margin-bottom: 10px !important; text-align: left !important; color: #f1f5f9 !important; }
-    .font-mono { font-family: monospace !important; }
-
-    @media (max-width: 768px) {
-      .uv-feature-grid { grid-template-columns: 1fr !important; }
-      .hud-carousel-wrapper { max-width: 100% !important; }
-    }
-
-    /* ==========================================================================
-       5. PETITION, NEUROPEDIA, CIVIC, BUILD & CREATOR SHARED STYLES
-       ========================================================================== */
-    #pane-petition, #pane-neuropedia, #pane-civic, #pane-build, #pane-creator {
-      display: block !important;
-      width: 100% !important;
-      position: relative !important;
-      z-index: 99 !important;
-      box-sizing: border-box !important;
-    }
-
-    .petition-master-container, .encyclopedia-master-container, #pane-neuropedia, .civic-master-container, #pane-build, .creator-master-container {
-      width: 100% !important;
-      max-width: 950px !important;
-      margin: 0 auto !important;
-      padding: 20px 20px 40px 20px !important;
-      text-align: center !important;
-      box-sizing: border-box !important;
-    }
-
-    .neuroverse-header-container { text-align: center !important; margin-bottom: 30px !important; }
-    .initiative-badge {
-      font-family: monospace !important;
-      font-size: 0.75rem !important;
-      font-weight: 800 !important;
-      color: #38bdf8 !important;
-      background: rgba(56, 189, 248, 0.15) !important;
-      border: 1px solid rgba(56, 189, 248, 0.4) !important;
-      padding: 4px 12px !important;
-      border-radius: 20px !important;
-      display: inline-block !important;
-      letter-spacing: 0.08em !important;
-      margin-bottom: 12px !important;
-    }
-    .neuroverse-main-heading {
-      font-size: 2.6rem !important;
-      font-weight: 900 !important;
-      color: #f8fafc !important;
-      margin: 0 0 12px 0 !important;
-      letter-spacing: -0.02em !important;
-      text-shadow: 0 0 20px rgba(56, 189, 248, 0.2) !important;
-    }
-    .petition-lead-manifesto, .civic-lead-manifesto, .creator-lead-manifesto {
-      font-size: 1.05rem !important;
-      color: #f1f5f9 !important;
-      line-height: 1.6 !important;
-      max-width: 750px !important;
-      margin: 0 auto 20px auto !important;
-    }
-
-    .telemetry-banner {
-      display: flex !important;
-      justify-content: space-around !important;
-      background: rgba(11, 15, 25, 0.85) !important;
-      border: 1px solid rgba(212, 175, 55, 0.35) !important;
-      border-radius: 8px !important;
-      padding: 14px 20px !important;
-      margin-bottom: 30px !important;
-      gap: 12px !important;
-      backdrop-filter: blur(8px) !important;
-    }
-    .telemetry-node { display: flex !important; flex-direction: column !important; align-items: center !important; }
-    .telemetry-label { font-family: monospace !important; font-size: 0.65rem !important; font-weight: 800 !important; color: #94a3b8 !important; letter-spacing: 0.08em !important; }
-    .telemetry-value { font-size: 0.9rem !important; font-weight: 800 !important; color: #f8fafc !important; margin-top: 2px !important; }
-    .status-active, .cyan-text { color: #38bdf8 !important; }
-    .gold-text { color: #d4af37 !important; }
-
-    .section-title { font-size: 1.3rem !important; font-weight: 800 !important; color: #f8fafc !important; letter-spacing: 0.05em !important; margin-bottom: 20px !important; text-transform: uppercase !important; }
-    .demands-cards-grid, .civic-cards-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 18px !important; margin: 24px 0 !important; text-align: left !important; }
-    .demand-card, .civic-card {
-      background: rgba(11, 15, 25, 0.85) !important;
-      border: 1px solid rgba(212, 175, 55, 0.3) !important;
-      border-radius: 8px !important;
-      padding: 20px !important;
-      text-align: left !important;
-      position: relative !important;
-      transition: all 0.25s ease !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-    }
-    .civic-card { display: flex !important; flex-direction: column !important; justify-content: space-between !important; border-radius: 12px !important; padding: 22px !important; }
-    .demand-card:hover { border-color: rgba(56, 189, 248, 0.6) !important; background: rgba(15, 23, 42, 0.95) !important; transform: translateY(-2px) !important; }
-    .card-num { font-family: monospace !important; font-size: 0.75rem !important; font-weight: 800 !important; color: #d4af37 !important; background: rgba(212, 175, 55, 0.2) !important; border: 1px solid rgba(212, 175, 55, 0.4) !important; padding: 2px 6px !important; border-radius: 4px !important; display: inline-block !important; margin-bottom: 12px !important; }
-    .demand-card-title { font-size: 1.05rem !important; font-weight: 800 !important; color: #38bdf8 !important; margin: 0 0 8px 0 !important; line-height: 1.3 !important; }
-    .demand-card-body { font-size: 0.85rem !important; color: #f1f5f9 !important; line-height: 1.55 !important; margin: 0 !important; }
-
-    .petition-action-deck { background: rgba(11, 15, 25, 0.9) !important; border: 1px solid rgba(212, 175, 55, 0.4) !important; border-radius: 12px !important; padding: 32px !important; margin-top: 10px !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important; backdrop-filter: blur(12px) !important; }
-    .form-header-block { margin-bottom: 20px !important; }
-    .form-title { font-size: 1.4rem !important; font-weight: 800 !important; color: #d4af37 !important; margin: 0 0 6px 0 !important; letter-spacing: 0.02em !important; }
-    .form-subtitle { font-size: 0.9rem !important; color: #f1f5f9 !important; margin: 0 !important; }
-    .campaign-launch-box { display: flex !important; flex-direction: column !important; gap: 20px !important; align-items: center !important; }
-    .campaign-info-row { text-align: center !important; }
-    .campaign-badge { font-family: monospace !important; font-size: 0.7rem !important; font-weight: 800 !important; color: #38bdf8 !important; background: rgba(56, 189, 248, 0.15) !important; border: 1px solid rgba(56, 189, 248, 0.4) !important; padding: 3px 8px !important; border-radius: 4px !important; display: inline-block !important; margin-bottom: 8px !important; }
-    .campaign-desc { font-size: 0.92rem !important; color: #f1f5f9 !important; margin: 0 !important; line-height: 1.5 !important; max-width: 650px !important; }
-    .petition-submit-btn { display: inline-flex !important; align-items: center !important; justify-content: center !important; background: rgba(56, 189, 248, 0.2) !important; border: 1px solid #38bdf8 !important; color: #f8fafc !important; font-weight: 800 !important; font-size: 1.05rem !important; letter-spacing: 0.05em !important; padding: 18px 36px !important; border-radius: 6px !important; text-decoration: none !important; cursor: pointer !important; transition: all 0.25s ease !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.25) !important; text-transform: uppercase !important; }
-    .petition-submit-btn:hover { background: rgba(56, 189, 248, 0.35) !important; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5) !important; transform: translateY(-2px) !important; color: #ffffff !important; }
-
-    /* NEUROPEDIA CARDS */
-    .series-block-container { background: rgba(11, 15, 25, 0.75) !important; border: 1px solid rgba(212, 175, 55, 0.25) !important; border-radius: 12px !important; padding: 24px !important; margin-bottom: 36px !important; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important; text-align: left !important; }
-    .series-header-bar { display: flex !important; align-items: center !important; gap: 12px !important; border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important; padding-bottom: 12px !important; margin-bottom: 20px !important; }
-    .series-tag { font-size: 0.65rem !important; font-weight: 800 !important; color: #d4af37 !important; background: rgba(212, 175, 55, 0.12) !important; border: 1px solid rgba(212, 175, 55, 0.3) !important; padding: 4px 8px !important; border-radius: 4px !important; letter-spacing: 0.1em !important; }
-    .series-node-title { font-size: 1.25rem !important; font-weight: 800 !important; color: #38bdf8 !important; margin: 0 !important; letter-spacing: 0.03em !important; text-transform: uppercase !important; }
-    .cards-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; gap: 18px !important; }
-    .flip-card { background-color: transparent !important; height: 182px !important; perspective: 1000px !important; user-select: none !important; cursor: pointer !important; }
-    .flip-card * { pointer-events: none !important; user-select: none !important; }
-    .flip-card-inner { position: relative !important; width: 100% !important; height: 100% !important; text-align: center !important; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important; transform-style: preserve-3d !important; }
-    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg) !important; }
-    .flip-card-front, .flip-card-back { position: absolute !important; width: 100% !important; height: 100% !important; -webkit-backface-visibility: hidden !important; backface-visibility: hidden !important; border-radius: 8px !important; box-sizing: border-box !important; padding: 12px 14px !important; display: flex !important; flex-direction: column !important; }
-    .flip-card-front { background: rgba(15, 23, 42, 0.9) !important; border: 1px solid rgba(212, 175, 55, 0.3) !important; align-items: center !important; justify-content: center !important; gap: 6px !important; }
-    .card-code-badge { font-size: 1.2rem !important; font-weight: 800 !important; color: #38bdf8 !important; letter-spacing: 0.05em !important; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3) !important; }
-    .card-title { font-size: 0.82rem !important; font-weight: 700 !important; color: #f8fafc !important; line-height: 1.25 !important; text-transform: uppercase !important; margin: 0 !important; }
-    .tap-hint { font-size: 0.58rem !important; font-weight: 700 !important; color: #64748b !important; letter-spacing: 0.08em !important; }
-    .flip-card-back { background: rgba(6, 9, 19, 0.95) !important; border: 1px solid #38bdf8 !important; transform: rotateY(180deg) !important; text-align: left !important; box-shadow: 0 0 14px rgba(56, 189, 248, 0.15) !important; justify-content: flex-start !important; }
-    .card-back-header { display: flex !important; align-items: center !important; gap: 8px !important; border-bottom: 1px solid rgba(212, 175, 55, 0.25) !important; padding-bottom: 6px !important; margin-bottom: 6px !important; }
-    .card-code-mini { font-size: 0.72rem !important; font-weight: 800 !important; color: #d4af37 !important; }
-    .card-title-mini { font-size: 0.74rem !important; font-weight: 700 !important; color: #f8fafc !important; }
-    .card-desc { font-size: 0.71rem !important; line-height: 1.35 !important; color: #cbd5e1 !important; margin: 0 !important; overflow: hidden !important; }
-
-    /* CIVIC STYLES */
-    .civic-card-header { margin-bottom: 14px !important; }
-    .civic-badge { font-family: monospace !important; font-size: 0.62rem !important; font-weight: 800 !important; padding: 3px 8px !important; border-radius: 4px !important; display: inline-block !important; letter-spacing: 0.05em !important; margin-bottom: 8px !important; }
-    .cyan-badge { color: #38bdf8 !important; background: rgba(56, 189, 248, 0.15) !important; border: 1px solid rgba(56, 189, 248, 0.4) !important; }
-    .gold-badge { color: #d4af37 !important; background: rgba(212, 175, 55, 0.15) !important; border: 1px solid rgba(212, 175, 55, 0.4) !important; }
-    .civic-card-title { font-size: 1.3rem !important; font-weight: 800 !important; color: #f8fafc !important; margin: 0 0 4px 0 !important; }
-    .civic-subtitle { font-size: 0.82rem !important; color: #94a3b8 !important; font-weight: 600 !important; display: block !important; }
-    .civic-description { font-size: 0.88rem !important; color: #f1f5f9 !important; line-height: 1.55 !important; margin-bottom: 18px !important; }
-    .civic-features-list { display: flex !important; flex-direction: column !important; gap: 12px !important; margin-bottom: 20px !important; }
-    .civic-feature-item { display: flex !important; align-items: flex-start !important; gap: 8px !important; }
-    .feature-bullet { color: #d4af37 !important; font-size: 0.75rem !important; margin-top: 2px !important; }
-    .feature-content { font-size: 0.82rem !important; line-height: 1.45 !important; color: #f1f5f9 !important; }
-    .feature-content strong { color: #f8fafc !important; display: block !important; margin-bottom: 2px !important; }
-    .feature-content span { color: #e2e8f0 !important; }
-    .civic-footer-row { display: flex !important; flex-direction: column !important; gap: 10px !important; padding-top: 14px !important; border-top: 1px solid rgba(51, 65, 85, 0.6) !important; align-items: stretch !important; text-align: center !important; }
-    .civic-cost-tag { font-family: monospace !important; font-size: 0.7rem !important; color: #94a3b8 !important; font-weight: 700 !important; }
-    .civic-action-btn { font-family: monospace !important; font-size: 0.75rem !important; font-weight: 800 !important; padding: 10px 12px !important; border-radius: 6px !important; text-decoration: none !important; transition: all 0.2s ease !important; display: block !important; text-align: center !important; box-sizing: border-box !important; text-transform: uppercase !important; }
-    .cyan-btn { color: #060913 !important; background: #38bdf8 !important; border: 1px solid #38bdf8 !important; }
-    .cyan-btn:hover { background: #7dd3fc !important; box-shadow: 0 0 12px rgba(56, 189, 248, 0.5) !important; }
-    .gold-btn { color: #060913 !important; background: #d4af37 !important; border: 1px solid #d4af37 !important; }
-    .gold-btn:hover { background: #fef08a !important; box-shadow: 0 0 12px rgba(212, 175, 55, 0.5) !important; }
-
-    /* BUILD STYLES */
-    .launch-portal-header-container { display: block !important; width: 100% !important; padding: 10px 0 !important; text-align: center !important; }
-    .portal-main-heading { font-size: 2.4rem !important; font-weight: 900 !important; color: #f8fafc !important; line-height: 1.2 !important; margin: 0 auto 19px auto !important; letter-spacing: -0.01em !important; display: block !important; text-align: center !important; }
-    .carrd-safe-chassis-container { display: block !important; width: 100% !important; clear: both !important; box-sizing: border-box !important; text-align: left !important; }
-    .integrated-portal-component { width: 100% !important; display: block !important; color: #f1f5f9 !important; }
-    .component-integrated-title { font-size: 2rem !important; font-weight: 800; color: #f8fafc !important; margin: 0 auto 24px auto !important; text-align: center !important; letter-spacing: -0.01em; display: block !important; }
-    .project-log { display: flex; flex-direction: column; gap: 16px; width: 100%; padding: 4px 0; }
-    .log-meta { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 8px; }
-    .log-tag { font-family: monospace; font-size: 0.8rem; font-weight: 800; color: #f8fafc; letter-spacing: 1px; }
-    .log-ver { font-family: monospace; font-size: 0.8rem; font-weight: bold; color: #94a3b8; }
-    .log-subtitle { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin: 0; line-height: 1.4; }
-    .promise-callout { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
-    .promise-badge { font-family: monospace; font-size: 0.7rem; font-weight: 800; color: #38bdf8; letter-spacing: 0.05em; }
-    .promise-callout p { font-size: 0.9rem; font-weight: bold; color: #f8fafc; margin: 0; line-height: 1.5; }
-    .log-body { font-size: 0.88rem; color: #f1f5f9; line-height: 1.6; margin: 0; }
-    .log-highlight { font-size: 0.92rem; font-weight: bold; color: #d4af37; line-height: 1.5; margin: 0; padding-top: 2px; }
-    .system-gold-divider-bottom { width: 100% !important; height: 1px !important; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 20%, rgba(212, 175, 55, 0.4) 80%, transparent) !important; margin: 24px 0 !important; display: block !important; border: none !important; }
-    .backing-grid { display: flex; flex-wrap: wrap; gap: 16px; width: 100%; max-width: 100%; padding: 4px 0; }
-    .backing-card { flex: 1 1 260px; background: rgba(11, 15, 25, 0.85) !important; border: 1px solid rgba(212, 175, 55, 0.35) !important; border-radius: 8px; padding: 18px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }
-    .backing-card .card-title { font-size: 1.05rem !important; font-weight: 800 !important; color: #38bdf8 !important; margin: 0 0 12px 0 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; }
-    .spec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-    .spec-list li { font-size: 0.9rem; color: #f1f5f9 !important; line-height: 1.5; padding-left: 14px; position: relative; text-align: left !important; }
-    .spec-list li::before { content: "◆"; position: absolute; left: 0; color: #d4af37; font-size: 0.65rem; top: 1px; }
-    .spec-list strong { color: #d4af37 !important; font-weight: 700; }
-    .transparency-framework { display: flex; flex-direction: column; gap: 16px; width: 100%; padding: 4px 0; }
-    .allocation-pledge { background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
-    .pledge-header { display: flex; justify-content: space-between; align-items: center; }
-    .pledge-title { font-family: monospace; font-size: 0.75rem; font-weight: 800; color: #d4af37; letter-spacing: 0.05em; }
-    .pledge-stat { font-family: monospace; font-size: 0.7rem; font-weight: 800; background: rgba(212, 175, 55, 0.2); color: #d4af37; padding: 2px 6px; border-radius: 4px; }
-    .pledge-text { font-size: 0.92rem; font-weight: bold; color: #f8fafc; margin: 0; line-height: 1.4; text-align: left !important; }
-    .transparency-body { font-size: 0.88rem; color: #f1f5f9; line-height: 1.6; margin: 0; text-align: left !important; }
-    .audit-stream { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
-    .stream-label { font-family: monospace; font-size: 0.7rem; font-weight: 800; color: #38bdf8; letter-spacing: 0.05em; }
-    .stream-desc { font-size: 0.85rem; color: #f1f5f9; margin: 0; line-height: 1.5; text-align: left !important; }
-    .tier-container { display: flex; flex-direction: column; gap: 16px; width: 100%; background: rgba(11, 15, 25, 0.85) !important; border: 1px solid rgba(212, 175, 55, 0.35) !important; border-radius: 10px; padding: 20px; box-sizing: border-box; }
-    .tier-header-row { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(51, 65, 85, 0.6); padding-bottom: 12px; }
-    .tier-model-badge { font-family: monospace; font-size: 0.7rem; font-weight: 800; color: #38bdf8; letter-spacing: 0.05em; text-align: left !important; }
-    .tier-price-point { font-size: 1.25rem; font-weight: 800; color: #f8fafc; text-align: left !important; }
-    .benefit-node { display: flex; align-items: flex-start; gap: 12px; }
-    .benefit-bullet { color: #d4af37; font-size: 0.75rem; margin-top: 4px; user-select: none; flex-shrink: 0; }
-    .benefit-text { font-size: 0.88rem; color: #f1f5f9; line-height: 1.6; margin: 0; text-align: left !important; }
-    .action-trigger { display: block; text-align: center; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.5); border-radius: 6px; padding: 14px 20px; color: #d4af37 !important; font-size: 0.9rem; font-weight: 700; text-decoration: none; letter-spacing: 0.03em; text-transform: uppercase; margin-top: 6px; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); cursor: pointer; }
-    .action-trigger:hover { background: rgba(212, 175, 55, 0.25); border-color: rgba(212, 175, 55, 0.8); color: #f8fafc !important; transform: translateY(-2px); }
-
-    /* CREATOR & GLITCH STYLES */
-    .creator-profile-card { background: rgba(11, 15, 25, 0.75) !important; border: 1px solid rgba(212, 175, 55, 0.3) !important; border-radius: 12px !important; padding: 30px !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important; backdrop-filter: blur(10px) !important; text-align: left !important; box-sizing: border-box !important; }
-    .architect-feed-wrapper { display: grid !important; grid-template-columns: 280px 1fr !important; gap: 24px !important; margin-bottom: 28px !important; align-items: center !important; }
-    .glitch-feed-container { display: flex !important; flex-direction: column !important; gap: 8px !important; }
-    .glitch-status-badge { display: flex !important; align-items: center !important; gap: 6px !important; background: rgba(6, 9, 19, 0.8) !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; border-radius: 4px !important; padding: 4px 8px !important; }
-    .signal-dot { width: 6px !important; height: 6px !important; border-radius: 50% !important; background: #ff0055 !important; box-shadow: 0 0 8px #ff0055 !important; animation: pulse-signal 0.6s infinite alternate !important; }
-    .signal-text { font-family: monospace !important; font-size: 0.6rem !important; font-weight: 800 !important; color: #38bdf8 !important; letter-spacing: 0.05em !important; }
-    .glitch-image-viewport { position: relative !important; width: 100% !important; height: 280px !important; border-radius: 8px !important; overflow: hidden !important; border: 1px solid rgba(212, 175, 55, 0.35) !important; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7) !important; background: #000 !important; animation: frame-jitter 0.15s infinite !important; }
-    .glitch-img { width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center !important; display: block !important; }
-    .glitch-layer { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; background-size: cover !important; background-position: center !important; pointer-events: none !important; }
-    .red-shift { mix-blend-mode: screen !important; filter: drop-shadow(-4px 0 #ff0055) saturate(2) !important; animation: intense-glitch-red 1.8s infinite linear !important; }
-    .cyan-shift { mix-blend-mode: screen !important; filter: drop-shadow(4px 0 #00ffff) saturate(2) !important; animation: intense-glitch-cyan 2.2s infinite linear !important; }
-    .crt-scanline-overlay { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05)) !important; background-size: 100% 4px, 6px 100% !important; pointer-events: none !important; animation: scanline-scroll 8s linear infinite !important; }
-
-    @keyframes pulse-signal { 0% { opacity: 0.2; } 100% { opacity: 1; } }
-    @keyframes frame-jitter { 0%, 92%, 100% { transform: translate(0, 0); } 94% { transform: translate(-1px, 1px); } 96% { transform: translate(1px, -1px); } 98% { transform: translate(-1px, -1px); } }
-    @keyframes scanline-scroll { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
-    @keyframes intense-glitch-red { 0%, 12%, 32%, 63%, 87%, 100% { opacity: 0; clip-path: inset(0 0 0 0); } 10% { opacity: 0.9; clip-path: inset(15% 0 60% 0); transform: translate(-6px, 2px); } 30% { opacity: 0.8; clip-path: inset(70% 0 5% 0); transform: translate(4px, -3px); } 60% { opacity: 0.95; clip-path: inset(40% 0 30% 0); transform: translate(-8px, 1px) skewX(-10deg); } 85% { opacity: 0.7; clip-path: inset(5% 0 80% 0); transform: translate(5px, -2px); } }
-    @keyframes intense-glitch-cyan { 0%, 17%, 47%, 75%, 100% { opacity: 0; clip-path: inset(0 0 0 0); } 15% { opacity: 0.9; clip-path: inset(50% 0 20% 0); transform: translate(6px, -2px); } 45% { opacity: 0.85; clip-path: inset(10% 0 75% 0); transform: translate(-5px, 3px); } 72% { opacity: 0.9; clip-path: inset(80% 0 2% 0); transform: translate(7px, -1px) skewX(8deg); } }
-
-    .architect-telemetry-box { background: rgba(6, 9, 19, 0.7) !important; border: 1px solid rgba(56, 189, 248, 0.25) !important; border-radius: 8px !important; padding: 20px !important; }
-    .telemetry-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 1px solid rgba(51, 65, 85, 0.5) !important; padding-bottom: 8px !important; margin-bottom: 14px !important; }
-    .telemetry-title { font-family: monospace !important; font-size: 0.75rem !important; font-weight: 800 !important; color: #38bdf8 !important; letter-spacing: 0.08em !important; }
-    .telemetry-ver { font-family: monospace !important; font-size: 0.7rem !important; font-weight: bold !important; color: #d4af37 !important; }
-    .telemetry-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; }
-    .telemetry-item { display: flex !important; flex-direction: column !important; gap: 2px !important; }
-    .t-label { font-family: monospace !important; font-size: 0.65rem !important; color: #64748b !important; letter-spacing: 0.05em !important; }
-    .t-val { font-size: 0.85rem !important; font-weight: 700 !important; color: #f8fafc !important; }
-    .creator-section-heading { font-size: 1.4rem !important; font-weight: 800 !important; color: #f8fafc !important; margin: 0 0 16px 0 !important; letter-spacing: -0.01em !important; }
-    .narrative-paragraph { font-size: 0.95rem !important; color: #cbd5e1 !important; line-height: 1.7 !important; margin-bottom: 16px !important; }
-    .highlight-callout-box { background: rgba(212, 175, 55, 0.08) !important; border-left: 3px solid #d4af37 !important; border-radius: 0 6px 6px 0 !important; padding: 16px 20px !important; margin: 24px 0 !important; }
-    .callout-badge { font-family: monospace !important; font-size: 0.68rem !important; font-weight: 800 !important; color: #d4af37 !important; letter-spacing: 0.08em !important; display: block !important; margin-bottom: 6px !important; }
-    .callout-quote { font-size: 0.98rem !important; font-weight: 700 !important; color: #f8fafc !important; line-height: 1.55 !important; margin: 0 !important; font-style: italic !important; }
-
-    .disclaimer-system-container { display: block !important; width: 100% !important; margin: 0 auto !important; padding: 20px 0 !important; box-sizing: border-box !important; position: relative !important; z-index: 99 !important; text-align: center !important; }
-    .disclaimer-main-title { font-size: 1.25rem !important; font-weight: 800 !important; color: #f8fafc !important; margin: 0 auto 16px auto !important; line-height: 1.3 !important; letter-spacing: 0.02em !important; display: block !important; text-align: center !important; }
-    .disclaimer-core-text { display: block !important; width: 100% !important; max-width: 93ch !important; margin: 0 auto 14px auto !important; font-size: 0.88rem !important; color: #f1f5f9 !important; line-height: 1.65 !important; text-align: center !important; }
-
-    @media (max-width: 900px) {
-      .demands-cards-grid, .civic-cards-grid { grid-template-columns: 1fr !important; }
-      .telemetry-banner { flex-direction: column !important; gap: 10px !important; }
-    }
-    @media (max-width: 768px) {
-      .series-block-container { padding: 16px !important; }
-      .series-header-bar { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
-      .cards-grid, .architect-feed-wrapper { grid-template-columns: 1fr !important; }
-      .neuroverse-main-heading, .portal-main-heading { font-size: 2rem !important; }
-      .component-integrated-title { font-size: 1.6rem !important; }
-    }
-
-    /* ==========================================================================
-       6. NEURAL CANVAS & FLOATING VISUAL COMFORT WIDGET STYLES
-       ========================================================================== */
-    #neuro-canvas {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      z-index: 1 !important;
-      pointer-events: none !important;
-      display: block !important;
-      transition: opacity 0.3s ease !important;
-    }
-
-    #audhme-widget-wrapper {
-      position: fixed !important;
-      bottom: 24px !important;
-      right: 24px !important;
-      z-index: 99999999 !important;
-      font-family: monospace !important;
-    }
-
-    #audhme-widget-bubble {
-      display: flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      background: rgba(11, 15, 25, 0.9) !important;
-      border: 1px solid rgba(212, 175, 55, 0.4) !important;
-      border-radius: 30px !important;
-      padding: 10px 18px !important;
-      cursor: pointer !important;
-      color: #e2e8f0 !important;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6) !important;
-      backdrop-filter: blur(10px) !important;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-      user-select: none !important;
-    }
-    #audhme-widget-bubble:hover {
-      border-color: #38bdf8 !important;
-      transform: translateY(-2px) !important;
-      box-shadow: 0 6px 22px rgba(56, 189, 248, 0.2) !important;
-    }
-    .bubble-icon { font-size: 0.9rem !important; }
-    .bubble-text { font-size: 0.75rem !important; font-weight: 800 !important; letter-spacing: 0.08em !important; color: #f8fafc !important; }
-
-    #audhme-widget-panel {
-      position: absolute !important;
-      bottom: 54px !important;
-      right: 0 !important;
-      width: 250px !important;
-      background: rgba(11, 15, 25, 0.96) !important;
-      border: 1px solid rgba(212, 175, 55, 0.4) !important;
-      border-radius: 12px !important;
-      padding: 16px !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
-      backdrop-filter: blur(14px) !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 14px !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-      transform: translateY(12px) scale(0.96) !important;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-      box-sizing: border-box !important;
-    }
-    #audhme-widget-wrapper.panel-open #audhme-widget-panel {
-      opacity: 1 !important;
-      visibility: visible !important;
-      transform: translateY(0) scale(1) !important;
-    }
-    .widget-panel-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important; padding-bottom: 8px !important; }
-    .widget-panel-title { font-size: 0.72rem !important; font-weight: 800 !important; color: #d4af37 !important; letter-spacing: 0.08em !important; }
-    .widget-close-btn { font-size: 0.8rem !important; color: #64748b !important; cursor: pointer !important; padding: 2px 6px !important; }
-    .widget-close-btn:hover { color: #f8fafc !important; }
-    .widget-control-row { display: flex !important; flex-direction: column !important; gap: 6px !important; }
-    .widget-label { font-size: 0.65rem !important; font-weight: 700 !important; color: #94a3b8 !important; letter-spacing: 0.05em !important; }
-    #bg-theme-select { background: #060913 !important; color: #f8fafc !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; border-radius: 6px !important; padding: 6px 8px !important; font-family: monospace !important; font-size: 0.72rem !important; outline: none !important; cursor: pointer !important; width: 100% !important; }
-    #bg-theme-select:hover { border-color: #38bdf8 !important; }
-
-    #sensory-slider-track { position: relative !important; display: flex !important; align-items: center !important; background: #060913 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; border-radius: 6px !important; padding: 3px !important; cursor: pointer !important; user-select: none !important; width: 100% !important; box-sizing: border-box !important; height: 32px !important; }
-    .slider-thumb { position: absolute !important; top: 3px !important; left: 50% !important; width: calc(50% - 3px) !important; height: calc(100% - 6px) !important; background: rgba(56, 189, 248, 0.18) !important; border: 1px solid #38bdf8 !important; border-radius: 4px !important; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important; box-sizing: border-box !important; }
-    body.low-input-active .slider-thumb { transform: translateX(-100%) !important; border-color: #64748b !important; background: rgba(100, 116, 139, 0.2) !important; }
-    .slider-option { position: relative !important; z-index: 2 !important; flex: 1 !important; text-align: center !important; font-size: 0.72rem !important; font-weight: 800 !important; color: #64748b !important; letter-spacing: 0.05em !important; transition: color 0.25s ease !important; }
-    body:not(.low-input-active) #opt-high { color: #38bdf8 !important; }
-    body.low-input-active #opt-low { color: #cbd5e1 !important; }
-
-    body.bg-nebula { background: radial-gradient(circle at 50% 20%, #0f172a 0%, #030712 100%) !important; }
-    body.bg-gold-matrix { background: radial-gradient(circle at 50% 50%, #1e1b10 0%, #060913 80%) !important; }
-    body.bg-cyber-obsidian #neuro-canvas { display: none !important; }
-    body.bg-cyber-obsidian { background-color: #060913 !important; }
-
-    body.low-input-active h1, body.low-input-active h2, body.low-input-active h3 { color: #cbd5e1 !important; text-shadow: none !important; }
-    body.low-input-active p { color: #94a3b8 !important; }
-    body.low-input-active #neuro-canvas { opacity: 0.35 !important; }
-    body.low-input-active .glitch-image-viewport, body.low-input-active .red-shift, body.low-input-active .cyan-shift { animation: none !important; }
-
-    @media (max-width: 768px) {
-      #audhme-widget-wrapper { bottom: 16px !important; right: 16px !important; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Interactive Neural Network Canvas -->
-  <canvas id="neuro-canvas"></canvas>
-
-  <!-- Navigation Header -->
-  <div class="audh-nav-wrapper">
-    <nav class="audh-nav">
-      <a onclick="switchPage('home', true)" class="audh-logo">
-        <img src="https://lh3.googleusercontent.com/d/1KvMT6VSK6cTC1KRqfFNUXxxw5ad9jw4w" alt="AuDHMe Logo">
-      </a>
-      <button class="audh-hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-      </button>
-      <ul class="audh-links">
-        <li><a onclick="switchPage('home', true)" class="nav-item active" data-target="home">Home</a></li>
-        <li><a onclick="switchPage('neuropedia', true)" class="nav-item" data-target="neuropedia">Neuropedia</a></li>
-        <li><a onclick="switchPage('build', true)" class="nav-item" data-target="build">The Build</a></li>
-        <li><a onclick="switchPage('petition', true)" class="nav-item" data-target="petition">Petition</a></li>
-        <li><a onclick="switchPage('neuroverse', true)" class="nav-item" data-target="neuroverse">Neuroverse</a></li>
-        <li><a onclick="switchPage('civic', true)" class="nav-item" data-target="civic">Civic</a></li>
-        <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
-      </ul>
-    </nav>
-  </div>
-
-  <!-- =========================================================================
-       EMBED 03: HOME PANE
-       ========================================================================= -->
-  <div id="embed03" class="active-embed">
-    <div id="pane-home" class="neuro-pane">
-      <div class="orbital-cluster-canvas">
-
-        <div class="orbital-card core-gateway-node">
-          <span class="organic-badge">System Index</span>
-          <h1 class="cluster-headline">AuDHMe System Hub</h1>
-          <p class="cluster-lead-text">An adaptive operating system and infrastructure built by and for neurodivergent minds, engineered from lived experience to eliminate the masking tax and establish true physical sovereignty.</p>
-        </div>
-
-        <div class="orbital-card node-offset-one" onclick="switchPage('petition', true)">
-          <div class="card-top-row">
-            <span class="organic-badge">01</span>
-            <span class="cluster-card-title">The Petition</span>
-            <span class="node-arrow">&rarr;</span>
-          </div>
-          <p class="cluster-desc">Challenging systemic workplace and societal norms. We are actively driving structural change, holding institutions accountable, and establishing a new global standard where neurodivergent individuals never have to sacrifice their well-being for a pay cheque or social interaction.</p>
-        </div>
-
-        <div class="orbital-card node-offset-two" onclick="switchPage('neuropedia', true)">
-          <div class="card-top-row">
-            <span class="organic-badge">02</span>
-            <span class="cluster-card-title">Neuropedia</span>
-            <span class="node-arrow">&rarr;</span>
-          </div>
-          <p class="cluster-desc">The expansive knowledge base and core curriculum. It encompasses the full spectrum of neurodivergence, including autism, ADHD, dyslexia, dyscalculia, dyspraxia, and sensory processing disorder, providing universal shorthand via the Neuro-Codes and Ally-Edition.</p>
-        </div>
-
-        <div class="orbital-card node-offset-three" onclick="switchPage('civic', true)">
-          <div class="card-top-row">
-            <span class="organic-badge">03</span>
-            <span class="cluster-card-title">Civic Registry &amp; Neuro-Pass</span>
-            <span class="node-arrow">&rarr;</span>
-          </div>
-          <p class="cluster-desc">Secure physical and digital identification credentials built with strict UK GDPR compliance. Features an integrated icon communication bar allowing instant, non-verbal advocacy and accommodation requests during high-stress moments or meltdowns.</p>
-        </div>
-
-        <div class="orbital-card node-offset-four" onclick="switchPage('neuroverse', true)">
-          <div class="card-top-row">
-            <span class="organic-badge">04</span>
-            <span class="cluster-card-title">The Neuroverse</span>
-            <span class="node-arrow">&rarr;</span>
-          </div>
-          <p class="cluster-desc">Designed around social recharge needs and body-doubling. Features passive connection spaces, soft light pulse avatars, and focus-sync algorithms that allow users to share momentum and community without the drain of forced verbal interaction.</p>
-        </div>
-
-        <div class="orbital-card node-offset-five" onclick="switchPage('build', true)">
-          <div class="card-top-row">
-            <span class="organic-badge">05</span>
-            <span class="cluster-card-title">The Build</span>
-            <span class="node-arrow">&rarr;</span>
-          </div>
-          <p class="cluster-desc">Sanctuary engineering blueprints and haptic tool kits. Outlines medically audited recovery spaces featuring acoustic absorption, high-CRI flicker-free lighting, thermal controls, and zero-scent environments designed to prevent and recover from shutdowns.</p>
-        </div>
-
-        <div class="orbital-card node-offset-six" onclick="switchPage('creator', true)">
-          <div class="card-top-row">
-            <span class="organic-badge">06</span>
-            <span class="cluster-card-title">The Creator</span>
-            <span class="node-arrow">&rarr;</span>
-          </div>
-          <p class="cluster-desc">Founded and architected by Jason Parish. This section houses the founder's manifesto, vision statements, and the foundational philosophy of shifting the cultural narrative from disability to a different operating system.</p>
-        </div>
-
-      </div>
-
-      <div class="hub-disclaimer-zone">
-        <div class="system-gold-divider"></div>
-        <h2 class="disclaimer-heading-sub">Legal Notice &amp; Disclaimer</h2>
-        <p class="disclaimer-paragraph">All original frameworks displayed here, including the Neuro-Code Protocol, Ally-Edition Codes, Endocrine-Codes Protocol, Neuro-Pass credentialing, and the AuDHMe ecosystem, are the exclusive intellectual property of Jason Parish &copy; 2026.</p>
-        <p class="disclaimer-paragraph">Commercial use or corporate training integration requires an active licensing agreement. Real-time access is freely permitted for individual self-advocacy and grassroots community use. AuDHMe provides environmental and communication logistics frameworks rooted in lived experience. These structures do not constitute, nor are they a substitute for, professional medical advice, clinical diagnosis, or treatment.</p>
-      </div>
-    </div>
-  </div>
-<!-- =========================================================================
-       EMBED 35: THE NEUROVERSE
-       ========================================================================= -->
-  <div id="embed35">
-    <div id="pane-neuroverse" class="neuro-pane">
-      <div class="nh-head"><h1>The Neuroverse</h1><div class="nh-div"></div></div>
-
-      <!-- SECTION 1: DEVELOPMENT ROADMAP -->
-      <h2 class="nh-sub">SYSTEM EXPANSION // FUTURE OPERATIONS</h2>
-      <div class="nh-roadmap">
-        <div class="nh-step cur">
-          <div class="nh-sh"><span>PHASE 01</span><span class="nh-st st-sky">CURRENT FOCUS</span></div>
-          <h4>The Neuro-Pass, Physical Cores &amp; Burnout Toolkits</h4>
-          <p>Fabrication of secure Neuro-Pass credentials, zero-verbal tactile toolkits, Ally-Edition guidance modules, Endo-Code tracking, and QR validation passes directly from the workbench.</p>
-        </div>
-        <div class="nh-step">
-          <div class="nh-sh"><span>PHASE 02</span><span class="nh-st st-gld">STOREFRONT INITIALISING</span></div>
-          <h4>Hardware &amp; Adaptive Apparel Deployment</h4>
-          <p>Launching premium, sensory-friendly lifestyle gear, low-friction apparel, and tactile network uniforms via our Fourthwall Secure Node.</p>
-        </div>
-        <div class="nh-step">
-          <div class="nh-sh"><span>PHASE 03</span><span class="nh-st st-slv">UPCOMING LAYER</span></div>
-          <h4>The Civic Registry</h4>
-          <p>Deploying sovereign registration protocols, Neuro-Pass accommodations, and active network identity architectures across civic and public infrastructure.</p>
+<!-- ==========================================================================
+       1. NEURODIVERGENT GROUNDING BREATH & TACTILE STIM ENTRY RITUAL
+       ========================================================================== -->
+  <div id="os-boot-overlay" role="dialog" aria-label="AuDHMe Sanctuary Arrival">
+    <div class="grounding-card">
+      <div class="breath-circle-wrap" onclick="triggerCalmHarmonic()" title="Tap to chime">
+        <div class="breath-halo"></div>
+        <div class="breath-core-ring">
+          <img src="https://lh3.googleusercontent.com/d/1KvMT6VSK6cTC1KRqfFNUXxxw5ad9jw4w" alt="AuDHMe Logo" onerror="this.onerror=null;this.src='https://placehold.co/80x80/0b0e14/d4af37?text=AuDHMe';">
         </div>
       </div>
-
-      <div class="nh-div" style="margin:28px 0"></div>
-
-      <!-- SECTION 2: UNITY VENTURES HERO SHOWCASE -->
-      <h2 class="nh-sub">REAL-WORLD SAFE HARBOURS // COMMUNITY OUTREACH</h2>
-      <div class="uv-hero-card">
-        <div class="uv-badge-row">
-          <span class="nh-st st-sky font-mono">COMMUNITY INITIATIVE</span>
-          <span class="nh-st st-gld font-mono">PAY WHAT YOU CAN MODEL</span>
-        </div>
-
-        <h3 class="uv-title">Unity Ventures</h3>
-
-        <p class="uv-lead">
-          Accessibility extends beyond digital protocols and physical passes into shared physical spaces. Unity Ventures delivers accessible local gatherings, sensory-conscious movie nights, and community events engineered to eliminate financial and social barriers across all neurodivergent profiles.
+      <div>
+        <span class="organic-badge">LOW-DEMAND SANCTUARY // ZERO MASKING TAX</span>
+        <h2 class="text-xl font-black text-white mt-2 mb-1">Drop Your Shoulders. Unclench Your Jaw.</h2>
+        <p id="boot-status-line" class="text-sm text-slate-300 max-w-md mx-auto">
+          You don't have to perform or mask here. Follow the breathing circle for a few seconds, or tap the fidget bar below while your space loads.
         </p>
-
-        <div class="uv-feature-grid">
-          <div class="uv-feat">
-            <span class="uv-feat-icon">🎟️</span>
-            <div>
-              <strong>Pay What You Can</strong>
-              <p>Zero financial barriers. Every event operates on a flexible contribution framework so everyone can participate.</p>
-            </div>
-          </div>
-          <div class="uv-feat">
-            <span class="uv-feat-icon">🎬</span>
-            <div>
-              <strong>Inclusive Movie Nights</strong>
-              <p>Low-friction, sensory-aware social screenings designed for comfort, ease, and community connection.</p>
-            </div>
-          </div>
-          <div class="uv-feat">
-            <span class="uv-feat-icon">🛡️</span>
-            <div>
-              <strong>Safe Harbour Environments</strong>
-              <p>Real-world social spaces structured around zero-subtext communication and unmasked acceptance.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="uv-action-row">
-          <a href="https://unityventures.carrd.co/#about" target="_blank" rel="noopener noreferrer" class="uv-primary-btn">Explore Unity Ventures &nearr;</a>
+      </div>
+      <div class="stim-fidget-strip">
+        <span class="font-mono text-[11px] font-bold text-[#d4af37] uppercase tracking-wider">TACTILE STIM BAR // TAP TO POP &amp; CHIME</span>
+        <div class="stim-fidget-grid" id="boot-stim-grid">
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 261)"><i class="fa-solid fa-clock"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 293)"><i class="fa-solid fa-volume-xmark"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 329)"><i class="fa-solid fa-battery-half"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 392)"><i class="fa-solid fa-brain"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 440)"><i class="fa-solid fa-shield"></i></button>
+          <button type="button" class="stim-pill" onclick="popStimButton(this, 523)"><i class="fa-solid fa-compass"></i></button>
         </div>
       </div>
-
-      <div class="nh-div" style="margin:28px 0 12px"></div>
-
-      <!-- SECTION 3: STOREFRONT -->
-      <div class="nh-head"><h1>Storefront</h1></div>
-      <div class="nh-hint"><span class="nh-badge">&lrarr; SWIPE TO VIEW APPAREL</span></div>
-
-      <div class="hud-carousel-wrapper" id="hoodie-swipe-area">
-        <div class="hud-carousel-slides">
-          <div class="hud-slide active-slide">
-            <div class="hud-card">
-              <div class="hud-img"><img src="https://www.image2url.com/r2/default/files/1781708703645-894d977d-af16-47ef-b2c6-d44925e5373d.png" alt="AuDHMe Core Hoodie"></div>
-              <h3>The AuDHMe™ Core Hoodie</h3>
-              <p>A premium statement piece designed to bring our community's mission off the screen and into everyday life. Featuring the golden geometric AuDHMe™ logo precision-printed on the chest.</p>
-              <div class="nh-meta"><b>Available Shades:</b> Black, Navy Blazer, Charcoal Heather, Vintage Black, Forest Green, White</div>
-              <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight fabric (8.5 oz) | Unisex</div>
-              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
-              <a href="https://buy.stripe.com/14A00l1qdcYYfBL9iLeQM03" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
-            </div>
-          </div>
-
-          <div class="hud-slide">
-            <div class="hud-card">
-              <div class="hud-img"><img src="https://www.image2url.com/r2/default/files/1781708814875-2d29dc18-e51e-4b59-ab22-18b8abf64ca4.png" alt="Spectrum Hoodie Black"></div>
-              <h3>The Spectrum Hoodie (Black)</h3>
-              <p class="nh-tag">"The Spectrum Starts With Me!"</p>
-              <p>A bold, frontline statement piece designed to celebrate identity and individual agency. Featuring our flagship tagline across the chest in a striking, high-contrast typography blend.</p>
-              <div class="nh-meta"><b>Base Colour:</b> Deep Obsidian Black</div>
-              <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight fabric (8.5 oz) | Unisex</div>
-              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
-              <a href="https://buy.stripe.com/6oUfZj2uhcYY4X70MfeQM02" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
-            </div>
-          </div>
-
-          <div class="hud-slide">
-            <div class="hud-card">
-              <div class="hud-img"><img src="https://www.image2url.com/r2/default/files/1781708839989-e77e976e-6eeb-41c1-83fa-867dcf360c80.png" alt="Spectrum Hoodie White"></div>
-              <h3>The Spectrum Hoodie (White)</h3>
-              <p class="nh-tag">"The Spectrum Starts With Me!"</p>
-              <p>A bold, frontline statement piece designed to celebrate identity and individual agency. Featuring our flagship tagline across the chest in a striking, high-contrast typography blend.</p>
-              <div class="nh-meta"><b>Base Colour:</b> Pure Platinum White</div>
-              <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight fabric (8.5 oz) | Unisex</div>
-              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
-              <a href="https://buy.stripe.com/8x2fZjfh36AA2OZ66zeQM04" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
-            </div>
-          </div>
+      <div class="w-full">
+        <div class="flex justify-between font-mono text-[11px] text-slate-400 mb-1.5">
+          <span id="boot-phase-text">Inhale slowly as the circle expands...</span>
+          <span id="boot-pct-label">0%</span>
+        </div>
+        <div class="boot-progress-track">
+          <div id="boot-bar-fill"></div>
         </div>
       </div>
-
-      <div class="carousel-indicators">
-        <span class="dot active-dot" data-target="0"></span>
-        <span class="dot" data-target="1"></span>
-        <span class="dot" data-target="2"></span>
-      </div>
-
-      <div class="nh-div"></div>
-      <div class="nh-disc">
-        <h2>Legal Notice &amp; Disclaimer</h2>
-        <p>All original frameworks displayed here, including the Neuro-Code™ Protocol, Ally-Edition Codes, Endocrine Code™ Protocol, Neuro-Pass™ credentialing, and the AuDHMe™ ecosystem, are the exclusive intellectual property of Jason Parish &copy; 2026.</p>
-        <p>Commercial use or corporate training integration requires an active licensing agreement. Real-time access is freely permitted for individual self-advocacy and grassroots community use. AuDHMe™ provides environmental and communication logistics frameworks rooted in lived experience. These structures do not constitute, nor are they a substitute for, professional medical advice, clinical diagnosis, or treatment.</p>
+      <div class="w-full flex flex-wrap justify-between items-center gap-2 pt-1">
+        <button type="button" id="boot-pause-btn" onclick="toggleBootPause()" class="px-3.5 py-2 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-mono font-bold text-sky-300 hover:border-sky-400 transition">
+          ⏸ STAY &amp; BREATHE LONGER
+        </button>
+        <button type="button" onclick="dismissBootSequence()" class="px-4 py-2 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-mono font-extrabold uppercase tracking-wider hover:bg-amber-300 transition">
+          ENTER STRAIGHT AWAY &rarr;
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- =========================================================================
-       EMBED 13: THE PETITION
-       ========================================================================= -->
-  <div id="embed13">
-    <div id="pane-petition" class="neuro-pane">
-      <div class="petition-master-container">
-
-        <div class="neuroverse-header-container">
-          <div class="initiative-badge">CIVIC LEGISLATION &amp; INFRASTRUCTURE DIRECTIVE</div>
-          <h1 class="neuroverse-main-heading">The Sanctuary Standard</h1>
-          <p class="petition-lead-manifesto">
-            A campaign to establish legally recognised, low-demand, sensory-safe environments in public and civic infrastructure. Replacing mandatory masking with physical sovereignty across all neurodivergent profiles.
-          </p>
-          <div class="system-gold-divider"></div>
-        </div>
-
-        <div class="telemetry-banner">
-          <div class="telemetry-node">
-            <span class="telemetry-label">CAMPAIGN STATUS</span>
-            <span class="telemetry-value status-active">ACTIVE ADVOCACY</span>
-          </div>
-          <div class="telemetry-node">
-            <span class="telemetry-label">TARGET JURISDICTION</span>
-            <span class="telemetry-value">PUBLIC &amp; CIVIC SPACES</span>
-          </div>
-          <div class="telemetry-node">
-            <span class="telemetry-label">CORE DEMAND</span>
-            <span class="telemetry-value gold-text">ZERO MASKING TAX</span>
-          </div>
-        </div>
-
-        <div class="demands-grid-section">
-          <h2 class="section-title">THE THREE PILLARS OF SANCTUARY</h2>
-
-          <div class="demands-cards-grid">
-            <div class="demand-card">
-              <div class="card-num">01</div>
-              <h3 class="demand-card-title">Acoustic &amp; Visual Regulation</h3>
-              <p class="demand-card-body">
-                Mandatory low-sensory zoning within civic facilities, including designated quiet corridors, flicker-free lighting protocols, and total elimination of high-decibel ambient audio pollution in essential public services.
-              </p>
-            </div>
-
-            <div class="demand-card">
-              <div class="card-num">02</div>
-              <h3 class="demand-card-title">Literal &amp; Direct Communication</h3>
-              <p class="demand-card-body">
-                Enforcement of zero-subtext signage and literal assistance options. Public infrastructure must provide clear, predictable, multi-modal navigation that removes the cognitive penalty of ambiguous directions.
-              </p>
-            </div>
-
-            <div class="demand-card">
-              <div class="card-num">03</div>
-              <h3 class="demand-card-title">Low-Demand Infrastructure</h3>
-              <p class="demand-card-body">
-                Establishing non-verbal service channels, zero-eye-contact interaction options, and physical retreat spaces designed to prevent sensory overload and autonomic nervous system burnout.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="system-gold-divider"></div>
-
-        <div class="petition-action-deck">
-          <div class="form-header-block">
-            <h2 class="form-title">JOIN THE OFFICIAL CAMPAIGN</h2>
-            <p class="form-subtitle">Our official petition is hosted live on Change.org to ensure verified signature logging and legal compliance for civic submission.</p>
-          </div>
-
-          <div class="campaign-launch-box">
-            <div class="campaign-info-row">
-              <span class="campaign-badge">OFFICIAL VERIFIED REGISTRY</span>
-              <p class="campaign-desc">Add your voice to demand mandatory sensory-friendly spaces, reduced-demand public zones, and physical sovereignty across civic infrastructure.</p>
-            </div>
-
-            <a href="https://www.change.org/MandatorySensoryRooms" target="_blank" rel="noopener noreferrer" class="petition-submit-btn">
-              <span>SIGN THE PETITION ON CHANGE.ORG &nearr;</span>
-            </a>
-          </div>
-        </div>
-
-        <div class="disclaimer-system-container">
-          <div class="system-gold-divider"></div>
-          <h2 class="disclaimer-main-title">Legal Notice &amp; Advocacy Directive</h2>
-          <p class="disclaimer-core-text">The Sanctuary Standard is a civic advocacy blueprint created by Jason Parish &copy; 2026 under the AuDHMe™ framework. Official petition signatures are recorded via Change.org for legislative advocacy and civic presentation.</p>
-        </div>
-
+  <!-- ==========================================================================
+       2. FULL-SCREEN NON-VERBAL ADVOCACY PASS MODAL
+       ========================================================================== -->
+  <div id="crisis-hud-modal" role="dialog" aria-modal="true" aria-label="Non-Verbal Crisis Advocacy Pass">
+    <div class="max-w-3xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <span class="font-mono text-xs sm:text-sm font-extrabold text-[#d4af37] tracking-wider uppercase">
+        AuDHMe™ NEURO-PASS // NON-VERBAL ADVOCACY CARD
+      </span>
+      <div class="flex items-center gap-2">
+        <button onclick="closeCrisisHud()" class="px-4 py-2 rounded-lg bg-slate-900 border border-[#38bdf8] text-[#38bdf8] font-mono text-xs font-extrabold">
+          CLOSE PASS [ESC]
+        </button>
       </div>
     </div>
+    <div class="max-w-3xl w-full mx-auto my-auto py-6 text-center">
+      <div class="inline-block px-4 py-1.5 rounded-md bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] font-mono text-sm font-extrabold mb-3" id="hud-modal-code">
+        NC-53 // ACTIVE STATE
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-black text-white mb-5" id="hud-modal-title">
+        Non-Verbal State Active
+      </h2>
+      <div class="p-6 sm:p-8 rounded-2xl bg-[#121721] border-2 border-[#38bdf8] mb-6">
+        <p class="text-lg sm:text-2xl text-slate-100 font-semibold leading-relaxed" id="hud-modal-desc">
+          My speech is offline right now due to sensory or cognitive overload. I can hear and understand you, so please don't force me to talk.
+        </p>
+      </div>
+      <div class="font-mono text-xs font-bold text-slate-400 uppercase mb-3">
+        TAP ANY BOX BELOW TO HIGHLIGHT WHAT I NEED RIGHT NOW:
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">🤫</div>
+          <div class="font-bold text-white text-xs sm:text-sm">Quiet Space</div>
+          <div class="text-[11px] text-slate-400">Away from noise/crowds</div>
+        </button>
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">📱</div>
+          <div class="font-bold text-white text-xs sm:text-sm">Written Only</div>
+          <div class="text-[11px] text-slate-400">Text or show notes</div>
+        </button>
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">✋</div>
+          <div class="font-bold text-white text-xs sm:text-sm">No Touch</div>
+          <div class="text-[11px] text-slate-400">Give physical space</div>
+        </button>
+        <button onclick="this.classList.toggle('ring-2'); this.classList.toggle('ring-[#d4af37]'); this.classList.toggle('bg-[#d4af37]/20')" class="p-3.5 rounded-xl bg-[#121721] border border-slate-700 text-left">
+          <div class="text-xl mb-1">⏳</div>
+          <div class="font-bold text-white text-xs sm:text-sm">Extra Time</div>
+          <div class="text-[11px] text-slate-400">Processing delay active</div>
+        </button>
+      </div>
+    </div>
+    <div class="max-w-3xl w-full mx-auto border-t border-slate-800 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
+      <span>AuDHMe™ SOVEREIGN CREDENTIAL // JASON PARISH &copy; 2026</span>
+      <span>THANK YOU FOR YOUR PATIENCE &amp; LOW-DEMAND SUPPORT</span>
+    </div>
   </div>
-
-  <!-- =========================================================================
-       EMBED 09: NEUROPEDIA (HEADER + SERIES 00 & SERIES 10)
+<button onclick="openCrisisHud('NC-53', 'Non-Verbal State', 'I have lost access to spoken language. I can still communicate via writing, gestures, or AAC. Do not force speech.')" class="px-3 py-2 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-xs font-extrabold uppercase transition" style="margin-left: 10px; cursor: pointer;">
+          🛡️ I Need Space Pass
+        </button>
+<!-- =========================================================================
+       EMBED 09: NEUROPEDIA (NEURO-CODES & 24 CONDITION PROFILES)
        ========================================================================= -->
   <div id="embed09">
     <div id="pane-neuropedia" class="neuro-pane">
 
       <div class="neuroverse-header-container">
+        <div class="initiative-badge">SHORTHAND COMMUNICATION &amp; REAL-TALK SYMPTOM ATLAS</div>
         <h1 class="neuroverse-main-heading">Neuro-Code™ Encyclopedia</h1>
+        <p class="text-slate-300 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-5">
+          Switch between the <strong>Neuro-Code™ Encyclopedia Flip Cards</strong> and the <strong>24 Compact Condition &amp; Symptom Cards</strong>.
+        </p>
+
+        <div class="inline-flex flex-wrap justify-center gap-2 p-1.5 rounded-xl bg-[#0b0e14] border border-[#d4af37]/40 mb-2">
+          <button id="tab-btn-codes" onclick="switchNeuropediaMode('codes')" class="px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider bg-[#d4af37] text-[#0b0e14]" style="cursor: pointer;">
+            01 // Neuro-Code™ Encyclopedia
+          </button>
+          <button id="tab-btn-conditions" onclick="switchNeuropediaMode('conditions')" class="px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white" style="cursor: pointer;">
+            02 // 24 Condition &amp; Symptom Cards (Tap to Open)
+          </button>
+        </div>
         <div class="system-gold-divider"></div>
       </div>
 
-      <!-- SERIES 00 -->
-      <div class="series-block-container">
-        <div class="series-header-bar">
-          <span class="series-tag">FOUNDATION</span>
-          <h2 class="series-node-title">Series 00: Foundation</h2>
-        </div>
-        <div class="cards-grid">
-          <div class="flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <span class="card-code-badge">NC-01</span>
-                <span class="card-title">Secure Signal</span>
-                <span class="tap-hint">TAP TO REVEAL</span>
-              </div>
-              <div class="flip-card-back">
-                <div class="card-back-header">
-                  <span class="card-code-mini">NC-01</span>
-                  <span class="card-title-mini">Secure Signal</span>
+      <!-- NEUROPEDIA SUB-VIEW A: CODES -->
+      <div id="neuropedia-codes-view">
+        <!-- SERIES 00 -->
+        <div class="series-block-container">
+          <div class="series-header-bar">
+            <span class="series-tag">FOUNDATION</span>
+            <h2 class="series-node-title">Series 00: Foundation</h2>
+          </div>
+          <div class="cards-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="card-code-badge">NC-01</span>
+                  <span class="card-title">Secure Signal</span>
+                  <span class="tap-hint">TAP TO REVEAL</span>
                 </div>
-                <p class="card-desc">You are a safe/trusted person. I am comfortable being unmasked and honest about my needs with you.</p>
+                <div class="flip-card-back">
+                  <div class="card-back-header">
+                    <span class="card-code-mini">NC-01</span>
+                    <span class="card-title-mini">Secure Signal</span>
+                  </div>
+                  <p class="card-desc">You are a safe/trusted person. I am comfortable being unmasked and honest about my needs with you.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+              <div class="flip-card-inner">
+                <div class="flip-card-front">
+                  <span class="card-code-badge">NC-02</span>
+                  <span class="card-title">Body Double Required</span>
+                  <span class="tap-hint">TAP TO REVEAL</span>
+                </div>
+                <div class="flip-card-back">
+                  <div class="card-back-header">
+                    <span class="card-code-mini">NC-02</span>
+                    <span class="card-title-mini">Body Double Required</span>
+                  </div>
+                  <p class="card-desc">My ability to sustain focus is tied to the presence of another person (physical or virtual). Their presence acts as a grounding anchor for my nervous system.</p>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <span class="card-code-badge">NC-02</span>
-                <span class="card-title">Body Double Required</span>
-                <span class="tap-hint">TAP TO REVEAL</span>
-              </div>
-              <div class="flip-card-back">
-                <div class="card-back-header">
-                  <span class="card-code-mini">NC-02</span>
-                  <span class="card-title-mini">Body Double Required</span>
-                </div>
-                <p class="card-desc">My ability to sustain focus is tied to the presence of another person (physical or virtual). Their presence acts as a grounding anchor for my nervous system.</p>
-              </div>
-            </div>
+        <!-- SERIES 10 -->
+        <div class="series-block-container">
+          <div class="series-header-bar">
+            <span class="series-tag">SENSORY</span>
+            <h2 class="series-node-title">Series 10: Sensory &amp; Input</h2>
+          </div>
+          <div class="cards-grid">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-10</span><span class="card-title">Sensory Overload</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-10</span><span class="card-title-mini">Sensory Overload</span></div><p class="card-desc">My sensory system is maxed out. Lights, sounds, or textures are too intense right now. I need a reduced-input environment to regulate.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-11</span><span class="card-title">Sensory Seeking</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-11</span><span class="card-title-mini">Sensory Seeking</span></div><p class="card-desc">My nervous system is understimulated. I need movement, pressure, texture, or sound input to feel grounded and present.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-12</span><span class="card-title">Noise Threshold Reached</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-12</span><span class="card-title-mini">Noise Threshold Reached</span></div><p class="card-desc">Background noise has hit my limit. I can't filter conversation from ambient sound. Quiet or headphones are required.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-13</span><span class="card-title">Tactile &amp; Surface Sensitivity</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-13</span><span class="card-title-mini">Tactile Sensitivity</span></div><p class="card-desc">My skin is hypersensitive or a texture/fabric in the environment is causing physical distress. Please avoid unexpected touch.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-14</span><span class="card-title">Visual Noise &amp; Glare</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-14</span><span class="card-title-mini">Visual Noise</span></div><p class="card-desc">Cluttered environments, flickering lights, busy screens, or harsh glares are disrupting my focus. I need a visually calm space.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-15</span><span class="card-title">Scent Sensitivity</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-15</span><span class="card-title-mini">Scent Sensitivity</span></div><p class="card-desc">A smell in this environment is causing physical distress. I may need to relocate or the scent source needs to be removed.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-16</span><span class="card-title">Cognitive Interface Overwhelm</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-16</span><span class="card-title-mini">Interface Overwhelm</span></div><p class="card-desc">The layout of the digital or physical system/info I am interacting with is too cluttered or illogical to process accurately right now.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-17</span><span class="card-title">Thermal Regulation Distress</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-17</span><span class="card-title-mini">Thermal Distress</span></div><p class="card-desc">My internal "thermostat" is failing. High ambient heat is causing a rapid drain on my cognitive resources.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-18</span><span class="card-title">Auditory Echo Interference</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-18</span><span class="card-title-mini">Echo Interference</span></div><p class="card-desc">Multiple competing sound sources are creating an "auditory wall" that prevents me from isolating specific information.</p></div></div></div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-19</span><span class="card-title">Selective Mutism Active</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-19</span><span class="card-title-mini">Selective Mutism</span></div><p class="card-desc">An anxiety-based physical inability to speak in specific social or high-pressure contexts. This is distinct from a total loss of language.</p></div></div></div>
           </div>
         </div>
       </div>
 
-      <!-- SERIES 10 -->
-      <div class="series-block-container">
-        <div class="series-header-bar">
-          <span class="series-tag">SENSORY</span>
-          <h2 class="series-node-title">Series 10: Sensory &amp; Input</h2>
+      <!-- NEUROPEDIA SUB-VIEW B: 24 CONDITION CARDS -->
+      <div id="neuropedia-conditions-view" style="display: none;">
+        <div class="bg-[#121721] border border-slate-700 rounded-xl p-5 mb-6 text-left">
+          <div class="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-3">
+            <input 
+              type="text" 
+              id="cond-search-input" 
+              oninput="renderConditionGuide()" 
+              placeholder="Search 24 profiles (e.g. 'Executive Age', 'Waiting Mode', 'ARFID', 'RSD')..." 
+              class="flex-1 bg-[#0b0e14] border border-slate-700 focus:border-[#d4af37] rounded-lg px-4 py-2.5 text-sm text-white outline-none"
+            >
+            <div class="flex flex-wrap gap-1.5" id="cond-category-pills">
+              <button onclick="setCondCategory('all')" data-cat="all" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#d4af37] text-[#0b0e14]" style="cursor:pointer;">ALL (24)</button>
+              <button onclick="setCondCategory('Executive')" data-cat="Executive" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700" style="cursor:pointer;">EXECUTIVE</button>
+              <button onclick="setCondCategory('Learning')" data-cat="Learning" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700" style="cursor:pointer;">LEARNING</button>
+              <button onclick="setCondCategory('Motor')" data-cat="Motor" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700" style="cursor:pointer;">MOTOR</button>
+              <button onclick="setCondCategory('Sensory')" data-cat="Sensory" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700" style="cursor:pointer;">SENSORY</button>
+            </div>
+          </div>
+          <p class="text-xs font-mono text-[#d4af37] m-0">
+            COMPACT DECK VIEW // Tap any condition card below to open its full breakdown, symptoms, and linked Neuro-Codes.
+          </p>
         </div>
-        <div class="cards-grid">
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-10</span><span class="card-title">Sensory Overload</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-10</span><span class="card-title-mini">Sensory Overload</span></div><p class="card-desc">My sensory system is maxed out. Lights, sounds, or textures are too intense right now. I need a reduced-input environment to regulate.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-11</span><span class="card-title">Sensory Seeking</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-11</span><span class="card-title-mini">Sensory Seeking</span></div><p class="card-desc">My nervous system is understimulated. I need movement, pressure, texture, or sound input to feel grounded and present.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-12</span><span class="card-title">Noise Threshold Reached</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-12</span><span class="card-title-mini">Noise Threshold Reached</span></div><p class="card-desc">Background noise has hit my limit. I can't filter conversation from ambient sound. Quiet or headphones are required.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-13</span><span class="card-title">Tactile &amp; Surface Sensitivity</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-13</span><span class="card-title-mini">Tactile Sensitivity</span></div><p class="card-desc">My skin is hypersensitive or a texture/fabric in the environment is causing physical distress. Please avoid unexpected touch.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-14</span><span class="card-title">Visual Noise &amp; Glare</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-14</span><span class="card-title-mini">Visual Noise</span></div><p class="card-desc">Cluttered environments, flickering lights, busy screens, or harsh glares are disrupting my focus. I need a visually calm space.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-15</span><span class="card-title">Scent Sensitivity</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-15</span><span class="card-title-mini">Scent Sensitivity</span></div><p class="card-desc">A smell in this environment is causing physical distress. I may need to relocate or the scent source needs to be removed.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-16</span><span class="card-title">Cognitive Interface Overwhelm</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-16</span><span class="card-title-mini">Interface Overwhelm</span></div><p class="card-desc">The layout of the digital or physical system/info I am interacting with is too cluttered or illogical to process accurately right now.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-17</span><span class="card-title">Thermal Regulation Distress</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-17</span><span class="card-title-mini">Thermal Distress</span></div><p class="card-desc">My internal "thermostat" is failing. High ambient heat is causing a rapid drain on my cognitive resources.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-18</span><span class="card-title">Auditory Echo Interference</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-18</span><span class="card-title-mini">Echo Interference</span></div><p class="card-desc">Multiple competing sound sources are creating an "auditory wall" that prevents me from isolating specific information.</p></div></div></div>
-          <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-card-inner"><div class="flip-card-front"><span class="card-code-badge">NC-19</span><span class="card-title">Selective Mutism Active</span><span class="tap-hint">TAP TO REVEAL</span></div><div class="flip-card-back"><div class="card-back-header"><span class="card-code-mini">NC-19</span><span class="card-title-mini">Selective Mutism</span></div><p class="card-desc">An anxiety-based physical inability to speak in specific social or high-pressure contexts. This is distinct from a total loss of language.</p></div></div></div>
-        </div>
+
+        <div id="condition-cards-mount" class="cards-grid mb-8"></div>
       </div>
 
     </div>
+  </div>
+
+  <!-- Expanded Condition Dossier Modal Container -->
+  <div id="condition-detail-modal" role="dialog" aria-modal="true" aria-label="Condition Profile Details" onclick="if(event.target === this) closeConditionModal()">
+    <div class="cond-modal-card" id="condition-modal-content"></div>
   </div>
 <!-- =========================================================================
        EMBED 41: NEUROPEDIA (SERIES 20 & SERIES 30)
@@ -1649,22 +809,122 @@
   </div>
 
   <!-- =========================================================================
-       MASTER JAVASCRIPT ROUTER, CANVAS & WIDGET ENGINE
+       MASTER JAVASCRIPT ENGINE (ROUTER, BOOT RITUAL, 24 CONDITIONS & CANVAS)
        ========================================================================= -->
   <script>
+    var audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTactileClick(freq, duration) {
+      if (document.body.classList.contains('low-input-active')) return;
+      try {
+        var ctx = getAudioContext();
+        if (!ctx) return;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq || 260, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + (duration || 0.045));
+        gain.gain.setValueAtTime(0.035, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.045));
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + (duration || 0.045));
+      } catch (e) {}
+    }
+
+    function popStimButton(btn, freq) {
+      btn.classList.toggle('popped');
+      playTactileClick(freq, 0.075);
+    }
+
+    function triggerCalmHarmonic() {
+      var pills = document.querySelectorAll('#boot-stim-grid .stim-pill');
+      pills.forEach(function(p, idx) {
+        setTimeout(function() { p.classList.toggle('popped'); }, idx * 45);
+      });
+      playTactileClick(392, 0.12);
+    }
+
+    var bootProgress = 0;
+    var bootInterval = null;
+    var bootPaused = false;
+
+    function startGroundingBoot() {
+      var overlay = document.getElementById('os-boot-overlay');
+      var fill = document.getElementById('boot-bar-fill');
+      var pct = document.getElementById('boot-pct-label');
+      var phase = document.getElementById('boot-phase-text');
+      if (!overlay) return;
+
+      overlay.classList.remove('boot-complete');
+      bootProgress = 0;
+      bootPaused = false;
+      if (bootInterval) clearInterval(bootInterval);
+
+      bootInterval = setInterval(function() {
+        if (bootPaused) return;
+        bootProgress += 1.1;
+        if (bootProgress > 100) bootProgress = 100;
+
+        var r = Math.floor(bootProgress);
+        if (fill) fill.style.width = r + '%';
+        if (pct) pct.textContent = r + '%';
+
+        if (phase) {
+          if (r < 35) phase.textContent = 'Breathe in slowly as the circle expands...';
+          else if (r < 70) phase.textContent = 'Hold gently... no rush, no pressure.';
+          else phase.textContent = 'Breathe out slowly... entering sanctuary.';
+        }
+
+        if (bootProgress >= 100) {
+          clearInterval(bootInterval);
+          setTimeout(dismissBootSequence, 300);
+        }
+      }, 50);
+    }
+
+    function toggleBootPause() {
+      bootPaused = !bootPaused;
+      var btn = document.getElementById('boot-pause-btn');
+      if (btn) {
+        btn.textContent = bootPaused ? '▶ RESUME AUTO-ENTRY' : '⏸ STAY & BREATHE LONGER';
+      }
+      playTactileClick(bootPaused ? 240 : 360, 0.06);
+    }
+
+    function dismissBootSequence() {
+      if (bootInterval) clearInterval(bootInterval);
+      var overlay = document.getElementById('os-boot-overlay');
+      if (overlay) overlay.classList.add('boot-complete');
+      playTactileClick(440, 0.08);
+    }
+
     function toggleMobileMenu() {
       var links = document.querySelector('.audh-links');
       if (links) links.classList.toggle('active');
     }
 
     function switchPage(pageKey, updateHistory) {
+      playTactileClick(310, 0.04);
       var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
       var targetEmbeds = [];
 
       if (pageKey === 'home') targetEmbeds = ['embed03'];
       else if (pageKey === 'neuroverse') targetEmbeds = ['embed35'];
       else if (pageKey === 'petition') targetEmbeds = ['embed13'];
-      else if (pageKey === 'neuropedia') targetEmbeds = ['embed09', 'embed41', 'embed07'];
+      else if (pageKey === 'neuropedia') {
+        targetEmbeds = (currentNeuropediaMode === 'conditions') ? ['embed09'] : ['embed09', 'embed41', 'embed07'];
+      }
       else if (pageKey === 'civic') targetEmbeds = ['embed06'];
       else if (pageKey === 'build') targetEmbeds = ['embed11'];
       else if (pageKey === 'creator') targetEmbeds = ['embed04'];
@@ -1690,195 +950,428 @@
       if (links) links.classList.remove('active');
 
       if (updateHistory) {
-        history.pushState(null, null, '#' + pageKey);
+        try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function handleInitialRoute() {
-      var hash = window.location.hash.replace('#', '');
+      var hash = window.location.hash.replace('#', '').toLowerCase();
       var validPages = ['home', 'neuropedia', 'build', 'petition', 'neuroverse', 'civic', 'creator'];
       var initialPage = validPages.includes(hash) ? hash : 'home';
       switchPage(initialPage, false);
     }
 
     window.addEventListener('popstate', handleInitialRoute);
-    document.addEventListener('DOMContentLoaded', handleInitialRoute);
+    window.addEventListener('hashchange', handleInitialRoute);
 
-    // Canvas Neural Network Animation Engine
-    (function() {
-      var canvas = document.getElementById('neuro-canvas');
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
+    /* Neuropedia Mode Switcher (Codes vs 24 Conditions) */
+    var currentNeuropediaMode = 'codes';
 
-      var particles = [];
-      var particleCount = 60;
-      var mouse = { x: null, y: null, radius: 150 };
+    function switchNeuropediaMode(mode) {
+      playTactileClick(330, 0.04);
+      currentNeuropediaMode = mode;
+      var codesView = document.getElementById('neuropedia-codes-view');
+      var condView = document.getElementById('neuropedia-conditions-view');
+      var embed41 = document.getElementById('embed41');
+      var embed07 = document.getElementById('embed07');
+      var btnCodes = document.getElementById('tab-btn-codes');
+      var btnCond = document.getElementById('tab-btn-conditions');
 
-      function resize() {
-        canvas.width = window.innerWidth || 1200;
-        canvas.height = window.innerHeight || 800;
+      if (mode === 'conditions') {
+        if (codesView) codesView.style.display = 'none';
+        if (condView) condView.style.display = 'block';
+        if (embed41) embed41.classList.remove('active-embed');
+        if (embed07) embed07.classList.remove('active-embed');
+        if (btnCond) btnCond.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider bg-[#d4af37] text-[#0b0e14]';
+        if (btnCodes) btnCodes.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white';
+        renderConditionGuide();
+      } else {
+        if (codesView) codesView.style.display = 'block';
+        if (condView) condView.style.display = 'none';
+        if (embed41) embed41.classList.add('active-embed');
+        if (embed07) embed07.classList.add('active-embed');
+        if (btnCodes) btnCodes.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider bg-[#d4af37] text-[#0b0e14]';
+        if (btnCond) btnCond.className = 'px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white';
       }
-      window.addEventListener('resize', resize);
-      resize();
+    }
 
-      window.addEventListener('mousemove', function(e) {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-
-      window.addEventListener('mouseleave', function() {
-        mouse.x = null;
-        mouse.y = null;
-      });
-
-      function Particle() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.6;
-        this.vy = (Math.random() - 0.5) * 0.6;
-        this.radius = Math.random() * 1.8 + 1;
+    /* 24 Condition Profiles Database & Renderer */
+    var fullSpectrumConditions = [
+      {
+        code: 'ND-01', name: 'Executive Age (The 30% Rule)', shortTag: 'Chronological vs Executive Battery', category: 'Executive',
+        summary: 'Why an intellectually sharp 26-year-old neurodivergent adult can have working memory or task-initiation battery of an 18-year-old when tired.',
+        symptoms: ['Intellectual intelligence matches birth certificate, but executive regulation age lags ~30% behind', 'Complex systems design is effortless, yet tidying a room or booking appointments feels insurmountable', 'Emotional floodgates drop rapidly once daily executive battery hits zero'],
+        internalReality: 'Formula 1 engine for deep thinking bolted onto fuel tank and brakes of a much younger nervous system.',
+        externalView: 'People say "You\'re so smart, how can you struggle with basic things?"',
+        maskingTax: 'Hiding executive exhaustion and feeling like an impostor adult.',
+        sanctuaryAdjustment: 'Respect the 30% rule: externalise reminders, use body-doubling (NC-02).',
+        relatedCodes: ['NC-24', 'NC-41', 'NC-64']
+      },
+      {
+        code: 'ND-02', name: 'Executive Dysfunction & Paralysis', shortTag: 'Why "Just Do It" Fails', category: 'Executive',
+        summary: 'When knowing what to do and actually starting it are disconnected, sitting frozen for hours.',
+        symptoms: ['Task Initiation Block (NC-41): unable to cross the starting line', 'Decision Paralysis (NC-48): equal options crashing the brain\'s sorting system', 'Out of Sight, De-Indexed (NC-47): object permanence drop-out'],
+        internalReality: 'Revving car engine to redline with a snapped clutch.',
+        externalView: 'Mislabelled as laziness or procrastination.',
+        maskingTax: 'Frantic 3:00 AM panic-adrenaline marathons.',
+        sanctuaryAdjustment: 'Shrink first steps ("just touch the laptop"), use body double (NC-02).',
+        relatedCodes: ['NC-02', 'NC-24', 'NC-41', 'NC-47', 'NC-48']
+      },
+      {
+        code: 'ND-03', name: 'Waiting Mode & Time Blindness', shortTag: '"Now" vs "Not Now" Time', category: 'Executive',
+        summary: 'Why a 4:00 PM appointment paralyses your entire day from 9:00 AM onwards.',
+        symptoms: ['Time split into two buckets: "Right Now" and "Not Now"', 'Waiting Mode locks brain in standby all morning', 'Underestimating travel and prep time consistently'],
+        internalReality: 'Clocks don\'t feel real inside your head.',
+        externalView: 'Asked "Why didn\'t you get your work done this morning?"',
+        maskingTax: 'Arriving 45 minutes early terrified of being late.',
+        sanctuaryAdjustment: 'Book appointments first thing, set leave alarms.',
+        relatedCodes: ['NC-23', 'NC-41', 'NC-42']
+      },
+      {
+        code: 'ND-04', name: 'AuDHD (Autism + ADHD Combined)', shortTag: 'The Dual-Engine Tug-of-War', category: 'Executive',
+        summary: 'Living with two opposite roommates in one head: autistic routine craving vs ADHD novelty seeking.',
+        symptoms: ['Building elaborate planners then abandoning them', 'Simultaneous sensory seeking and sensory overload', 'Social contradiction: chatty then needing days alone'],
+        internalReality: 'Feeding ADHD side accidentally overwhelms autistic side.',
+        externalView: 'Assumed "fine" because ADHD masks autism.',
+        maskingTax: 'Policing sensory distress and physical restlessness simultaneously.',
+        sanctuaryAdjustment: 'Flexible menu routines and tactile stims.',
+        relatedCodes: ['NC-10', 'NC-11', 'NC-23', 'NC-30', 'NC-64']
+      },
+      {
+        code: 'ND-05', name: 'Autism (Monotropism & Sensory Intake)', shortTag: 'Deep Focus & Literal Clarity', category: 'Executive',
+        summary: 'A bottom-up operating system built on pattern recognition and zero-subtext honesty.',
+        symptoms: ['Monotropic focus tunnels', 'Bottom-up thinking needing foundational \'why\'', 'Zero-subtext communication exhaustion'],
+        internalReality: 'Manually calculating eye contact while sensory inputs come in unfiltered.',
+        externalView: 'Misread as blunt or aloof.',
+        maskingTax: 'Rehearsing scripts and forcing eye contact (NC-33) until speech goes offline (NC-53).',
+        sanctuaryAdjustment: 'Direct communication, advance notice of changes (NC-45).',
+        relatedCodes: ['NC-10', 'NC-22', 'NC-31', 'NC-32', 'NC-33', 'NC-50']
+      },
+      {
+        code: 'ND-06', name: 'ADHD (Interest-Based Nervous System)', shortTag: 'Novelty, Urgency & Hyperfocus', category: 'Executive',
+        summary: 'Nervous system regulated by interest, novelty, urgency, and challenge.',
+        symptoms: ['Unable to force focus on boring admin, hyperfocusing on creative builds', 'Working memory drop-outs', 'Dopamine crashes after project completion'],
+        internalReality: 'Thirty browser tabs open without a mouse cursor.',
+        externalView: 'Labelled inconsistent.',
+        maskingTax: 'Running on pure anxiety and deadline adrenaline.',
+        sanctuaryAdjustment: 'Body-doubling (NC-02) and sprint work.',
+        relatedCodes: ['NC-02', 'NC-21', 'NC-23', 'NC-40', 'NC-41', 'NC-42']
+      },
+      {
+        code: 'ND-07', name: 'PDA (Pervasive Drive for Autonomy)', shortTag: 'Autonomic Demand Avoidance', category: 'Executive',
+        summary: 'When any demand or loss of choice triggers an involuntary threat response.',
+        symptoms: ['Body locking up when told to do a task', 'Basic biological needs registering as demands', 'Needing equal, collaborative communication'],
+        internalReality: 'Nervous system mistakes routine expectations for physical traps.',
+        externalView: 'Mislabelled as stubborn or defiant.',
+        maskingTax: 'People-pleasing until burnout.',
+        sanctuaryAdjustment: 'Declarative phrasing and real choices (NC-44).',
+        relatedCodes: ['NC-41', 'NC-44', 'NC-54', 'NC-56', 'NC-57']
+      },
+      {
+        code: 'ND-08', name: 'RSD (Rejection Sensitive Dysphoria)', shortTag: 'Acute Rejection / Critique Pain', category: 'Sensory',
+        summary: 'Intense nervous-system gut-punch triggered by perceived rejection or criticism.',
+        symptoms: ['Short texts like "K." setting off adrenaline spikes', 'Replaying awkward moments for days', 'Perfectionism to avoid critique'],
+        internalReality: 'Small social friction hits like a physical burn.',
+        externalView: 'Told you are overreacting.',
+        maskingTax: 'Hiding physical panic behind a calm face.',
+        sanctuaryAdjustment: 'Clear tone tags and direct reassurance.',
+        relatedCodes: ['NC-01', 'NC-56', 'NC-60']
+      },
+      {
+        code: 'ND-09', name: 'Autistic & AuDHD Burnout', shortTag: 'Skill Regression & System Crash', category: 'Sensory',
+        summary: 'Full neurological system crash caused by years of over-masking.',
+        symptoms: ['Skill regression in cooking, speaking, or noise management', 'Sensory thresholds dropping drastically', 'Exhaustion unfixable by sleep'],
+        internalReality: 'Main circuit breaker pulled to prevent wiring burn-out.',
+        externalView: 'Misdiagnosed as depression.',
+        maskingTax: 'The ultimate bill for the Masking Tax.',
+        sanctuaryAdjustment: 'Radical demand reduction and sensory darkness.',
+        relatedCodes: ['NC-30', 'NC-50', 'NC-64']
+      },
+      {
+        code: 'ND-10', name: 'Revenge Bedtime Procrastination & DSPS', shortTag: 'Circadian Drift & Night Peace', category: 'Sensory',
+        summary: 'When brain only feels quiet and in control at 1:30 AM.',
+        symptoms: ['Staying awake late because night has zero demands', 'Delayed Sleep Phase: second wind at 11:00 PM', 'Racing thoughts at bedtime'],
+        internalReality: 'Late night reclaims existence from a demanding day.',
+        externalView: 'Told to go to bed earlier.',
+        maskingTax: 'Running on chronic sleep debt (NC-43).',
+        sanctuaryAdjustment: 'Guilt-free daytime decompression time.',
+        relatedCodes: ['NC-34', 'NC-43', 'NC-64']
+      },
+      {
+        code: 'ND-11', name: 'OCD (Intrusive Doubt Loops)', shortTag: 'Ego-Dystonic Alarms & Rituals', category: 'Sensory',
+        summary: 'Threat-detection loop demanding rituals for certainty.',
+        symptoms: ['Intrusive thoughts attacking valued principles', 'Checking or counting loops', '"Just Right" symmetry urges'],
+        internalReality: 'Faulty fire alarm screaming over 0.001% possibilities.',
+        externalView: 'Trivialised as liking things tidy.',
+        maskingTax: 'Performing mental rituals silently.',
+        sanctuaryAdjustment: 'Neutral external redirection (NC-58).',
+        relatedCodes: ['NC-21', 'NC-48', 'NC-58', 'NC-64']
+      },
+      {
+        code: 'ND-12', name: 'Dyslexia (3D Spatial vs 2D Text)', shortTag: 'Big-Picture Systems Thinking', category: 'Learning',
+        summary: '3D spatial brain forced through flat 2D spelling lines.',
+        symptoms: ['Visual glare and letter crowding (NC-14)', 'Seeing system architecture instantly but losing spelling stamina', 'Reading slower under timed pressure'],
+        internalReality: 'Thinking in 3D IMAX cinema, pushing it through a tiny letterbox.',
+        externalView: 'Judged by spelling speed over idea depth.',
+        maskingTax: 'Triple-checking messages constantly.',
+        sanctuaryAdjustment: 'Atkinson Hyperlegible font, wide line spacing, dark backgrounds.',
+        relatedCodes: ['NC-14', 'NC-16', 'NC-20', 'NC-27']
+      },
+      {
+        code: 'ND-13', name: 'Dyscalculia (Number & Time Slippage)', shortTag: 'Numerical Working Memory', category: 'Learning',
+        summary: 'Numbers and quantities refusing to hold solid shapes in working memory.',
+        symptoms: ['Counting items one-by-one', 'Digits flipping during mental math', 'Struggling to estimate elapsed time (NC-42)'],
+        internalReality: 'Numbers feel like wet soap.',
+        externalView: 'Told you are not a maths person.',
+        maskingTax: 'Panic when put on the spot for figures (NC-57).',
+        sanctuaryAdjustment: 'Visual progress bars and calculator access.',
+        relatedCodes: ['NC-16', 'NC-21', 'NC-42', 'NC-57']
+      },
+      {
+        code: 'ND-14', name: 'Dysgraphia (Brain-to-Pen Bottleneck)', shortTag: 'Fine-Motor Transcription', category: 'Learning',
+        summary: 'Thoughts running at 100mph while pen wiring cramps.',
+        symptoms: ['Hand and forearm pain after writing a few lines', 'Inconsistent letter sizes', 'Fluent expression when typing or speaking'],
+        internalReality: 'Mind is a laser printer, hand is buffering.',
+        externalView: 'Judged for messy handwriting.',
+        maskingTax: 'Gripping pens until hands ache.',
+        sanctuaryAdjustment: 'Digital-first access and voice-to-text.',
+        relatedCodes: ['NC-25', 'NC-46', 'NC-57']
+      },
+      {
+        code: 'ND-15', name: 'Dyspraxia / DCD (Motor & Spatial GPS)', shortTag: '"Body in Space" Calibration', category: 'Motor',
+        summary: 'Calibration gap between brain planning movement and body execution.',
+        symptoms: ['Proprioception gaps (NC-46): bumping into doors', 'Consciously planning automatic physical sequences', 'Postural fatigue from standing'],
+        internalReality: 'Knowing the move, but limb Wi-Fi drops packets.',
+        externalView: 'Written off as clumsy.',
+        maskingTax: 'Hyper-monitoring every movement in public.',
+        sanctuaryAdjustment: 'Uncluttered walkways and supportive seating.',
+        relatedCodes: ['NC-24', 'NC-36', 'NC-46', 'NC-57']
+      },
+      {
+        code: 'ND-16', name: 'Tourette Syndrome & Tic Disorders', shortTag: 'Premonitory Urges & Tics', category: 'Motor',
+        summary: 'Involuntary motor and vocal tics driven by physical urges.',
+        symptoms: ['Premonitory sensory itch before tics', 'Tics spiking under fluorescent lights or when watched (NC-57)', 'Exhaustion from suppressing tics'],
+        internalReality: 'Holding back tics takes 90% of brainpower.',
+        externalView: 'Treated like a voluntary habit.',
+        maskingTax: 'Muscle pain from tic suppression.',
+        sanctuaryAdjustment: 'Normalising regulatory movement (NC-37).',
+        relatedCodes: ['NC-11', 'NC-30', 'NC-37', 'NC-57', 'NC-63']
+      },
+      {
+        code: 'ND-17', name: 'Auditory Processing Disorder (APD)', shortTag: 'Hearing vs Decoding Speech', category: 'Sensory',
+        summary: 'Ears work, but sound-mixing desk cannot isolate voices from noise.',
+        symptoms: ['Auditory Wall (NC-18): noise merges with speech', '3-Second Lag (NC-20): saying "What?" then answering before repeat', 'Needing subtitles'],
+        internalReality: 'Sound arrives on one flat track; speech sounds like Sims language.',
+        externalView: 'Accused of not listening.',
+        maskingTax: 'Nodding and guessing from facial expressions.',
+        sanctuaryAdjustment: 'Written-over-verbal communication (NC-25).',
+        relatedCodes: ['NC-12', 'NC-18', 'NC-20', 'NC-25', 'NC-59']
+      },
+      {
+        code: 'ND-18', name: 'Misophonia (Sound Panic)', shortTag: 'Autonomic Trigger Sounds', category: 'Sensory',
+        summary: 'Specific repetitive sounds bypassing logic and triggering instant panic.',
+        symptoms: ['Surge of visceral rage at chewing or tapping sounds', 'Unable to think of anything else', 'Intense guilt afterwards'],
+        internalReality: 'Sound hot-wires straight into survival alarms.',
+        externalView: 'Told to just ignore it.',
+        maskingTax: 'Digging nails into palms to hide panic.',
+        sanctuaryAdjustment: 'Headphone use and brown noise.',
+        relatedCodes: ['NC-10', 'NC-12']
+      },
+      {
+        code: 'ND-19', name: 'ARFID & Sensory Safe-Food Profiles', shortTag: 'Sensory Food Safety', category: 'Sensory',
+        summary: 'Unpredictable food textures triggering gag or threat reflexes.',
+        symptoms: ['Relying on samefoods', 'Unexpected texture making meals impossible', 'Preferring starvation over unsafe textures'],
+        internalReality: 'Sensory system flags unpredictable food like eating gravel.',
+        externalView: 'Shamed as fussy.',
+        maskingTax: 'Anxiety around social meals and restaurants.',
+        sanctuaryAdjustment: 'Never comment on plates; provide predictable options.',
+        relatedCodes: ['NC-13', 'NC-15', 'NC-40']
+      },
+      {
+        code: 'ND-20', name: 'Sensory Processing Disorder (SPD)', shortTag: 'Hypersensitive & Sensory Seeking', category: 'Sensory',
+        summary: 'Sensory volume knobs turned up to 11 with no limiter.',
+        symptoms: ['Tactile pain from clothing tags (NC-13)', 'Visual and olfactory overload from lights (NC-14) or perfumes (NC-15)', 'Thermal drain (NC-17) wiping battery'],
+        internalReality: 'Living without sensory calluses.',
+        externalView: 'Called dramatic for wearing sunglasses inside.',
+        maskingTax: 'Enduring physical sensory pain silently.',
+        sanctuaryAdjustment: 'Tagless clothing and dimmable warm lights.',
+        relatedCodes: ['NC-10', 'NC-11', 'NC-13', 'NC-14', 'NC-15', 'NC-17']
+      },
+      {
+        code: 'ND-21', name: 'Alexithymia & Interoception', shortTag: 'Missed Body & Emotion Cues', category: 'Sensory',
+        summary: 'Internal dashboard gauges for hunger, thirst, and emotions not pinging until 0%.',
+        symptoms: ['Not noticing hunger or bathroom needs for hours (NC-40)', 'Delayed emotional processing', 'Feeling emotions as physical sensations'],
+        internalReality: 'Body skips warnings and jumps straight to shutdown.',
+        externalView: 'Pressured to explain feelings instantly.',
+        maskingTax: 'Inventing fake emotional answers.',
+        sanctuaryAdjustment: 'Use concrete Neuro-Codes instead of vague questions.',
+        relatedCodes: ['NC-17', 'NC-20', 'NC-36', 'NC-40', 'NC-64']
+      },
+      {
+        code: 'ND-22', name: 'BFRBs (Skin Picking & Hair Pulling)', shortTag: 'Body-Focused Repetitive Stims', category: 'Motor',
+        summary: 'Automatic, sensory-driven grooming loops triggered by stress.',
+        symptoms: ['Scanning skin or hair on autopilot', 'Seeking tactile feedback', 'Shame spirals from unhelpful comments'],
+        internalReality: 'Unconscious sensory-motor regulation keeping brain anchored.',
+        externalView: 'Misunderstood as self-harm.',
+        maskingTax: 'Hiding hands and carrying guilt.',
+        sanctuaryAdjustment: 'Keep tactile fidgets in pockets.',
+        relatedCodes: ['NC-11', 'NC-13', 'NC-37', 'NC-58']
+      },
+      {
+        code: 'ND-23', name: 'Hyperlexia & Aphantasia', shortTag: 'Visual & Linguistic Extremes', category: 'Learning',
+        summary: 'Operating at extremes of pattern-reading and mental imagery.',
+        symptoms: ['Hyperlexia: precocious reading', 'Aphantasia: zero visual pictures in mind\'s eye, thinking in abstract concepts'],
+        internalReality: 'Assuming everyone else\'s head works the same.',
+        externalView: 'Teaching methods assuming universal visualisation.',
+        maskingTax: 'Translating internal concepts into linear explanations.',
+        sanctuaryAdjustment: 'Multi-modal tools combining text and structure.',
+        relatedCodes: ['NC-25', 'NC-27', 'NC-32']
+      },
+      {
+        code: 'ND-24', name: 'Synaesthesia & CPTSD Overlap', shortTag: 'Cross-Wired Senses & Vigilance', category: 'Sensory',
+        summary: 'Cross-wired sensory channels and cumulative trauma from growing up unaccommodated.',
+        symptoms: ['Synaesthesia: letters having colours', 'CPTSD & Tone Trigger (NC-56): hyper-vigilance from past punishment'],
+        internalReality: 'Nervous system remembers every penalty for stimming.',
+        externalView: 'Wondering why you are guarded around authority.',
+        maskingTax: 'Living in chronic fight-or-flight.',
+        sanctuaryAdjustment: 'Explicit safety signals (NC-01) and full autonomy.',
+        relatedCodes: ['NC-01', 'NC-30', 'NC-54', 'NC-56']
       }
+    ];
 
-      Particle.prototype.update = function() {
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-        this.x += this.vx;
-        this.y += this.vy;
-      };
+    var currentCondCategory = 'all';
 
-      Particle.prototype.draw = function() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#d4af37';
-        ctx.fill();
-      };
-
-      for (var i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-      }
-
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        for (var a = 0; a < particles.length; a++) {
-          particles[a].update();
-          particles[a].draw();
-
-          for (var b = a + 1; b < particles.length; b++) {
-            var dx = particles[a].x - particles[b].x;
-            var dy = particles[a].y - particles[b].y;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 130) {
-              ctx.beginPath();
-              ctx.strokeStyle = 'rgba(212, 175, 55, ' + (1 - dist / 130) * 0.25 + ')';
-              ctx.lineWidth = 0.8;
-              ctx.moveTo(particles[a].x, particles[a].y);
-              ctx.lineTo(particles[b].x, particles[b].y);
-              ctx.stroke();
-            }
-          }
-
-          if (mouse.x !== null && mouse.y !== null) {
-            var mdx = particles[a].x - mouse.x;
-            var mdy = particles[a].y - mouse.y;
-            var mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-            if (mdist < mouse.radius) {
-              ctx.beginPath();
-              ctx.strokeStyle = 'rgba(56, 189, 248, ' + (1 - mdist / mouse.radius) * 0.4 + ')';
-              ctx.lineWidth = 1;
-              ctx.moveTo(particles[a].x, particles[a].y);
-              ctx.lineTo(mouse.x, mouse.y);
-              ctx.stroke();
-            }
-          }
+    function setCondCategory(cat) {
+      playTactileClick(300, 0.035);
+      currentCondCategory = cat;
+      document.querySelectorAll('.cond-pill').forEach(function(btn) {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#d4af37] text-[#0b0e14]';
+        } else {
+          btn.className = 'cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700';
         }
-        requestAnimationFrame(animate);
+      });
+      renderConditionGuide();
+    }
+
+    function renderConditionGuide() {
+      var mount = document.getElementById('condition-cards-mount');
+      if (!mount) return;
+      var q = (document.getElementById('cond-search-input').value || '').toLowerCase().trim();
+
+      var filtered = fullSpectrumConditions.filter(function(c) {
+        var matchCat = (currentCondCategory === 'all') || (c.category === currentCondCategory);
+        var matchQ = !q ||
+          c.code.toLowerCase().includes(q) ||
+          c.name.toLowerCase().includes(q) ||
+          c.shortTag.toLowerCase().includes(q) ||
+          c.summary.toLowerCase().includes(q) ||
+          c.internalReality.toLowerCase().includes(q) ||
+          c.maskingTax.toLowerCase().includes(q) ||
+          c.sanctuaryAdjustment.toLowerCase().includes(q) ||
+          c.symptoms.some(function(s) { return s.toLowerCase().includes(q); });
+        return matchCat && matchQ;
+      });
+
+      if (!filtered.length) {
+        mount.innerHTML = '<div class="col-span-full p-8 text-center bg-[#121721] border border-slate-800 rounded-xl font-mono text-sm text-slate-400">NO MATCHING PROFILES FOUND // Try clearing your search box.</div>';
+        return;
       }
-      animate();
-    })();
 
-    // Widget Controls & Preferences
-    window.toggleWidgetPanel = function() {
-      var wrapper = document.getElementById('audhme-widget-wrapper');
-      if (wrapper) wrapper.classList.toggle('panel-open');
-    };
+      mount.innerHTML = filtered.map(function(c) {
+        return '<div class="cond-compact-card" onclick="openConditionModal(\'' + c.code + '\')" style="background:#161d2a; border:1px solid rgba(212,175,55,0.32); border-bottom:3px solid #d4af37; border-radius:12px; padding:20px 16px; min-height:185px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:8px; cursor:pointer;">' +
+          '<span class="card-code-badge">' + c.code + '</span>' +
+          '<span class="card-title">' + c.name + '</span>' +
+          '<span class="text-xs text-sky-300 font-medium leading-snug px-1">' + c.shortTag + '</span>' +
+          '<span class="tap-hint">TAP TO OPEN FULL PROFILE &rarr;</span>' +
+        '</div>';
+      }).join('');
+    }
 
-    document.addEventListener('click', function(e) {
-      var wrapper = document.getElementById('audhme-widget-wrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        wrapper.classList.remove('panel-open');
+    function openConditionModal(code) {
+      var c = fullSpectrumConditions.find(function(item) { return item.code === code; });
+      if (!c) return;
+      playTactileClick(380, 0.05);
+
+      var symList = c.symptoms.map(function(s) {
+        return '<li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#d4af37] mt-0.5">◆</span><span>' + s + '</span></li>';
+      }).join('');
+
+      var codeBadges = c.relatedCodes.map(function(rc) {
+        return '<button onclick="closeConditionModal(); switchNeuropediaMode(\'codes\'); document.getElementById(\'nc-search-input\').value=\'' + rc + '\';" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/50 text-[#d4af37] font-mono text-xs font-bold" style="cursor:pointer;">' + rc + ' &rarr;</button>';
+      }).join('');
+
+      var content = document.getElementById('condition-modal-content');
+      content.innerHTML =
+        '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">' +
+          '<span class="organic-badge">' + c.code + ' // ' + c.category.toUpperCase() + ' PROFILE</span>' +
+          '<button onclick="closeConditionModal()" class="px-3.5 py-1.5 rounded-lg bg-[#0b0e14] border border-slate-700 text-slate-300 hover:text-white font-mono text-xs font-extrabold" style="cursor:pointer;">✕ CLOSE PROFILE [ESC]</button>' +
+        '</div>' +
+        '<h2 class="text-2xl sm:text-3xl font-black text-white mb-2">' + c.name + '</h2>' +
+        '<p class="text-sky-300 text-base font-medium leading-relaxed mb-5">' + c.summary + '</p>' +
+        '<div class="mb-5 p-4 rounded-xl bg-[#0b0e14] border border-slate-800 text-left">' +
+          '<div class="font-mono text-xs font-extrabold text-[#d4af37] uppercase tracking-wider mb-2.5">WHAT IT ACTUALLY LOOKS &amp; FEELS LIKE:</div>' +
+          '<ul class="space-y-2.5 m-0 p-0 list-none">' + symList + '</ul>' +
+        '</div>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 text-left">' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-sky-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-sky-400 uppercase mb-1">01 // INSIDE YOUR HEAD</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.internalReality + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-slate-800">' +
+            '<div class="font-mono text-xs font-extrabold text-slate-400 uppercase mb-1">02 // HOW OTHERS MISREAD IT</div>' +
+            '<p class="text-slate-300 text-xs sm:text-sm leading-relaxed m-0">' + c.externalView + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-rose-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-rose-400 uppercase mb-1">03 // THE MASKING TAX</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.maskingTax + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-emerald-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-emerald-400 uppercase mb-1">04 // WHAT ACTUALLY HELPS</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.sanctuaryAdjustment + '</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">' +
+          '<span class="font-mono text-xs text-slate-400">LINKED NEURO-CODES:</span>' +
+          '<div class="flex flex-wrap gap-1.5">' + codeBadges + '</div>' +
+        '</div>';
+
+      document.getElementById('condition-detail-modal').classList.add('modal-open');
+    }
+
+    function closeConditionModal() {
+      var modal = document.getElementById('condition-detail-modal');
+      if (modal && modal.classList.contains('modal-open')) {
+        playTactileClick(240, 0.04);
+        modal.classList.remove('modal-open');
+      }
+    }
+
+    function openCrisisHud(code, title, desc) {
+      playTactileClick(420, 0.07);
+      document.getElementById('hud-modal-code').textContent = code + ' // ACTIVE ADVOCACY PASS';
+      document.getElementById('hud-modal-title').textContent = title;
+      document.getElementById('hud-modal-desc').textContent = desc;
+      document.getElementById('crisis-hud-modal').classList.add('hud-active');
+    }
+
+    function closeCrisisHud() {
+      playTactileClick(220, 0.05);
+      document.getElementById('crisis-hud-modal').classList.remove('hud-active');
+    }
+
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeCrisisHud();
+        closeConditionModal();
       }
     });
 
-    window.changeSiteBackground = function(theme) {
-      var body = document.body;
-      body.classList.remove('bg-nebula', 'bg-gold-matrix', 'bg-cyber-obsidian');
-      if (theme && theme !== 'default') body.classList.add('bg-' + theme);
-      try { localStorage.setItem('audhme_bg_theme', theme); } catch(e) {}
-    };
-
-    window.toggleLowInputMode = function() {
-      var body = document.body;
-      var isLow = body.classList.toggle('low-input-active');
-      try { localStorage.setItem('audhme_sensory_mode', isLow ? 'low' : 'high'); } catch(e) {}
-    };
-
-    (function() {
-      function restorePreferences() {
-        try {
-          var savedTheme = localStorage.getItem('audhme_bg_theme');
-          if (savedTheme) {
-            var selectEl = document.getElementById('bg-theme-select');
-            if (selectEl) selectEl.value = savedTheme;
-            window.changeSiteBackground(savedTheme);
-          }
-
-          if (localStorage.getItem('audhme_sensory_mode') === 'low') {
-            document.body.classList.add('low-input-active');
-          }
-        } catch(e) {}
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', restorePreferences);
-      } else {
-        restorePreferences();
-      }
-    })();
-
-    /* Storefront Hoodie Carousel */
-    (function() {
-      function switchSlide(dir, idx) {
-        var s = document.querySelectorAll('#pane-neuroverse .hud-slide'),
-            t = document.querySelectorAll('#pane-neuroverse .dot');
-        if (!s.length) return;
-        var c = 0;
-        s.forEach(function(x, i) { if (x.classList.contains('active-slide')) c = i; });
-        var i = (idx !== undefined) ? idx : (c + dir + s.length) % s.length;
-        s.forEach(function(x, k) { x.classList.toggle('active-slide', k === i); });
-        t.forEach(function(x, k) { x.classList.toggle('active-dot', k === i); });
-      }
-      document.addEventListener('click', function(e) {
-        var d = e.target.closest('.dot');
-        if (d) switchSlide(0, parseInt(d.getAttribute('data-target'), 10));
-      });
-      var startX = 0, startY = 0;
-      document.addEventListener('touchstart', function(e) {
-        var a = e.target.closest('#hoodie-swipe-area');
-        if (a) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }
-      }, { passive: true });
-      document.addEventListener('touchend', function(e) {
-        var a = e.target.closest('#hoodie-swipe-area');
-        if (!a || !startX) return;
-        var dX = e.changedTouches[0].clientX - startX,
-            dY = e.changedTouches[0].clientY - startY;
-        if (Math.abs(dX) > 30 && Math.abs(dX) > Math.abs(dY)) { switchSlide(dX < 0 ? 1 : -1); }
-        startX = 0;
-      }, { passive: true });
-    })();
+    document.addEventListener('DOMContentLoaded', function() {
+      handleInitialRoute();
+      renderConditionGuide();
+      startGroundingBoot();
+    });
   </script>
-</body>
-</html>
