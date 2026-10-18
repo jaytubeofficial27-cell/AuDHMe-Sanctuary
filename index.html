@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AuDHMe™ // System Hub &amp; Neurodivergent Sanctuary</title>
+  <title>AuDHMe™ // Neurodivergent Sanctuary & System Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -24,13 +25,12 @@
     html {
       margin: 0 !important; padding: 0 !important; width: 100%;
       overflow-x: hidden; overflow-y: scroll; scroll-behavior: smooth;
-      background-color: #060913 !important;
+      background-color: var(--bg-linen) !important;
     }
 
     body {
       margin: 0 !important; padding: 0 !important; width: 100%; min-height: 100vh;
-      overflow-x: hidden; background-color: #060913 !important;
-      background-image: radial-gradient(circle at 50% 20%, #0b0f19 0%, #060913 100%) !important;
+      overflow-x: hidden; background-color: var(--bg-linen) !important;
       color: var(--text-primary);
       font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       position: relative;
@@ -96,59 +96,16 @@
     .audh-hamburger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 6px; padding: 10px; z-index: 1001; }
     .audh-hamburger span { display: block; width: 28px; height: 3px; background: #f1f5f9; border-radius: 2px; }
 
-    /* Page Sections Routing */
+    /* Section Routing Visibility */
     .sanctuary-section { display: none !important; visibility: hidden !important; }
     .sanctuary-section.active-section { display: block !important; visibility: visible !important; }
 
-    /* Cards & Grids Styling */
-    .cards-grid {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
-      gap: 18px !important;
-      width: 100%;
-    }
-    .flip-card {
-      background-color: transparent !important;
-      height: 190px !important;
-      perspective: 1000px !important;
-      cursor: pointer !important;
-      width: 100%;
-    }
-    .flip-card-inner {
-      position: relative !important;
-      width: 100% !important;
-      height: 100% !important;
-      text-align: center !important;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
-      transform-style: preserve-3d !important;
-    }
-    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg) !important; }
-    .flip-card-front, .flip-card-back {
-      position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important;
-      backface-visibility: hidden !important; -webkit-backface-visibility: hidden !important;
-      border-radius: 12px !important; padding: 16px !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important;
-    }
-    .flip-card-front {
-      background: rgba(15, 23, 42, 0.95) !important; border: 1px solid rgba(212, 175, 55, 0.35) !important;
-      align-items: center !important; justify-content: center !important; gap: 8px !important;
-    }
-    .flip-card-back {
-      background: #060913 !important; border: 1px solid #38bdf8 !important; transform: rotateY(180deg) !important;
-      text-align: left !important; justify-content: space-between !important;
-    }
-    .card-code-badge { font-size: 1.15rem !important; font-weight: 800 !important; color: #38bdf8 !important; font-family: 'JetBrains Mono', monospace !important; }
-    .card-title { font-size: 0.85rem !important; font-weight: 700 !important; color: #f8fafc !important; text-transform: uppercase !important; }
-    .tap-hint { font-size: 0.6rem !important; font-weight: 700 !important; color: #64748b !important; letter-spacing: 0.08em !important; }
-    .series-block-container {
-      background: rgba(11, 15, 25, 0.88) !important; border: 1px solid rgba(212, 175, 55, 0.3) !important;
-      border-radius: 14px !important; padding: 24px !important; margin-bottom: 30px !important; text-align: left !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+    .system-gold-divider {
+      width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 20%, rgba(212, 175, 55, 0.4) 80%, transparent); margin: 24px 0; border: none;
     }
     .organic-badge, .initiative-badge {
       font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 800; color: var(--brass);
       background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.35); padding: 4px 10px; border-radius: 6px; display: inline-block; text-transform: uppercase;
-    }
-    .system-gold-divider {
-      width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4) 20%, rgba(212, 175, 55, 0.4) 80%, transparent); margin: 24px 0; border: none;
     }
 
     @media (max-width: 900px) {
@@ -178,7 +135,7 @@
       <div>
         <span class="organic-badge">LOW-DEMAND SANCTUARY // ZERO MASKING TAX</span>
         <h2 class="text-xl font-black text-white mt-2 mb-1">Drop Your Shoulders. Unclench Your Jaw.</h2>
-        <p class="text-sm text-slate-300 max-w-md mx-auto">You don't have to perform or mask here. Follow the breathing circle or use the comfort settings below if you prefer complete quiet.</p>
+        <p class="text-sm text-slate-300 max-w-md mx-auto">You don't have to perform or mask here. Follow the breathing circle or use the comfort settings if you prefer complete quiet.</p>
       </div>
       <div class="stim-fidget-strip">
         <span class="font-mono text-[11px] font-bold text-[#d4af37] uppercase tracking-wider">TACTILE STIM BAR // TAP TO POP &amp; CHIME</span>
@@ -255,7 +212,6 @@
       </ul>
     </nav>
   </div>
-
   <!-- =========================================================================
        SECTION: HOME
        ========================================================================= -->
@@ -305,9 +261,8 @@
       </div>
     </div>
   </div>
-
   <!-- =========================================================================
-       SECTION: NEUROPEDIA
+       SECTION: NEUROPEDIA (FULL CODES & 24 CONDITION PROFILES)
        ========================================================================= -->
   <div id="section-neuropedia" class="sanctuary-section">
     <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
@@ -331,6 +286,7 @@
 
       <!-- NEUROPEDIA SUB-VIEW A: ALL CODES SERIES (00 - 60) -->
       <div id="neuropedia-codes-view">
+        <!-- Series 00 -->
         <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">FOUNDATION</span>
@@ -342,6 +298,7 @@
           </div>
         </div>
 
+        <!-- Series 10: Sensory -->
         <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">SENSORY</span>
@@ -357,6 +314,7 @@
           </div>
         </div>
 
+        <!-- Series 20: Processing -->
         <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">PROCESSING</span>
@@ -370,6 +328,7 @@
           </div>
         </div>
 
+        <!-- Series 30: Social -->
         <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">SOCIAL</span>
@@ -383,6 +342,7 @@
           </div>
         </div>
 
+        <!-- Series 40, 50, 60 -->
         <div class="series-block-container">
           <div style="display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; margin-bottom: 16px;">
             <span class="initiative-badge" style="font-size: 0.65rem;">SAFETY &amp; GROWTH</span>
@@ -421,157 +381,285 @@
   <div id="condition-detail-modal" role="dialog" aria-modal="true" aria-label="Condition Profile Details" onclick="if(event.target === this) closeConditionModal()" style="position:fixed; inset:0; z-index:999998; background:rgba(6,9,19,0.9); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; padding:20px; overflow-y:auto;">
     <div class="cond-modal-card" id="condition-modal-content" style="width:100%; max-width:840px; max-height:90vh; overflow-y:auto; background:#0b0f19; border:2px solid #d4af37; border-radius:16px; padding:28px; box-shadow:0 25px 60px rgba(0,0,0,0.85); text-align:left;"></div>
   </div>
-
-  <!-- =========================================================================
-       SECTION: THE BUILD
+ <!-- =========================================================================
+       SECTION: THE BUILD (MATERIAL LAUNCH PORTAL)
        ========================================================================= -->
   <div id="section-build" class="sanctuary-section">
     <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 0 0 8px 0;">Material Launch Portal</h1>
+      <div class="launch-portal-header-container" style="text-align: center; margin-bottom: 24px;">
+        <h1 class="portal-main-heading" style="font-size: 2.4rem; font-weight: 900; color: #f8fafc; margin: 0 0 12px 0;">Material Launch Portal</h1>
         <div class="system-gold-divider"></div>
       </div>
-      <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);">
-        <h3 style="font-size: 1.3rem; font-weight: 800; color: #38bdf8; margin: 0 0 10px 0;">From Digital Screen to Physical Cards</h3>
-        <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; margin: 0 0 16px 0;">The digital Neuropedia will always remain 100% free. Backing The Build directly funds raw materials on the workbench: 310gsm matte black-core linen cardstock, CR80 Neuro-Passes, and quiet industrial tin cases.</p>
-        <a href="https://buy.stripe.com/00wbJ12gDeIgazGaQ9frW01" target="_blank" rel="noopener noreferrer" style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 800; color: #060913; background: #d4af37; padding: 10px 18px; border-radius: 8px; text-decoration: none; text-transform: uppercase;">Pre-Order Physical Deck (£25) &nearr;</a>
+
+      <div class="carrd-safe-chassis-container">
+        <div class="integrated-portal-component">
+          <h2 class="component-integrated-title" style="text-align: center; margin-bottom: 20px;">The Material Mission</h2>
+          <div class="project-log" style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+            <div class="log-meta">
+              <span class="log-tag">PROJECT LOG: MATERIAL FUND</span>
+              <span class="log-ver">VER 1.4</span>
+            </div>
+            <h4 class="log-subtitle" style="margin: 10px 0;">From Blueprint to Tactile Reality: Funding the Physical Build.</h4>
+            <div class="promise-callout">
+              <span class="promise-badge">THE ACCESSIBILITY PROMISE</span>
+              <p>The AuDHMe™ Neuro-Code™ digital engine will always remain open-access and free.</p>
+            </div>
+            <p class="log-body">Translating these digital codes and credentialing standards into physical, high-durability, zero-verbal communication tools requires industrial materials. We are bypassing traditional corporate manufacturing by sourcing and building our initial runs directly from the workbench.</p>
+            <p class="log-highlight">By backing this campaign, you are directly funding premium raw materials to unlock our first production pipeline.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="carrd-safe-chassis-container">
+        <div class="integrated-portal-component">
+          <h2 class="component-integrated-title" style="text-align: center; margin-bottom: 20px;">What is Being Backed?</h2>
+          <div class="backing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="backing-card" style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 20px;">
+              <h4 class="card-title">The Core Deck</h4>
+              <ul class="spec-list">
+                <li><strong>Material:</strong> 310gsm Black-Core Linen Cardstock.</li>
+                <li><strong>Finish:</strong> Premium matte, low-glare. Bypasses NC-14 (Visual Noise).</li>
+                <li><strong>Durability:</strong> Built for high-friction handling under stress.</li>
+              </ul>
+            </div>
+            <div class="backing-card" style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 20px;">
+              <h4 class="card-title">The Neuro-Pass</h4>
+              <ul class="spec-list">
+                <li><strong>Material:</strong> CR80 Professional Credential Format.</li>
+                <li><strong>Integration:</strong> Icon Communication Bar for non-verbal crisis support.</li>
+                <li><strong>Utility:</strong> Secure physical identification backed by strict UK GDPR protocols.</li>
+              </ul>
+            </div>
+            <div class="backing-card" style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 20px;">
+              <h4 class="card-title">The Sensory Container</h4>
+              <ul class="spec-list">
+                <li><strong>Material:</strong> Seamless, Matte-Finished Industrial Tinware.</li>
+                <li><strong>Acoustics:</strong> Rugged, quiet, compact travel case.</li>
+                <li><strong>Utility:</strong> Secures your active codes and tactile tools on any desk.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carrd-safe-chassis-container">
+        <div class="integrated-portal-component">
+          <h2 class="component-integrated-title" style="text-align: center; margin-bottom: 20px;">Support Tiers & Pre-Orders</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="tier-container">
+              <div class="tier-header-row">
+                <div class="tier-model-badge">SLIDING SCALE MODEL</div>
+                <div class="tier-price-point">Pay What You Can</div>
+              </div>
+              <div class="benefit-node"><span class="benefit-bullet">◆</span><p class="benefit-text">Keeps live Neuropedia 100% ad-free, public, and open-access for grassroots community self-advocacy.</p></div>
+              <a href="https://buy.stripe.com/cNieVdf3p0Rq7nu5vPfrW00" class="action-trigger" target="_blank" rel="noopener noreferrer">Allocate Digital Support</a>
+            </div>
+            <div class="tier-container">
+              <div class="tier-header-row">
+                <div class="tier-model-badge">PREMIUM DIGITAL STATUS</div>
+                <div class="tier-price-point">£10</div>
+              </div>
+              <div class="benefit-node"><span class="benefit-bullet">◆</span><p class="benefit-text">Unlocks a dedicated suite of copy-ready status formats optimized for Discord and email signatures.</p></div>
+              <a href="https://jasonparish.gumroad.com/l/krcaug" class="action-trigger" target="_blank" rel="noopener noreferrer">Secure Digital Expansion Pass</a>
+            </div>
+            <div class="tier-container">
+              <div class="tier-header-row">
+                <div class="tier-model-badge">PRODUCTION RUN PRE-ORDER</div>
+                <div class="tier-price-point">£25</div>
+              </div>
+              <div class="benefit-node"><span class="benefit-bullet">◆</span><p class="benefit-text">Guarantees your allocation in the very first professional workbench production batch.</p></div>
+              <a href="https://buy.stripe.com/00wbJ12gDeIgazGaQ9frW01" class="action-trigger" target="_blank" rel="noopener noreferrer">Secure Production Run Unit</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="disclaimer-system-container" style="text-align: center; margin-top: 30px;">
+        <div class="system-gold-divider"></div>
+        <h2 class="disclaimer-main-title" style="font-size: 1.1rem; color: #f8fafc; margin-bottom: 8px;">Legal Notice & Disclaimer</h2>
+        <p class="disclaimer-core-text" style="font-size: 0.8rem; color: #94a3b8; max-width: 750px; margin: 0 auto; line-height: 1.5;">All original frameworks displayed here, including the Neuro-Code™ Protocol and AuDHMe™ ecosystem, are the exclusive intellectual property of Jason Parish © 2026. Real-time access is freely permitted for individual self-advocacy.</p>
       </div>
     </div>
   </div>
-
   <!-- =========================================================================
-       SECTION: PETITION
+       SECTION: PETITION (THE SANCTUARY STANDARD)
        ========================================================================= -->
   <div id="section-petition" class="sanctuary-section">
-    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
-      <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 36px 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);">
+    <div class="petition-master-container" style="width: 100%; max-width: 900px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
+      <div class="neuroverse-header-container" style="margin-bottom: 24px;">
         <span class="initiative-badge">CIVIC LEGISLATION &amp; INFRASTRUCTURE DIRECTIVE</span>
-        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 14px 0;">The Sanctuary Standard</h1>
-        <p style="font-size: 1rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 24px auto; line-height: 1.6;">Challenging workplace and public norms at the root to establish legally recognised, low-demand, sensory-safe rooms and protocols.</p>
-        <a href="https://www.change.org/MandatorySensoryRooms" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #d4af37; color: #060913; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.9rem; padding: 14px 28px; border-radius: 8px; text-decoration: none; text-transform: uppercase;">Sign Petition on Change.org &nearr;</a>
+        <h1 class="neuroverse-main-heading" style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 14px 0;">The Sanctuary Standard</h1>
+        <p class="petition-lead-manifesto" style="font-size: 1rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 20px auto; line-height: 1.6;">A campaign to establish legally recognized, low-demand, sensory-safe environments in public and civic infrastructure, replacing mandatory masking with physical sovereignty.</p>
+        <div class="system-gold-divider"></div>
+      </div>
+
+      <!-- Telemetry Banner -->
+      <div class="telemetry-banner" style="display: flex; justify-content: space-around; background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 8px; padding: 14px 20px; margin-bottom: 30px;">
+        <div class="telemetry-node"><span class="telemetry-label" style="font-family: monospace; font-size: 0.65rem; color: #94a3b8; font-weight: bold;">CAMPAIGN STATUS</span><span class="telemetry-value" style="font-size: 0.9rem; font-weight: 800; color: #38bdf8;">ACTIVE ADVOCACY</span></div>
+        <div class="telemetry-node"><span class="telemetry-label" style="font-family: monospace; font-size: 0.65rem; color: #94a3b8; font-weight: bold;">TARGET JURISDICTION</span><span class="telemetry-value" style="font-size: 0.9rem; font-weight: 800; color: #f8fafc;">PUBLIC &amp; CIVIC SPACES</span></div>
+        <div class="telemetry-node"><span class="telemetry-label" style="font-family: monospace; font-size: 0.65rem; color: #94a3b8; font-weight: bold;">CORE DEMAND</span><span class="telemetry-value" style="font-size: 0.9rem; font-weight: 800; color: #d4af37;">ZERO MASKING TAX</span></div>
+      </div>
+
+      <!-- Pillars Grid -->
+      <div style="margin-bottom: 30px; text-align: left;">
+        <h2 class="section-title" style="font-size: 1.2rem; font-weight: 800; color: #f8fafc; text-align: center; margin-bottom: 18px; text-transform: uppercase;">The Three Pillars of Sanctuary</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+          <div style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 18px;">
+            <span class="card-num" style="font-family: monospace; font-size: 0.7rem; color: #d4af37; background: rgba(212,175,55,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px;">01</span>
+            <h3 style="font-size: 1rem; font-weight: 800; color: #38bdf8; margin: 0 0 6px 0;">Acoustic &amp; Visual Regulation</h3>
+            <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; margin: 0;">Mandatory low-sensory zoning in civic facilities, including quiet corridors and flicker-free lighting protocols.</p>
+          </div>
+          <div style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 18px;">
+            <span class="card-num" style="font-family: monospace; font-size: 0.7rem; color: #d4af37; background: rgba(212,175,55,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px;">02</span>
+            <h3 style="font-size: 1rem; font-weight: 800; color: #38bdf8; margin: 0 0 6px 0;">Literal &amp; Direct Communication</h3>
+            <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; margin: 0;">Enforcement of zero-subtext signage and predictable, multi-modal public navigation options.</p>
+          </div>
+          <div style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 18px;">
+            <span class="card-num" style="font-family: monospace; font-size: 0.7rem; color: #d4af37; background: rgba(212,175,55,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px;">03</span>
+            <h3 style="font-size: 1rem; font-weight: 800; color: #38bdf8; margin: 0 0 6px 0;">Low-Demand Infrastructure</h3>
+            <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; margin: 0;">Establishing non-verbal service channels and physical retreat zones to prevent meltdowns and burnout.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Deck -->
+      <div class="petition-action-deck" style="background: rgba(11, 15, 25, 0.9); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #d4af37; margin: 0 0 6px 0;">JOIN THE OFFICIAL CAMPAIGN</h2>
+        <p style="font-size: 0.88rem; color: #cbd5e1; margin: 0 0 18px 0;">Our official petition is hosted live on Change.org for verified signature logging and legal compliance.</p>
+        <a href="https://www.change.org/MandatorySensoryRooms" target="_blank" rel="noopener noreferrer" class="petition-submit-btn" style="display: inline-block; background: #38bdf8; color: #060913; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.85rem; padding: 14px 28px; border-radius: 8px; text-decoration: none; text-transform: uppercase;">Sign the Petition on Change.org &nearr;</a>
+      </div>
+
+      <div class="disclaimer-system-container" style="margin-top: 30px;">
+        <div class="system-gold-divider"></div>
+        <p style="font-size: 0.78rem; color: #94a3b8; max-width: 750px; margin: 0 auto; line-height: 1.5;">The Sanctuary Standard is a civic advocacy blueprint created by Jason Parish © 2026 under the AuDHMe™ framework. Official petition signatures are recorded via Change.org.</p>
       </div>
     </div>
   </div>
-
   <!-- =========================================================================
-       SECTION: NEUROVERSE
+       SECTION: NEUROVERSE & STOREFRONT
        ========================================================================= -->
   <div id="section-neuroverse" class="sanctuary-section">
-    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 0 0 8px 0;">The Neuroverse</h1>
+    <div style="width: 100%; max-width: 900px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
+      <div class="neuroverse-header-container" style="text-align: center; margin-bottom: 24px;">
+        <h1 class="neuroverse-main-heading" style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 0 0 12px 0;">The Neuroverse &amp; Storefront</h1>
         <div class="system-gold-divider"></div>
       </div>
-      <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px);">
-        <h3 style="font-size: 1.5rem; font-weight: 900; color: #f8fafc; margin: 0 0 10px 0;">Unity Ventures</h3>
-        <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; margin: 0 0 20px 0;">Accessible local gatherings, pay-what-you-can sensory movie nights, and unmasked safe harbours designed to eliminate financial and social barriers.</p>
-        <a href="https://unityventures.carrd.co/#about" target="_blank" rel="noopener noreferrer" style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 800; color: #060913; background: #38bdf8; padding: 10px 18px; border-radius: 8px; text-decoration: none;">Explore Unity Ventures &nearr;</a>
+
+      <!-- Unity Ventures Showcase -->
+      <div class="uv-hero-card" style="background: rgba(11, 15, 25, 0.9); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 24px; margin-bottom: 30px;">
+        <span class="initiative-badge" style="margin-bottom: 10px;">COMMUNITY INITIATIVE // PAY WHAT YOU CAN</span>
+        <h3 style="font-size: 1.4rem; font-weight: 900; color: #f8fafc; margin: 0 0 10px 0;">Unity Ventures</h3>
+        <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.6; margin: 0 0 18px 0;">Accessible local gatherings, pay-what-you-can sensory movie nights, and unmasked safe harbours designed to eliminate financial and social barriers.</p>
+        <a href="https://unityventures.carrd.co/#about" target="_blank" rel="noopener noreferrer" style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 800; color: #060913; background: #38bdf8; padding: 10px 18px; border-radius: 8px; text-decoration: none; text-transform: uppercase;">Explore Unity Ventures &nearr;</a>
+      </div>
+
+      <!-- Storefront Carousel / Deck -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">Sensory Apparel &amp; Gear</h2>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.35); padding: 3px 10px; border-radius: 16px; display: inline-block;">HEAVYWEIGHT GROUNDING HOODIES</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 30px;">
+        <div style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="height: 180px; background: rgba(6, 9, 19, 0.7); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; padding: 10px;">
+              <img src="https://www.image2url.com/r2/default/files/1781708703645-894d977d-af16-47ef-b2c6-d44925e5373d.png" alt="AuDHMe Core Hoodie" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+            <h3 style="font-size: 1rem; font-weight: 800; color: #f8fafc; margin: 0 0 6px 0;">The AuDHMe™ Core Hoodie</h3>
+            <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 10px 0;">Heavyweight ring-spun cotton blend featuring our gold geometric emblem.</p>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #d4af37; margin-bottom: 10px;">£39.99</div>
+          </div>
+          <a href="https://buy.stripe.com/14A00l1qdcYYfBL9iLeQM03" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.6); color: #d4af37; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 800; padding: 10px; border-radius: 6px; text-decoration: none; text-transform: uppercase;">Buy Now</a>
+        </div>
+
+        <div style="background: rgba(11, 15, 25, 0.85); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="height: 180px; background: rgba(6, 9, 19, 0.7); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; padding: 10px;">
+              <img src="https://www.image2url.com/r2/default/files/1781708814875-2d29dc18-e51e-4b59-ab22-18b8abf64ca4.png" alt="Spectrum Hoodie Black" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+            <h3 style="font-size: 1rem; font-weight: 800; color: #f8fafc; margin: 0 0 6px 0;">The Spectrum Hoodie (Black)</h3>
+            <p style="font-size: 0.82rem; color: #38bdf8; font-style: italic; font-weight: 700; margin: 0 0 6px 0;">"The Spectrum Starts With Me!"</p>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #d4af37; margin-bottom: 10px;">£39.99</div>
+          </div>
+          <a href="https://buy.stripe.com/6oUfZj2uhcYY4X70MfeQM02" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.6); color: #d4af37; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 800; padding: 10px; border-radius: 6px; text-decoration: none; text-transform: uppercase;">Buy Now</a>
+        </div>
+      </div>
+
+      <div class="disclaimer-system-container" style="text-align: center; margin-top: 30px;">
+        <div class="system-gold-divider"></div>
+        <p style="font-size: 0.78rem; color: #94a3b8; max-width: 750px; margin: 0 auto; line-height: 1.5;">Unity Ventures community initiatives and apparel store partnerships operate under dedicated community guidelines to ensure sustainable access.</p>
       </div>
     </div>
   </div>
-
   <!-- =========================================================================
-       SECTION: CIVIC
-       ========================================================================= -->
-  <div id="section-civic" class="sanctuary-section">
-    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: center;">
-      <div style="margin-bottom: 30px;">
-        <span class="initiative-badge">CIVIC VERIFICATION // ACCESSIBILITY TOOLS</span>
-        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 14px 0;">Civic Access &amp; Passes</h1>
-        <p style="font-size: 0.95rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 20px auto; line-height: 1.6;">Established UK verification systems providing recognised proof of accessibility needs without explaining private medical histories.</p>
-        <div class="system-gold-divider"></div>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; text-align: left;">
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <span class="initiative-badge" style="font-size: 0.65rem;">SYSTEM INTEGRATED ACCESS</span>
-            <h3 style="font-size: 1.2rem; font-weight: 800; color: #f8fafc; margin: 6px 0 4px 0;">Nimbus Access Card</h3>
-            <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px;">Translates disability and accessibility needs into universal symbols for automated online booking and companion tickets.</p>
-          </div>
-          <a href="https://www.accesscard.online" target="_blank" rel="noopener noreferrer" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 800; color: #060913; background: #38bdf8; padding: 10px; border-radius: 6px; text-decoration: none; text-align: center; text-transform: uppercase;">Apply via Access Card &nearr;</a>
-        </div>
-        <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <span class="initiative-badge" style="font-size: 0.65rem; color: #d4af37; background: rgba(212, 175, 55, 0.15);">EVERYDAY VISUAL PROOF</span>
-            <h3 style="font-size: 1.2rem; font-weight: 800; color: #f8fafc; margin: 6px 0 4px 0;">National Disability Card</h3>
-            <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px;">Straightforward photo ID for retail, transport, and public spaces to confirm status without private paperwork.</p>
-          </div>
-          <a href="https://www.nationaldisabilitycard.co.uk" target="_blank" rel="noopener noreferrer" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 800; color: #060913; background: #d4af37; padding: 10px; border-radius: 6px; text-decoration: none; text-align: center; text-transform: uppercase;">Apply via Disability Card &nearr;</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       SECTION: THE CREATOR
+       SECTION: THE CREATOR (JASON PARISH)
        ========================================================================= -->
   <div id="section-creator" class="sanctuary-section">
-    <div style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <span class="initiative-badge">SOLO ARCHITECT // LIVED AuDHD EXPERIENCE</span>
-        <h1 style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 8px 0;">The Creator</h1>
+    <div class="creator-master-container" style="width: 100%; max-width: 850px; margin: 0 auto; padding: 36px 20px 60px 20px; box-sizing: border-box; text-align: left;">
+      <div class="neuroverse-header-container" style="text-align: center; margin-bottom: 24px;">
+        <span class="initiative-badge">SOLO SYSTEM ARCHITECT // LIVED EXPERIENCE</span>
+        <h1 class="neuroverse-main-heading" style="font-size: 2.3rem; font-weight: 900; color: #f8fafc; margin: 8px 0 12px 0;">The Creator</h1>
+        <p class="creator-lead-manifesto" style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.6; max-width: 750px; margin: 0 auto 20px auto;">AuDHMe™ wasn't drawn up in a corporate boardroom. It was forged out of daily survival, pattern-recognition, and the necessity of building an operating system for an unaccommodating world.</p>
         <div class="system-gold-divider"></div>
       </div>
-      <div style="background: rgba(11, 15, 25, 0.88); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); backdrop-filter: blur(10px); display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; align-items: center;">
-        <div style="width: 100%; height: 240px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(212, 175, 55, 0.45); background: #000;">
-          <img src="https://lh3.googleusercontent.com/d/1znEIszd19WqZbz-bVzLUL1YCHcXJTYGe" alt="Jason Parish" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-        </div>
-        <div>
-          <h3 style="font-size: 1.4rem; font-weight: 900; color: #f8fafc; margin: 0 0 8px 0;">Jason Parish // Founder</h3>
-          <p style="font-size: 0.92rem; color: #cbd5e1; line-height: 1.6; margin: 0 0 12px 0;">AuDHMe™ was built out of daily AuDHD survival, hyperfocus, and pattern-matching, turning lived friction into practical tools for the whole neurodivergent community.</p>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #38bdf8; font-weight: 800;">ZERO SUBTEXT / NO MASKING TAX</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Background Canvas -->
-  <canvas id="neuro-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none; display:block;"></canvas>
+      <!-- Profile Card with Glitch Feed -->
+      <div class="creator-profile-card" style="background: rgba(11, 15, 25, 0.75); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        
+        <div class="architect-feed-wrapper" style="display: grid; grid-template-columns: 260px 1fr; gap: 24px; margin-bottom: 28px; align-items: center;">
+          <!-- Glitch Photo Frame -->
+          <div class="glitch-feed-container" style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="glitch-status-badge" style="display: flex; align-items: center; gap: 6px; background: rgba(6, 9, 19, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 4px 8px;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff0055; box-shadow: 0 0 8px #ff0055;"></span>
+              <span style="font-family: monospace; font-size: 0.6rem; font-weight: 800; color: #38bdf8; letter-spacing: 0.05em;">SIGNAL: UNSTABLE // TELEMETRY FEED</span>
+            </div>
 
-  <!-- Floating Visual Comfort & Audio Control Widget -->
-  <div id="audhme-widget-wrapper" style="position:fixed; bottom:24px; right:24px; z-index:999999;">
-    <div id="audhme-widget-panel" style="display:none; position:absolute; bottom:60px; right:0; width:280px; background:#0b0f19; border:1px solid #d4af37; border-radius:12px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.8); text-align:left;">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:12px;">
-        <span style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:800; color:#d4af37;">VISUAL COMFORT &amp; AUDIO</span>
-        <span onclick="toggleWidgetPanel()" style="cursor:pointer; color:#94a3b8; font-weight:bold;">✕</span>
+            <div class="glitch-image-viewport" style="position: relative; width: 100%; height: 260px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.35); background: #000;">
+              <img src="https://lh3.googleusercontent.com/d/1znEIszd19WqZbz-bVzLUL1YCHcXJTYGe" alt="Jason Parish - System Architect" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.4) 50%), linear-gradient(90deg, rgba(255,0,0,0.05), rgba(0,255,0,0.02), rgba(0,0,255,0.05)); background-size: 100% 4px, 6px 100%; pointer-events: none;"></div>
+            </div>
+          </div>
+
+          <!-- Telemetry Box -->
+          <div class="architect-telemetry-box" style="background: rgba(6, 9, 19, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(51, 65, 85, 0.5); padding-bottom: 8px; margin-bottom: 14px;">
+              <span style="font-family: monospace; font-size: 0.75rem; font-weight: 800; color: #38bdf8;">ARCHITECT DOSSIER</span>
+              <span style="font-family: monospace; font-size: 0.7rem; font-weight: bold; color: #d4af37;">FOUNDER // JASON PARISH</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div><span style="font-family: monospace; font-size: 0.65rem; color: #64748b; display: block;">OPERATING SYSTEM:</span><span style="font-size: 0.85rem; font-weight: 700; color: #38bdf8;">AuDHD (ASD + ADHD Combined)</span></div>
+              <div><span style="font-family: monospace; font-size: 0.65rem; color: #64748b; display: block;">BUILD ENGINE:</span><span style="font-size: 0.85rem; font-weight: 700; color: #d4af37;">Hyperfocus &amp; Pattern-Matching</span></div>
+              <div><span style="font-family: monospace; font-size: 0.65rem; color: #64748b; display: block;">DESIGN PRINCIPLE:</span><span style="font-size: 0.85rem; font-weight: 700; color: #f8fafc;">Zero Subtext / Physical Sovereignty</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Narrative Copy -->
+        <div class="creator-narrative-body">
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: #f8fafc; margin-bottom: 16px;">Forged Out of Daily Friction</h2>
+          <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.7; margin-bottom: 16px;">Navigating the world as a confirmed <strong>AuDHD</strong> individual means living at a constant neurological intersection: balancing the autistic need for predictability and quiet regulation against the kinetic energy and rapid context-switching of ADHD.</p>
+          <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.7; margin-bottom: 16px;">Forcing dual neurodivergent processing into rigid neurotypical environments creates a massive, silent <strong>"Masking Tax"</strong>: a continuous drain on executive function and nervous system regulation.</p>
+          <div style="background: rgba(212, 175, 55, 0.08); border-left: 3px solid #d4af37; padding: 16px 20px; border-radius: 0 6px 6px 0; margin: 24px 0;">
+            <span style="font-family: monospace; font-size: 0.68rem; font-weight: 800; color: #d4af37; letter-spacing: 0.08em; display: block; margin-bottom: 6px;">THE WORKBENCH COMMITMENT</span>
+            <p style="font-size: 0.98rem; font-weight: 700; color: #f8fafc; line-height: 1.55; margin: 0; font-style: italic;">"Instead of spending a lifetime apologizing for an operating system the world wasn't built for, I started mapping it. Every Neuro-Code™ in this library comes directly from lived experience."</p>
+          </div>
+          <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.7; margin-bottom: 16px;">While AuDHMe™ was born out of authentic lived experience, the tools and protocols we build are engineered to support anyone navigating sensory overload, executive dysfunction, or communication friction across the entire neurodivergent community.</p>
+        </div>
       </div>
-      <div style="margin-bottom:12px;">
-        <label style="display:block; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:#cbd5e1; margin-bottom:4px;">BACKGROUND THEME</label>
-        <select id="bg-theme-select" onchange="changeSiteBackground(this.value)" style="width:100%; background:#060913; border:1px solid #334155; color:#fff; padding:6px; border-radius:6px; font-size:0.8rem; outline:none;">
-          <option value="default">Neural Mesh Canvas</option>
-          <option value="obsidian">Deep Obsidian (Solid Dark)</option>
-        </select>
+
+      <div class="disclaimer-system-container" style="text-align: center; margin-top: 30px;">
+        <div class="system-gold-divider"></div>
+        <p style="font-size: 0.78rem; color: #94a3b8; max-width: 750px; margin: 0 auto; line-height: 1.5;">The AuDHMe™ ecosystem, Neuro-Code™ Protocol, and associated materials are created and maintained by Jason Parish © 2026. All rights reserved.</p>
       </div>
-      <div style="margin-bottom:12px;">
-        <button onclick="toggleAudioMute()" id="audio-toggle-btn" style="width:100%; background:#111827; border:1px solid #d4af37; color:#d4af37; padding:8px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:bold; cursor:pointer;">AUDIO FEEDBACK: ON</button>
-      </div>
-      <div>
-        <button onclick="toggleLowInputMode()" style="width:100%; background:#111827; border:1px solid #38bdf8; color:#38bdf8; padding:8px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:bold; cursor:pointer;">TOGGLE LOW-SENSORY MODE</button>
-      </div>
-    </div>
-    <div onclick="toggleWidgetPanel()" style="background:#0b0f19; border:1px solid #d4af37; color:#d4af37; padding:10px 16px; border-radius:99px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:bold; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,0.6); display:flex; align-items:center; gap:8px;">
-      <span>⚙️</span> DISPLAY &amp; COMFORT
     </div>
   </div>
 
   <!-- =========================================================================
-       MASTER JAVASCRIPT ENGINE
+       MASTER JAVASCRIPT ROUTER & CONDITION GUIDE ENGINE
        ========================================================================= -->
   <script>
-    var audioMuted = false;
-    function toggleAudioMute() {
-      audioMuted = !audioMuted;
-      var btn = document.getElementById('audio-toggle-btn');
-      if (btn) {
-        btn.textContent = audioMuted ? 'AUDIO FEEDBACK: MUTED' : 'AUDIO FEEDBACK: ON';
-        btn.style.borderColor = audioMuted ? '#64748b' : '#d4af37';
-        btn.style.color = audioMuted ? '#64748b' : '#d4af37';
-      }
-    }
-
     var audioCtx = null;
     function getAudioContext() {
-      if (audioMuted) return null;
       if (!audioCtx) {
         var cls = window.AudioContext || window.webkitAudioContext;
         if (cls) audioCtx = new cls();
@@ -581,7 +669,6 @@
     }
 
     function playTactileClick(freq) {
-      if (audioMuted || document.body.classList.contains('low-input-active')) return;
       try {
         var ctx = getAudioContext();
         if (!ctx) return;
@@ -811,84 +898,6 @@
     function closeCrisisHud() {
       document.getElementById('crisis-hud-modal').style.display = 'none';
     }
-
-    function toggleWidgetPanel() {
-      var panel = document.getElementById('audhme-widget-panel');
-      if (panel) panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function changeSiteBackground(theme) {
-      var canvas = document.getElementById('neuro-canvas');
-      if (theme === 'obsidian') {
-        if (canvas) canvas.style.display = 'none';
-        document.body.style.backgroundImage = 'none';
-        document.body.style.backgroundColor = '#03050a';
-      } else {
-        if (canvas) canvas.style.display = 'block';
-        document.body.style.backgroundImage = 'radial-gradient(circle at 50% 20%, #0b0f19 0%, #060913 100%)';
-      }
-    }
-
-    function toggleLowInputMode() {
-      document.body.classList.toggle('low-input-active');
-      var isLow = document.body.classList.contains('low-input-active');
-      var canvas = document.getElementById('neuro-canvas');
-      if (canvas) canvas.style.display = isLow ? 'none' : 'block';
-    }
-
-    /* Background Neural Canvas Animation */
-    (function() {
-      var canvas = document.getElementById('neuro-canvas');
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
-      var particles = [];
-      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-      window.addEventListener('resize', resize);
-      resize();
-
-      function Particle() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.4;
-        this.vy = (Math.random() - 0.5) * 0.4;
-        this.radius = Math.random() * 1.5 + 1;
-      }
-      Particle.prototype.update = function() {
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-        this.x += this.vx; this.y += this.vy;
-      };
-      Particle.prototype.draw = function() {
-        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#d4af37'; ctx.fill();
-      };
-      for (var i = 0; i < 45; i++) particles.push(new Particle());
-
-      function animate() {
-        if (document.body.classList.contains('low-input-active')) {
-          requestAnimationFrame(animate);
-          return;
-        }
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (var a = 0; a < particles.length; a++) {
-          particles[a].update(); particles[a].draw();
-          for (var b = a + 1; b < particles.length; b++) {
-            var dx = particles[a].x - particles[b].x, dy = particles[a].y - particles[b].y;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 130) {
-              ctx.beginPath();
-              ctx.strokeStyle = 'rgba(212, 175, 55, ' + (1 - dist / 130) * 0.18 + ')';
-              ctx.lineWidth = 0.7;
-              ctx.moveTo(particles[a].x, particles[a].y);
-              ctx.lineTo(particles[b].x, particles[b].y);
-              ctx.stroke();
-            }
-          }
-        }
-        requestAnimationFrame(animate);
-      }
-      animate();
-    })();
 
     document.addEventListener('DOMContentLoaded', function() {
       handleInitialRoute();
