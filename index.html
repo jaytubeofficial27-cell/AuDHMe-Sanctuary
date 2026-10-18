@@ -216,25 +216,48 @@
     /* ==========================================================================
        2. PREDICTABLE, LOW-FRICTION PAGE TRANSITIONS
        ========================================================================== */
-   #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
+  /* Lock the body width and prevent horizontal shift */
+    html {
+      overflow-y: scroll !important;
+    }
+    
+    body {
+      overflow-x: hidden !important;
+      width: 100vw;
+    }
+
+    /* Smooth, gentle opacity crossfade for page transitions */
+    #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
       display: none !important;
       visibility: hidden !important;
       opacity: 0;
-      position: absolute;
-      width: 100%;
-      pointer-events: none;
     }
 
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
       display: block !important;
       visibility: visible !important;
-      position: relative;
-      pointer-events: auto;
-      animation: calmSanctuaryReveal 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: gentleFadeIn 0.35s ease-in-out forwards;
     }
 
     #embed03.leaving-embed, #embed35.leaving-embed, #embed13.leaving-embed, #embed09.leaving-embed, #embed41.leaving-embed, #embed07.leaving-embed, #embed06.leaving-embed, #embed11.leaving-embed, #embed04.leaving-embed {
-      display: none !important;
+      display: block !important;
+      visibility: visible !important;
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      animation: gentleFadeOut 0.2s ease-out forwards;
+    }
+
+    @keyframes gentleFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes gentleFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
 
     @keyframes calmSanctuaryExit {
