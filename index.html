@@ -11,6 +11,44 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    /* ==========================================================================
+       GLOBAL FLUID SITE-WIDE RESPONSIVENESS (SCALES WITH SCREEN)
+       ========================================================================== */
+    :root {
+      /* Fluid scaling for headings across all devices */
+      --fluid-heading: clamp(1.5rem, 4vw, 2.5rem);
+      --fluid-subheading: clamp(1.1rem, 2.5vw, 1.5rem);
+      --fluid-body: clamp(0.875rem, 1.5vw, 1rem);
+    }
+
+    /* Apply fluid scaling site-wide to headings and text */
+    h1, .cluster-headline, .neuroverse-main-heading, .portal-main-heading {
+      font-size: var(--fluid-heading) !important;
+    }
+
+    h2, .series-node-title, .demand-card-title, .civic-card-title {
+      font-size: var(--fluid-subheading) !important;
+    }
+
+    p, .cluster-desc, .card-desc {
+      font-size: var(--fluid-body) !important;
+    }
+
+    /* Fluid master containers so everything adapts proportionally */
+    .orbital-cluster-canvas, 
+    .encyclopedia-master-container, 
+    #pane-neuroverse, 
+    .petition-master-container, 
+    .civic-master-container, 
+    #pane-build, 
+    .creator-master-container {
+      width: 100% !important;
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      padding-left: clamp(12px, 3vw, 28px) !important;
+      padding-right: clamp(12px, 3vw, 28px) !important;
+      box-sizing: border-box !important;
+    }
     html { overflow-y: scroll !important; }
     :root {
       --bg-linen: #0b0e14;
