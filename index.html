@@ -315,12 +315,13 @@
       gap: 1rem;
     }
 
-    .audh-logo {
+   .audh-logo {
       display: flex;
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      flex-shrink: 0;
+      flex-shrink: 1; 
+      min-width: 0;  
       cursor: pointer;
     }
 
@@ -410,14 +411,14 @@
        4. TACTILE LINEN CARDS & PREDICTABLE GRID LAYOUTS
        ========================================================================== */
     .orbital-cluster-canvas {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      width: 100%;
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 36px 20px 50px 20px;
-    }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* <--- CHANGE THIS LINE */
+  gap: 20px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 36px 16px 50px 16px; /* Adjusted side padding for phones */
+}
 
     .orbital-card {
       background: var(--bg-card);
@@ -616,11 +617,13 @@
       text-transform: uppercase !important;
     }
 
-    .cards-grid {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
-      gap: 18px !important;
-    }
+   .cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
 
     .flip-card {
       background-color: transparent !important;
@@ -998,9 +1001,10 @@
        7. FULL-SCREEN NON-VERBAL ADVOCACY PASS & COMFORT WIDGET
        ========================================================================== */
     #crisis-hud-modal {
-      position: fixed; inset: 0; z-index: 9999995; background: #0b0e14;
-      display: none; flex-direction: column; justify-content: space-between; padding: 24px;
-    }
+  position: fixed; inset: 0; z-index: 9999995; background: #0b0e14;
+  display: none; flex-direction: column; justify-content: space-between; padding: 24px;
+  overflow-y: auto;
+}
     #crisis-hud-modal.hud-active { display: flex; animation: calmSanctuaryReveal 0.25s ease-out; }
 
     #audhme-widget-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 999990; font-family: 'JetBrains Mono', monospace; }
