@@ -1198,6 +1198,7 @@
         <li><a onclick="switchPage('neuroverse', true)" class="nav-item" data-target="neuroverse">Neuroverse</a></li>
         <li><a onclick="switchPage('civic', true)" class="nav-item" data-target="civic">Civic</a></li>
         <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
+        <li><a onclick="switchView('directory')" class="nav-item" data-target="directory">Directory</a></li>
         <!-- TikTok & Instagram Social Links -->
 <li class="social-link-item" style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
   <a href="https://www.tiktok.com/@audhmehub" target="_blank" rel="noopener noreferrer" title="TikTok // @audhmehub" style="padding: 8px 10px; color: #cbd5e1; text-decoration: none; font-size: 1rem; transition: color 0.18s ease;">
@@ -1210,6 +1211,14 @@
       </ul>
 
       <div class="flex items-center gap-2">
+        <div id="user-display">
+          <button onclick="openAuthModal('signup')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-sky-300 hover:border-sky-400">
+            👤 Sign Up / In
+          </button>
+        </div>
+        <button onclick="toggleCartModal()" class="px-3 py-1.5 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-extrabold uppercase">
+          🛒 Basket (<span id="cart-count">0</span>)
+        </button>
         <button onclick="openCrisisHud('NC-53', 'Non-Verbal State Active', 'My speech is offline right now due to sensory or cognitive overload. I can understand you, so please give me quiet space and do not force me to speak.')" class="px-3 py-2 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-xs font-extrabold uppercase transition">
           🛡️ I Need Space Pass
         </button>
@@ -2071,6 +2080,302 @@
   <!-- =========================================================================
        FLOATING SENSORY, AUDIO & READING COMFORT WIDGET
        ========================================================================= -->
+  <!-- ================= PAGE 2: FULL-PAGE SANCTUARY PROFILE ================= -->
+  <div id="profile-page" class="max-w-4xl mx-auto space-y-6 hidden" style="padding: 24px 16px;">
+    
+    <!-- Top Action Bar -->
+    <div class="flex justify-between items-center bg-[#121721] border border-slate-800 rounded-xl p-4">
+      <button onclick="switchView('store')" class="text-xs text-sky-400 font-bold hover:underline bg-transparent border-0 cursor-pointer">
+        &larr; Back to Main Site
+      </button>
+      <div class="flex items-center gap-3">
+        <button id="owner-settings-btn" onclick="openSettingsView()" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition">
+          ⚙️ Account Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- PUBLIC PROFILE VIEW -->
+    <div id="profile-public-view" class="bg-[#121721] border border-[#d4af37]/30 rounded-2xl p-8 space-y-6">
+      <div class="flex items-center gap-5 border-b border-slate-800 pb-6">
+        <div id="profile-view-avatar-wrap" class="w-24 h-24 rounded-full bg-[#0b0e14] border-2 border-[#d4af37] overflow-hidden flex items-center justify-center shrink-0">
+          <span id="profile-view-avatar-initial" class="text-3xl font-bold text-[#d4af37]">?</span>
+        </div>
+        <div>
+          <h2 id="profile-display-username" class="text-2xl font-black text-white"></h2>
+          <!-- Consistent badges container handled by JavaScript -->
+          <div id="profile-header-badges" class="flex items-center gap-2 mt-3 flex-wrap"></div>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <span class="text-xs text-slate-400 uppercase tracking-wider font-mono block">Sanctuary Bio:</span>
+        <div class="bg-[#0b0e14]/60 border-l-2 border-[#d4af37] px-4 py-3.5 rounded-r-xl">
+          <p id="profile-view-bio" class="text-sm text-slate-300 italic leading-relaxed">No bio added yet.</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <span class="text-xs text-slate-400 uppercase tracking-wider font-mono block">Neurotypes & Profiles:</span>
+        <div id="profile-view-neurotypes" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Custom Links Container -->
+      <div id="profile-links-container" class="flex flex-wrap gap-2 pt-2"></div>
+
+      <!-- Welcome Discount Perk Box -->
+      <div id="owner-perk-box" class="bg-[#161d2a] border border-[#d4af37]/40 rounded-xl p-4 space-y-1">
+        <span class="text-xs font-bold text-[#d4af37] flex items-center gap-1.5"><span>🎁</span> New Member Perk</span>
+        <p class="text-xs text-slate-300">Your 15% one-time welcome discount code:</p>
+        <div class="font-mono text-sm font-black text-white bg-[#0b0e14] px-3 py-1.5 rounded border border-slate-700 inline-block">AUDHFREE15</div>
+      </div>
+    </div>
+
+    <!-- PRIVATE ACCOUNT SETTINGS & EDIT VIEW (Owner only) -->
+    <div id="profile-settings-view" class="bg-[#121721] border border-slate-700 rounded-2xl p-8 space-y-6 hidden">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+        <h3 class="text-lg font-bold text-white">Account Settings & Security</h3>
+        <button onclick="closeSettingsView()" class="text-xs text-sky-400 hover:underline bg-transparent border-0 cursor-pointer">
+          &larr; Back to Public Profile
+        </button>
+      </div>
+
+      <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">Username / Alias (30-day cooldown):</label>
+            <input type="text" id="edit-username" required class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#d4af37]">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">Email Address (Private, 30-day cooldown):</label>
+            <input type="email" id="edit-email" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#d4af37]">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Profile Picture:</label>
+          <input type="file" id="edit-avatar-file" accept="image/*" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-slate-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#d4af37] file:text-[#0b0e14] hover:file:bg-amber-300">
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Sanctuary Bio (Max 150 chars):</label>
+          <textarea id="edit-bio" rows="3" maxlength="150" placeholder="A little bit about you..." class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#d4af37] resize-none"></textarea>
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Neurotypes & Profiles (Select all that apply):</label>
+          <div id="edit-neurotypes-container" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto text-xs text-slate-200"></div>
+        </div>
+
+        <!-- Custom Links Section (6 Open Fields) -->
+        <div class="space-y-3 pt-2 border-t border-slate-800">
+          <label class="text-xs text-[#d4af37] font-bold uppercase tracking-wider block">Custom Links & Portfolios (Max 6):</label>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" id="edit-link-1-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+            <input type="url" id="edit-link-1-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" id="edit-link-2-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+            <input type="url" id="edit-link-2-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" id="edit-link-3-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+            <input type="url" id="edit-link-3-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" id="edit-link-4-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+            <input type="url" id="edit-link-4-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" id="edit-link-5-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+            <input type="url" id="edit-link-5-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="text" id="edit-link-6-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+            <input type="url" id="edit-link-6-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full py-3 rounded-xl bg-[#d4af37] text-[#0b0e14] font-extrabold text-xs uppercase tracking-wider hover:bg-amber-300 transition">
+            Save Changes
+          </button>
+        </div>
+      </form>
+
+      <div class="pt-6 border-t border-slate-800 flex justify-between items-center">
+        <button onclick="handleLogout()" class="text-rose-400 hover:text-rose-300 text-xs font-bold bg-transparent border-0 cursor-pointer">
+          Sign Out of Account
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= PAGE 3: COMMUNITY DIRECTORY & SEARCH ================= -->
+  <div id="directory-view" class="max-w-4xl mx-auto space-y-6 hidden" style="padding: 24px 16px;">
+    <div class="bg-[#121721] border border-slate-800 rounded-xl p-4 flex justify-between items-center">
+      <h2 class="text-xs font-mono font-bold text-[#d4af37] tracking-wider uppercase">Community Member Directory</h2>
+      <span class="text-[11px] text-slate-400 italic">Type in the header search to filter</span>
+    </div>
+
+    <div class="bg-[#121721] border border-[#d4af37]/30 rounded-2xl p-6 space-y-4">
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">Search Members by Username:</label>
+        <input type="text" id="member-search-input" oninput="filterCommunityMembers()" placeholder="Type username..." class="w-full bg-[#0b0e14] border border-slate-700 rounded-xl p-3 text-sm text-white outline-none focus:border-[#d4af37]">
+      </div>
+    </div>
+
+    <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+
+  <!-- Basket Modal -->
+  <div id="cart-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#121721] border border-[#d4af37] rounded-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-lg text-white">Your Shopping Basket</h3>
+        <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+      
+      <div id="cart-items-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+
+      <div id="discount-section" class="bg-[#161d2a] border border-dashed border-[#d4af37]/40 rounded-xl p-3 flex items-center justify-between text-xs">
+        <div>
+          <span class="font-bold text-[#d4af37] block">Member Welcome Perk</span>
+          <span class="text-slate-300">15% one-time discount for new members</span>
+        </div>
+        <span class="font-mono bg-[#d4af37]/15 text-[#d4af37] px-2 py-1 rounded border border-[#d4af37]/30 font-bold">AUDHFREE15</span>
+      </div>
+
+      <div class="border-t border-slate-800 pt-3 space-y-1 text-sm">
+        <div class="flex justify-between text-slate-400 text-xs">
+          <span>Subtotal:</span>
+          <span id="cart-subtotal">£0.00</span>
+        </div>
+        <div id="discount-row" class="flex justify-between text-emerald-400 text-xs hidden">
+          <span>Member Discount (15%):</span>
+          <span id="cart-discount-amount">-£0.00</span>
+        </div>
+        <div class="flex justify-between items-center font-bold text-base pt-2 border-t border-slate-800/60">
+          <span>Total:</span>
+          <span id="cart-total" class="text-[#d4af37]">£0.00</span>
+        </div>
+      </div>
+
+      <button onclick="proceedToCheckout()" class="w-full py-3 rounded-xl bg-sky-400 text-[#0b0e14] font-extrabold text-xs uppercase tracking-wider hover:bg-sky-300 transition">
+        Proceed to Secure Checkout &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- Sign Up / Sign In Modal -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#121721] border border-sky-400 rounded-2xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 id="auth-modal-title" class="font-bold text-lg text-white">Create Community Account</h3>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+
+      <div class="space-y-2 flex flex-col items-center">
+        <div id="g_id_onload"
+             data-client_id="588550369427-tevnfs7vn4smfurr54qho9ppntcpjsoo.apps.googleusercontent.com"
+             data-callback="handleGoogleSignIn"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin w-full flex justify-center"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="continue_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 my-2">
+        <div class="flex-1 h-px bg-slate-800"></div>
+        <span class="text-[10px] uppercase font-mono text-slate-500">Or email</span>
+        <div class="flex-1 h-px bg-slate-800"></div>
+      </div>
+      
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Email Address:</label>
+          <input type="email" id="auth-email" required placeholder="name@example.com" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-sky-400">
+        </div>
+        <div id="password-field-wrap">
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs text-slate-400">Password:</label>
+            <button type="button" onclick="openForgotPassModal()" class="text-[11px] text-sky-400 hover:underline">Forgot password?</button>
+          </div>
+          <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-sky-400">
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-sky-400 text-[#0b0e14] font-extrabold text-xs uppercase tracking-wider">
+          Continue & Claim 15% Off
+        </button>
+      </form>
+
+      <div class="text-center pt-2">
+        <button onclick="toggleAuthMode()" id="auth-switch-text" class="text-xs text-slate-400 hover:text-sky-300 underline">
+          Already have an account? Sign in here
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Onboarding Modal -->
+  <div id="onboarding-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#121721] border-2 border-[#d4af37] rounded-2xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="border-b border-slate-800 pb-3">
+        <span class="text-[11px] font-mono text-[#d4af37] uppercase tracking-wider">STEP 2 OF 2 // SANCTUARY PROFILE</span>
+        <h3 class="font-bold text-xl text-white mt-1">Set Up Your Sanctuary Identity</h3>
+        <p class="text-xs text-slate-300 mt-0.5">Customize how you appear and share your neurotypes with the community.</p>
+      </div>
+      
+      <form onsubmit="handleOnboardingSubmit(event)" class="space-y-4">
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Choose Username / Alias:</label>
+          <input type="text" id="onboard-username" required placeholder="e.g. Jason" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#d4af37]">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Select Your Neurotypes & Profiles (Select all that apply):</label>
+          <div id="onboard-neurotypes-container" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto text-xs text-slate-200"></div>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-[#d4af37] text-[#0b0e14] font-extrabold text-xs uppercase tracking-wider hover:bg-amber-300 transition">
+          Complete Profile & Enter Sanctuary &rarr;
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-pass-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#121721] border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-lg text-white">Reset Password</h3>
+        <button onclick="closeForgotPassModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+      <p class="text-xs text-slate-300">Enter your account email address and we'll send you a secure link to reset your password.</p>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">Email Address:</label>
+        <input type="email" id="forgot-email" placeholder="name@example.com" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-sky-400">
+      </div>
+      <button onclick="handlePasswordReset()" class="w-full py-3 rounded-xl bg-sky-400 text-[#0b0e14] font-extrabold text-xs uppercase tracking-wider hover:bg-sky-300 transition">
+        Send Reset Link
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
   <div id="audhme-widget-wrapper">
     <div id="audhme-widget-panel">
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -3164,6 +3469,711 @@
       renderConditionGuide();
       startGroundingBoot();
     });
+    let cart = JSON.parse(localStorage.getItem('test_cart')) || [];
+    let registeredUsers = JSON.parse(localStorage.getItem('test_users_db')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('test_current_user')) || null;
+    let isLoginMode = false;
+    let tempAuthEmail = null;
+    let isSearchOpen = false;
+
+    if (currentUser && !currentUser.bio) {
+      currentUser.bio = "Founder of AuDHMe";
+      currentUser.neurotypes = ["AuDHD (Autism + ADHD)", "Sensory Processing Difference / Sensitivity"];
+      localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+    }
+
+    const availableNeurotypes = [
+      "AuDHD (Autism + ADHD)", "Autism / Autistic Spectrum", "ADHD (Attention Deficit Hyperactivity Disorder)",
+      "Dyslexia", "Dyscalculia", "Dyspraxia / DCD", "Dysgraphia", "Sensory Processing Difference / Sensitivity",
+      "Synesthesia", "Obsessive-Compulsive Profile (OCD)", "Tourette Syndrome / Tic Profile",
+      "AuDHD + Dyslexia / Learning Difference", "Neurodivergent Explorer / Self-Discovering", "Hypermobility / HSD / EDS", "Ally / Supporter / Family"
+    ];
+
+    function renderCheckboxList(containerId, selectedValues = []) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = availableNeurotypes.map((type) => {
+        const isChecked = selectedValues.includes(type) ? 'checked' : '';
+        return '<label class="flex items-center gap-2.5 cursor-pointer hover:text-white">' +
+          '<input type="checkbox" name="neurotype-option" value="' + type + '" ' + isChecked + ' class="rounded bg-slate-800 border-slate-600 text-amber-400 focus:ring-0">' +
+          '<span>' + type + '</span>' +
+        '</label>';
+      }).join('');
+    }
+
+    function getSelectedCheckboxes(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return [];
+      const checkboxes = container.querySelectorAll('input[name="neurotype-option"]:checked');
+      return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto bg-[#161d2a] border border-[#d4af37] text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-bold toast-animate flex items-center gap-2';
+      toast.innerHTML = '<span class="text-[#d4af37]">✨</span> ' + message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function updateUI() {
+      const countEl = document.getElementById('cart-count');
+      if (countEl) countEl.textContent = cart.length;
+      
+      const userDisplay = document.getElementById('user-display');
+      if (!userDisplay) return;
+      
+      if (currentUser) {
+        userDisplay.innerHTML = '<button onclick="switchView(\'profile\')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-xs font-bold text-[#d4af37] hover:border-[#d4af37] transition flex items-center gap-1.5">' +
+          '<span>👤</span> <span>' + (currentUser.username || currentUser.email.split('@')[0]) + '</span>' +
+          '</button>';
+      } else {
+        userDisplay.innerHTML = '<button onclick="openAuthModal(\'signup\')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-sky-300 hover:border-sky-400">👤 Sign Up / In</button>';
+      }
+    }
+
+    function switchView(viewName) {
+      // Hide all embeds from the main site navigation
+      var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
+      allEmbeds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active-embed', 'leaving-embed');
+      });
+
+      const profilePage = document.getElementById('profile-page');
+      const directoryView = document.getElementById('directory-view');
+
+      if (profilePage) profilePage.classList.add('hidden');
+      if (directoryView) directoryView.classList.add('hidden');
+
+      if (viewName === 'profile') {
+        if (!currentUser) {
+          openAuthModal('signup');
+          return;
+        }
+        if (profilePage) profilePage.classList.remove('hidden');
+        renderProfile();
+      } else if (viewName === 'directory') {
+        if (directoryView) directoryView.classList.remove('hidden');
+        renderCommunityDirectory();
+      } else {
+        switchPage('home', true);
+      }
+    }
+
+    function renderProfile() {
+      const usernameEl = document.getElementById('profile-display-username');
+      if (usernameEl) usernameEl.textContent = currentUser.username || 'Not set';
+      
+      const avatarWrap = document.getElementById('profile-view-avatar-wrap');
+      if (avatarWrap) {
+        if (currentUser.avatar) {
+          avatarWrap.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar" class="w-full h-full object-cover">`;
+        } else {
+          const initial = (currentUser.username || 'A').charAt(0).toUpperCase();
+          avatarWrap.innerHTML = `<span class="text-3xl font-bold text-[#d4af37]">${initial}</span>`;
+        }
+      }
+      
+      const bioEl = document.getElementById('profile-view-bio');
+      if (bioEl) bioEl.textContent = currentUser.bio || 'No bio added yet.';
+
+      const neurotypesContainer = document.getElementById('profile-view-neurotypes');
+      if (neurotypesContainer) {
+        const userTypes = currentUser.neurotypes || [];
+        if (userTypes.length === 0) {
+          neurotypesContainer.innerHTML = '<span class="text-xs text-slate-400 italic">No neurotypes selected</span>';
+        } else {
+          neurotypesContainer.innerHTML = userTypes.map(t => 
+            '<span class="px-3 py-1 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/40 text-[#d4af37] text-xs font-mono font-bold">' + t + '</span>'
+          ).join('');
+        }
+      }
+
+      const badgesContainer = document.getElementById('profile-header-badges');
+      const publicViewCard = document.getElementById('profile-public-view');
+      
+      if (badgesContainer) {
+        const isFounder = (currentUser.username || '').toLowerCase() === 'jason_fable';
+        
+        if (isFounder && publicViewCard) {
+          publicViewCard.className = "bg-[#121721] border-2 border-[#d4af37] shadow-lg shadow-[#d4af37]/10 rounded-2xl p-8 space-y-6";
+        }
+
+        const founderBadge = isFounder ? '<span class="px-3 py-1 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md"><span>✨</span> Sanctuary Founder & Architect</span>' : '';
+        const memberBadge = '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">Verified Member</span>';
+        
+        badgesContainer.innerHTML = founderBadge + memberBadge;
+      }
+      
+      const linksContainer = document.getElementById('profile-links-container');
+      if (linksContainer) {
+        const userLinks = currentUser.links || [];
+        if (userLinks.length === 0) {
+          linksContainer.innerHTML = '';
+        } else {
+          linksContainer.innerHTML = userLinks.map(l => 
+            `<a href="${l.url}" target="_blank" class="px-3 py-1.5 rounded-xl bg-[#161d2a] border border-slate-700 hover:border-[#d4af37] text-xs font-bold text-sky-300 transition flex items-center gap-1.5 shadow-sm">
+              <span>🔗</span> <span>${l.label}</span>
+            </a>`
+          ).join('');
+        }
+      }
+
+      const publicView = document.getElementById('profile-public-view');
+      if (publicView) publicView.classList.remove('hidden');
+
+      const settingsView = document.getElementById('profile-settings-view');
+      if (settingsView) settingsView.classList.add('hidden');
+    }
+
+    function renderCommunityDirectory(searchQuery = '') {
+      const grid = document.getElementById('members-grid');
+      if (!grid) return;
+
+      const users = JSON.parse(localStorage.getItem('test_users_db')) || [];
+
+      if (users.length === 0) {
+        grid.innerHTML = '<p class="text-xs text-slate-400 italic col-span-2 text-center py-8">No community members registered yet.</p>';
+        return;
+      }
+
+      const query = searchQuery.toLowerCase();
+      const filtered = users.filter(u => {
+        const username = (u.username || '').toLowerCase();
+        return username.startsWith(query);
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<p class="text-xs text-slate-400 italic col-span-2 text-center py-8">No members found matching your search.</p>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(member => {
+        const initial = (member.username || 'A').charAt(0).toUpperCase();
+        const avatarHtml = member.avatar 
+          ? `<img src="${member.avatar}" alt="Avatar" class="w-full h-full object-cover">`
+          : `<span class="text-xl font-bold text-[#d4af37]">${initial}</span>`;
+        
+        const bioText = member.bio || 'No bio added yet.';
+        const memberTypes = member.neurotypes || [];
+        
+        const isFounder = (member.username || '').toLowerCase() === 'jason_fable';
+        const founderBadge = isFounder ? '<span class="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold">✨ Sanctuary Founder</span>' : '';
+        
+        const badges = memberTypes.length === 0 
+          ? '<span class="text-[11px] text-slate-500 italic">No neurotypes specified</span>'
+          : memberTypes.map(t => '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">' + t + '</span>').join('');
+
+        return '<div class="bg-[#121721] border border-slate-700 rounded-xl p-5 space-y-3 flex flex-col justify-between">' +
+          '<div class="flex items-center gap-3">' +
+            '<div class="w-14 h-14 rounded-full bg-[#0b0e14] border border-[#d4af37] overflow-hidden flex items-center justify-center shrink-0">' + avatarHtml + '</div>' +
+            '<div>' +
+              '<h3 class="font-bold text-white text-base">' + (member.username || 'Member') + '</h3>' +
+              '<div class="flex items-center gap-1.5 mt-1 flex-wrap">' +
+                founderBadge +
+                '<span class="text-[10px] font-mono text-[#d4af37] bg-[#d4af37]/10 px-2.5 py-0.5 rounded border border-[#d4af37]/20">Sanctuary Member</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<p class="text-xs text-slate-300 italic bg-[#0b0e14] p-3 rounded-lg border border-slate-800">' + bioText + '</p>' +
+          '<div class="flex flex-wrap gap-1.5 pt-1">' + badges + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function toggleHeaderSearch(event) {
+      event.stopPropagation();
+      const input = document.getElementById('header-search-input');
+      const iconBtn = document.getElementById('search-icon-btn');
+      
+      isSearchOpen = !isSearchOpen;
+
+      if (isSearchOpen) {
+        input.classList.remove('w-0', 'opacity-0', 'pointer-events-none');
+        input.classList.add('w-56', 'opacity-100', 'pointer-events-auto');
+        input.focus();
+        iconBtn.innerHTML = '✕';
+      } else {
+        closeHeaderSearch();
+      }
+    }
+
+    function closeHeaderSearch() {
+      const input = document.getElementById('header-search-input');
+      const iconBtn = document.getElementById('search-icon-btn');
+      
+      isSearchOpen = false;
+      if (input) {
+        input.classList.remove('w-56', 'opacity-100', 'pointer-events-auto');
+        input.classList.add('w-0', 'opacity-0', 'pointer-events-none');
+        input.value = '';
+      }
+      if (iconBtn) {
+        iconBtn.innerHTML = '🔍';
+      }
+      
+      const directoryView = document.getElementById('directory-view');
+      if (directoryView && !directoryView.classList.contains('hidden')) {
+        directoryView.classList.add('hidden');
+        switchPage('home', true);
+      }
+    }
+
+    function handleHeaderSearchInput(event) {
+      const query = event.target.value.trim();
+      const directoryView = document.getElementById('directory-view');
+
+      if (query.length > 0) {
+        if (directoryView && directoryView.classList.contains('hidden')) {
+          var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
+          allEmbeds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.remove('active-embed', 'leaving-embed');
+          });
+          const profilePage = document.getElementById('profile-page');
+          if (profilePage) profilePage.classList.add('hidden');
+          directoryView.classList.remove('hidden');
+        }
+        renderCommunityDirectory(query);
+      } else {
+        if (directoryView) directoryView.classList.add('hidden');
+        switchPage('home', true);
+      }
+
+      const mainSearchInput = document.getElementById('member-search-input');
+      if (mainSearchInput) mainSearchInput.value = query;
+    }
+
+    function handleHeaderSearchKey(event) {
+      if (event.key === 'Enter') {
+        const query = event.target.value.trim();
+        if (query.length > 0) switchView('directory');
+      }
+    }
+
+    function filterCommunityMembers() {
+      const input = document.getElementById('member-search-input');
+      const query = input ? input.value.trim() : '';
+      renderCommunityDirectory(query);
+    }
+
+    function openSettingsView() {
+      const usernameInput = document.getElementById('edit-username');
+      const emailInput = document.getElementById('edit-email');
+      
+      if (usernameInput) usernameInput.value = currentUser.username || '';
+      if (emailInput) emailInput.value = currentUser.email || '';
+      
+      const bioInput = document.getElementById('edit-bio');
+      if (bioInput) bioInput.value = currentUser.bio || '';
+      
+      const avatarFile = document.getElementById('edit-avatar-file');
+      if (avatarFile) avatarFile.value = '';
+      
+      renderCheckboxList('edit-neurotypes-container', currentUser.neurotypes || []);
+
+      const publicView = document.getElementById('profile-public-view');
+      const settingsView = document.getElementById('profile-settings-view');
+
+      if (publicView) publicView.classList.add('hidden');
+      if (settingsView) settingsView.classList.remove('hidden');
+
+      const links = currentUser.links || [];
+      for (let i = 0; i < 6; i++) {
+        document.getElementById(`edit-link-${i+1}-label`).value = links[i]?.label || '';
+        document.getElementById(`edit-link-${i+1}-url`).value = links[i]?.url || '';
+      }
+    }
+
+    function closeSettingsView() {
+      const publicView = document.getElementById('profile-public-view');
+      const settingsView = document.getElementById('profile-settings-view');
+
+      if (settingsView) settingsView.classList.add('hidden');
+      if (publicView) publicView.classList.remove('hidden');
+
+      const links = currentUser.links || [];
+      for (let i = 0; i < 6; i++) {
+        document.getElementById(`edit-link-${i+1}-label`).value = links[i]?.label || '';
+        document.getElementById(`edit-link-${i+1}-url`).value = links[i]?.url || '';
+      }
+    }
+
+    function handleProfileUpdate(event) {
+      event.preventDefault();
+      
+      const usernameInput = document.getElementById('edit-username');
+      const emailInput = document.getElementById('edit-email');
+      const avatarFileInput = document.getElementById('edit-avatar-file');
+      const bioInput = document.getElementById('edit-bio');
+      
+      const newUsername = usernameInput ? usernameInput.value.trim() : currentUser.username;
+      const newEmail = emailInput ? emailInput.value.trim() : currentUser.email;
+      const newBio = bioInput ? bioInput.value.trim() : currentUser.bio;
+      const newNeurotypes = getSelectedCheckboxes('edit-neurotypes-container');
+
+      const links = [
+        { label: document.getElementById('edit-link-1-label').value.trim(), url: document.getElementById('edit-link-1-url').value.trim() },
+        { label: document.getElementById('edit-link-2-label').value.trim(), url: document.getElementById('edit-link-2-url').value.trim() },
+        { label: document.getElementById('edit-link-3-label').value.trim(), url: document.getElementById('edit-link-3-url').value.trim() },
+        { label: document.getElementById('edit-link-4-label').value.trim(), url: document.getElementById('edit-link-4-url').value.trim() },
+        { label: document.getElementById('edit-link-5-label').value.trim(), url: document.getElementById('edit-link-5-url').value.trim() },
+        { label: document.getElementById('edit-link-6-label').value.trim(), url: document.getElementById('edit-link-6-url').value.trim() }
+      ].filter(l => l.label && l.url);
+
+      const nsfwKeywords = ['onlyfans.com', 'fansly.com', 'pornhub.com', 'xvideos.com', 'redtube.com'];
+      for (let link of links) {
+        if (nsfwKeywords.some(domain => link.url.toLowerCase().includes(domain))) {
+          showToast('Adult or NSFW links are not permitted in the Sanctuary directory.');
+          return;
+        }
+      }
+
+      currentUser.links = links;
+      
+      const now = new Date().getTime();
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+
+      if (newUsername !== currentUser.username) {
+        if (currentUser.lastUsernameChange && (now - currentUser.lastUsernameChange < thirtyDaysMs)) {
+          const daysLeft = Math.ceil((thirtyDaysMs - (now - currentUser.lastUsernameChange)) / (1000 * 60 * 60 * 24));
+          showToast(`Username is locked. You can change it again in ${daysLeft} days.`);
+          return;
+        }
+        
+        const confirmChange = window.confirm("Are you sure? Changing your username will lock this field and prevent further changes for 30 days.");
+        if (!confirmChange) return;
+
+        currentUser.username = newUsername;
+        currentUser.lastUsernameChange = now;
+      }
+
+      if (newEmail && newEmail !== currentUser.email) {
+        if (currentUser.lastEmailChange && (now - currentUser.lastEmailChange < thirtyDaysMs)) {
+          const daysLeft = Math.ceil((thirtyDaysMs - (now - currentUser.lastEmailChange)) / (1000 * 60 * 60 * 24));
+          showToast(`Email is locked. You can change it again in ${daysLeft} days.`);
+          return;
+        }
+
+        const confirmEmailChange = window.confirm("Are you sure? Changing your email will lock this field and prevent further changes for 30 days.");
+        if (!confirmEmailChange) return;
+
+        currentUser.email = newEmail;
+        currentUser.lastEmailChange = now;
+      }
+
+      currentUser.bio = newBio;
+      currentUser.neurotypes = newNeurotypes;
+
+      const saveAndFinish = () => {
+        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+
+        const userIndex = registeredUsers.findIndex(u => u.email === currentUser.email || u.username === currentUser.username);
+        if (userIndex !== -1) {
+          registeredUsers[userIndex] = currentUser;
+          localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
+        }
+
+        showToast('✨ Sanctuary profile updated successfully!');
+        renderProfile();
+      };
+
+      if (avatarFileInput && avatarFileInput.files && avatarFileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentUser.avatar = e.target.result;
+          saveAndFinish();
+        };
+        reader.readAsDataURL(avatarFileInput.files[0]);
+      } else {
+        saveAndFinish();
+      }
+    }
+
+    function addJumperToCart() {
+      const sizeInput = document.getElementById('jumper-size');
+      const size = sizeInput ? sizeInput.value : 'L';
+      cart.push({ name: "The AuDHFree Jumper", price: 39.99, size: size });
+      localStorage.setItem('test_cart', JSON.stringify(cart));
+      updateUI();
+      showToast('Added AuDHFree Jumper (Size: ' + size + ') to basket!');
+    }
+
+    function toggleCartModal() {
+      const modal = document.getElementById('cart-modal');
+      if (!modal) return;
+      if (modal.classList.contains('hidden')) {
+        renderCartItems();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function renderCartItems() {
+      const list = document.getElementById('cart-items-list');
+      const subtotalEl = document.getElementById('cart-subtotal');
+      const discountRow = document.getElementById('discount-row');
+      const discountAmountEl = document.getElementById('cart-discount-amount');
+      const totalEl = document.getElementById('cart-total');
+      
+      if (!list) return;
+
+      if (cart.length === 0) {
+        list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Your basket is empty.</p>';
+        if (subtotalEl) subtotalEl.textContent = '£0.00';
+        if (discountRow) discountRow.classList.add('hidden');
+        if (totalEl) totalEl.textContent = '£0.00';
+        return;
+      }
+
+      let subtotal = 0;
+      list.innerHTML = cart.map((item, index) => {
+        subtotal += item.price;
+        return '<div class="flex justify-between items-center bg-[#0b0e14] p-2.5 rounded-lg text-sm">' +
+          '<div>' + item.name + ' <span class="text-xs text-slate-400">(Size: ' + item.size + ')</span></div>' +
+          '<div class="flex items-center gap-3"><span class="text-[#d4af37]">£' + item.price.toFixed(2) + '</span>' +
+          '<button onclick="removeItem(' + index + ')" class="text-rose-400 text-xs font-bold">✕</button></div>' +
+        '</div>';
+      }).join('');
+
+      if (subtotalEl) subtotalEl.textContent = '£' + subtotal.toFixed(2);
+
+      if (currentUser) {
+        let discount = subtotal * 0.15;
+        let finalTotal = subtotal - discount;
+        if (discountRow) discountRow.classList.remove('hidden');
+        if (discountAmountEl) discountAmountEl.textContent = '-£' + discount.toFixed(2);
+        if (totalEl) totalEl.textContent = '£' + finalTotal.toFixed(2);
+      } else {
+        if (discountRow) discountRow.classList.add('hidden');
+        if (totalEl) totalEl.textContent = '£' + subtotal.toFixed(2);
+      }
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('test_cart', JSON.stringify(cart));
+      updateUI();
+      renderCartItems();
+      showToast('Item removed from basket.');
+    }
+
+    function openAuthModal(mode) {
+      isLoginMode = (mode === 'login');
+      const titleEl = document.getElementById('auth-modal-title');
+      const submitBtn = document.getElementById('auth-submit-btn');
+      const switchText = document.getElementById('auth-switch-text');
+
+      if (titleEl) titleEl.textContent = isLoginMode ? 'Sign In to Account' : 'Create Community Account';
+      if (submitBtn) submitBtn.textContent = isLoginMode ? 'Sign In' : 'Continue & Claim 15% Off';
+      if (switchText) switchText.textContent = isLoginMode ? "Don't have an account? Register here" : 'Already have an account? Sign in here';
+      
+      const modal = document.getElementById('auth-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal');
+      if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      openAuthModal(isLoginMode ? 'login' : 'signup');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('auth-email');
+      const passwordInput = document.getElementById('auth-password');
+      
+      const email = emailInput ? emailInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+
+      if (!isLoginMode) {
+        const existing = registeredUsers.find(u => u.email === email);
+        if (existing) {
+          showToast('An account with this email already exists! Try logging in.');
+          return;
+        }
+
+        tempAuthEmail = email;
+        const newUser = { email, password, username: email.split('@')[0], neurotypes: [] };
+        registeredUsers.push(newUser);
+        localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
+
+        closeAuthModal();
+        openOnboardingModal();
+      } else {
+        const user = registeredUsers.find(u => u.email === email && u.password === password);
+        if (!user) {
+          showToast('Invalid email or password.');
+          return;
+        }
+        currentUser = user;
+        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+        showToast('Welcome back, ' + currentUser.username + '! 15% member discount active.');
+        closeAuthModal();
+      }
+
+      updateUI();
+    }
+
+    function handleGoogleSignIn(response) {
+      const responsePayload = parseJwt(response.credential);
+      const email = responsePayload.email;
+      const name = responsePayload.name || email.split('@')[0];
+
+      closeAuthModal();
+
+      let user = registeredUsers.find(u => u.email === email);
+      if (!user) {
+        tempAuthEmail = email;
+        user = { email: email, password: 'google_oauth_auth', username: name, neurotypes: [] };
+        registeredUsers.push(user);
+        localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
+        
+        setTimeout(() => {
+          openOnboardingModal();
+          const onboardName = document.getElementById('onboard-username');
+          if (onboardName) onboardName.value = name;
+        }, 200);
+      } else {
+        currentUser = user;
+        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+        showToast('Welcome back, ' + currentUser.username + '! Signed in with Google.');
+        updateUI();
+      }
+    }
+
+    function parseJwt(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
+    function openOnboardingModal() {
+      const onboardName = document.getElementById('onboard-username');
+      if (onboardName) onboardName.value = tempAuthEmail ? tempAuthEmail.split('@')[0] : '';
+      renderCheckboxList('onboard-neurotypes-container');
+      const modal = document.getElementById('onboarding-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function handleOnboardingSubmit(e) {
+      e.preventDefault();
+      const usernameInput = document.getElementById('onboard-username');
+      const username = usernameInput ? usernameInput.value.trim() : '';
+      const neurotypes = getSelectedCheckboxes('onboard-neurotypes-container');
+
+      const user = registeredUsers.find(u => u.email === tempAuthEmail);
+      if (user) {
+        user.username = username;
+        user.neurotypes = neurotypes;
+        currentUser = user;
+        localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
+        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+      }
+
+      const onboardingModal = document.getElementById('onboarding-modal');
+      if (onboardingModal) {
+        onboardingModal.classList.remove('flex');
+        onboardingModal.classList.add('hidden');
+      }
+      updateUI();
+      showToast('🎉 Sanctuary profile created! Your 15% code (AUDFREE15) is active.');
+    }
+
+    function openForgotPassModal() {
+      closeAuthModal();
+      const modal = document.getElementById('forgot-pass-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeForgotPassModal() {
+      const modal = document.getElementById('forgot-pass-modal');
+      if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function handlePasswordReset() {
+      const emailInput = document.getElementById('forgot-email');
+      const email = emailInput ? emailInput.value.trim() : '';
+      if (!email) {
+        showToast('Please enter your account email address.');
+        return;
+      }
+      closeForgotPassModal();
+      showToast('Password reset link sent to ' + email + '! (Simulated)');
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('test_current_user');
+      updateUI();
+      switchPage('home', true);
+      showToast('Signed out successfully. Member discount paused.');
+    }
+
+    function proceedToCheckout() {
+      if (cart.length === 0) {
+        showToast('Your basket is empty!');
+        return;
+      }
+
+      let subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+      let discount = 0;
+
+      if (currentUser) {
+        if (!currentUser.hasRedeemedPerk) {
+          discount = subtotal * 0.15;
+          currentUser.hasRedeemedPerk = true;
+          localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+          
+          const userIndex = registeredUsers.findIndex(u => u.email === currentUser.email);
+          if (userIndex !== -1) {
+            registeredUsers[userIndex] = currentUser;
+            localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
+          }
+          showToast('✨ AUDHFREE15 applied! One-time new member discount redeemed.');
+        } else {
+          showToast('Notice: You have already used your one-time AUDHFREE15 member discount.');
+        }
+      }
+
+      let finalTotal = (subtotal - discount).toFixed(2);
+      showToast('Redirecting to secure checkout (Total: £' + finalTotal + ')...');
+      toggleCartModal();
+    }
+
+    updateUI();
   </script>
 </body>
 </html>
