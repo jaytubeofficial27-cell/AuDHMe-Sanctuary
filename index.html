@@ -333,6 +333,7 @@
     /* ==========================================================================
        3. STICKY HEADER WITH LOGO & CLEAR WAYFINDING
        ========================================================================== */
+    /* Increased Header Height & Spacing */
     .audh-nav-wrapper {
       position: sticky;
       top: 0;
@@ -347,11 +348,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.6rem 1.5rem;
+      padding: 1rem 1.75rem; /* Increased height */
       max-width: 1380px;
       margin: 0 auto;
       width: 100%;
-      gap: 1rem;
+      gap: 1.5rem;
+    }
+
+    /* Dropdown Hover State */
+    .group:hover ul {
+      display: flex !important;
+    }
+
+    /* Expanding Search Bar Animation */
+    #header-search-input {
+      transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
     }
 
    .audh-logo {
@@ -1192,48 +1203,83 @@
        ========================================================================== -->
   <div class="audh-nav-wrapper">
     <nav class="audh-nav" aria-label="AuDHMe Primary System Navigation">
+      <!-- Site Logo -->
       <a onclick="switchPage('home', true)" class="audh-logo">
         <img src="https://lh3.googleusercontent.com/d/1KvMT6VSK6cTC1KRqfFNUXxxw5ad9jw4w" alt="AuDHMe Logo" onerror="this.onerror=null;this.src='https://placehold.co/220x80/0b0e14/d4af37?text=AuDHMe';">
       </a>
 
-     <ul class="audh-links">
+      <!-- Categorised Navigation & Dropdowns -->
+      <ul class="audh-links">
         <li><a onclick="switchPage('home', true)" class="nav-item active" data-target="home">Home</a></li>
-        <li><a onclick="switchPage('neuropedia', true)" class="nav-item" data-target="neuropedia">Neuropedia</a></li>
-        <li><a onclick="switchPage('build', true)" class="nav-item" data-target="build">The Build</a></li>
-        <li><a onclick="switchPage('petition', true)" class="nav-item" data-target="petition">Petition</a></li>
-        <li><a onclick="switchPage('neuroverse', true)" class="nav-item" data-target="neuroverse">Neuroverse</a></li>
-        <li><a onclick="switchPage('civic', true)" class="nav-item" data-target="civic">Civic</a></li>
-        <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
         
-        <!-- TikTok & Instagram Social Links -->
-        <li class="social-link-item" style="display: flex; align-items: center; gap: 8px; margin-left: 6px;">
-          <a href="https://www.tiktok.com/@audhmehub" target="_blank" rel="noopener noreferrer" title="TikTok // @audhmehub" style="padding: 6px 8px; color: #cbd5e1; text-decoration: none; font-size: 1rem; transition: color 0.18s ease;">
-            <i class="fa-brands fa-tiktok"></i>
-          </a>
-          <a href="https://www.instagram.com/audhmehub/" target="_blank" rel="noopener noreferrer" title="Instagram // @audhmehub" style="padding: 6px 8px; color: #cbd5e1; text-decoration: none; font-size: 1rem; transition: color 0.18s ease;">
-            <i class="fa-brands fa-instagram"></i>
-          </a>
+        <!-- Knowledge Dropdown -->
+        <li class="relative group">
+          <button class="nav-item flex items-center gap-1 cursor-pointer">Knowledge ▾</button>
+          <ul class="absolute top-full left-0 bg-[#121721] border border-[#d4af37]/30 rounded-xl py-2 w-48 shadow-2xl hidden group-hover:flex flex-col z-50">
+            <li><a onclick="switchPage('neuropedia', true); switchNeuropediaMode('codes');" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">Neuro-Codes</a></li>
+            <li><a onclick="switchPage('neuropedia', true); switchNeuropediaMode('conditions');" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">24 Condition Cards</a></li>
+            <li><a onclick="switchPage('build', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">The Build Portal</a></li>
+          </ul>
         </li>
+
+        <!-- Community & Action Dropdown -->
+        <li class="relative group">
+          <button class="nav-item flex items-center gap-1 cursor-pointer">Community ▾</button>
+          <ul class="absolute top-full left-0 bg-[#121721] border border-[#d4af37]/30 rounded-xl py-2 w-48 shadow-2xl hidden group-hover:flex flex-col z-50">
+            <li><a onclick="switchPage('neuroverse', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">The Neuroverse</a></li>
+            <li><a onclick="switchPage('petition', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">The Petition</a></li>
+            <li><a onclick="switchPage('civic', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">Civic & Passes</a></li>
+          </ul>
+        </li>
+
+        <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
       </ul>
 
-      <div class="flex items-center gap-2">
-        <div id="user-display">
-          <button onclick="openAuthModal('signup')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-sky-300 hover:border-sky-400">
-            👤 Sign Up / In
+      <!-- Right-Side Action Deck (Search, Socials, Stacked Buttons, Trolley) -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Expanding Search Box -->
+        <div class="relative flex items-center">
+          <button id="search-icon-btn" onclick="toggleHeaderSearch(event)" title="Search Community Directory" class="w-9 h-9 rounded-lg bg-[#161d2a] border border-slate-700 flex items-center justify-center text-sm text-[#d4af37] hover:border-[#d4af37] transition shadow-sm z-10 cursor-pointer">
+            🔍
+          </button>
+          <input type="text" id="header-search-input" oninput="handleHeaderSearchInput(event)" onkeydown="handleHeaderSearchKey(event)" placeholder="Search directory..." class="absolute right-0 w-0 opacity-0 bg-[#0b0e14] border border-[#d4af37]/60 rounded-xl py-2 pl-3 pr-9 text-xs text-white outline-none transition-all duration-300 ease-in-out z-0 pointer-events-none">
+        </div>
+
+        <!-- Stacked Socials (TikTok Top, Insta Bottom) -->
+        <div class="flex flex-col gap-1">
+          <a href="https://www.tiktok.com/@audhmehub" target="_blank" rel="noopener noreferrer" title="TikTok" class="text-slate-300 hover:text-white text-xs px-1.5 py-0.5 rounded bg-[#161d2a] border border-slate-800 text-center">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+          <a href="https://www.instagram.com/audhmehub/" target="_blank" rel="noopener noreferrer" title="Instagram" class="text-slate-300 hover:text-white text-xs px-1.5 py-0.5 rounded bg-[#161d2a] border border-slate-800 text-center">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+        </div>
+
+        <!-- Stacked Profile & Space Pass -->
+        <div class="flex flex-col gap-1.5">
+          <div id="user-display">
+            <button onclick="openAuthModal('signup')" class="px-3 py-1 rounded-lg bg-[#161d2a] border border-slate-700 text-[11px] font-bold text-sky-300 hover:border-sky-400 block w-full text-left">
+              👤 Sign Up / In
+            </button>
+          </div>
+          <button onclick="openCrisisHud('NC-53', 'Non-Verbal State Active', 'My speech is offline right now due to sensory or cognitive overload. I can understand you, so please give me quiet space and do not force me to speak.')" class="px-3 py-1 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-[10px] font-extrabold uppercase transition block w-full text-center">
+            🛡️ Space Pass
           </button>
         </div>
-        <button onclick="toggleCartModal()" class="px-3 py-1.5 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-extrabold uppercase">
-          🛒 Basket (<span id="cart-count">0</span>)
+
+        <!-- Compact Trolley Basket Icon -->
+        <button onclick="toggleCartModal()" title="Shopping Basket" class="relative w-10 h-10 rounded-xl bg-[#d4af37] text-[#0b0e14] flex items-center justify-center font-bold text-base hover:bg-amber-300 transition cursor-pointer">
+          🛒
+          <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-sky-400 text-[#0b0e14] text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-[#0b0e14]">0</span>
         </button>
-        <button onclick="openCrisisHud('NC-53', 'Non-Verbal State Active', 'My speech is offline right now due to sensory or cognitive overload. I can understand you, so please give me quiet space and do not force me to speak.')" class="px-3 py-2 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-xs font-extrabold uppercase transition">
-          🛡️ I Need Space Pass
-        </button>
+
+        <!-- Mobile Menu Trigger -->
         <button class="audh-hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">
           <span></span><span></span><span></span>
         </button>
       </div>
     </nav>
-
     <!-- Pinned Neuro-Codes Bar -->
     <div id="active-neurocode-hud">
       <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
