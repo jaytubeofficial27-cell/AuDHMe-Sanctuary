@@ -1201,43 +1201,41 @@
   <!-- ==========================================================================
        2. STICKY NAVIGATION HEADER WITH LOGO
        ========================================================================== -->
-  <div class="audh-nav-wrapper">
+ <div class="audh-nav-wrapper">
     <nav class="audh-nav" aria-label="AuDHMe Primary System Navigation">
-      <!-- Site Logo -->
+      <!-- Left: Site Logo -->
       <a onclick="switchPage('home', true)" class="audh-logo">
         <img src="https://lh3.googleusercontent.com/d/1KvMT6VSK6cTC1KRqfFNUXxxw5ad9jw4w" alt="AuDHMe Logo" onerror="this.onerror=null;this.src='https://placehold.co/220x80/0b0e14/d4af37?text=AuDHMe';">
       </a>
 
-      <!-- Categorised Navigation & Dropdowns -->
-      <ul class="audh-links">
+      <!-- Center: Clean Grouped Navigation -->
+      <ul class="audh-links flex items-center gap-1 mx-auto">
         <li><a onclick="switchPage('home', true)" class="nav-item active" data-target="home">Home</a></li>
         
-        <!-- Knowledge Dropdown -->
+        <!-- Knowledge Dropdown (Points straight to Neuropedia & Build) -->
         <li class="relative group">
-          <button class="nav-item flex items-center gap-1 cursor-pointer">Knowledge ▾</button>
-          <ul class="absolute top-full left-0 bg-[#121721] border border-[#d4af37]/30 rounded-xl py-2 w-48 shadow-2xl hidden group-hover:flex flex-col z-50">
-            <li><a onclick="switchPage('neuropedia', true); switchNeuropediaMode('codes');" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">Neuro-Codes</a></li>
-            <li><a onclick="switchPage('neuropedia', true); switchNeuropediaMode('conditions');" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">24 Condition Cards</a></li>
-            <li><a onclick="switchPage('build', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">The Build Portal</a></li>
+          <button class="nav-item flex items-center gap-1 cursor-pointer px-3 py-2 rounded-lg text-slate-300 hover:text-white">Knowledge ▾</button>
+          <ul class="absolute top-full left-0 bg-[#121721] border border-[#d4af37]/30 rounded-xl py-2 w-44 shadow-2xl hidden group-hover:flex flex-col z-50">
+            <li><a onclick="switchPage('neuropedia', true)" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#161d2a]">Neuropedia</a></li>
+            <li><a onclick="switchPage('build', true)" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#161d2a]">The Build Portal</a></li>
           </ul>
         </li>
 
-        <!-- Community & Action Dropdown -->
+        <!-- Community Dropdown -->
         <li class="relative group">
-          <button class="nav-item flex items-center gap-1 cursor-pointer">Community ▾</button>
-          <ul class="absolute top-full left-0 bg-[#121721] border border-[#d4af37]/30 rounded-xl py-2 w-48 shadow-2xl hidden group-hover:flex flex-col z-50">
-            <li><a onclick="switchPage('neuroverse', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">The Neuroverse</a></li>
-            <li><a onclick="switchPage('petition', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">The Petition</a></li>
-            <li><a onclick="switchPage('civic', true)" class="block px-4 py-2 text-xs hover:bg-[#161d2a]">Civic & Passes</a></li>
+          <button class="nav-item flex items-center gap-1 cursor-pointer px-3 py-2 rounded-lg text-slate-300 hover:text-white">Community ▾</button>
+          <ul class="absolute top-full left-0 bg-[#121721] border border-[#d4af37]/30 rounded-xl py-2 w-44 shadow-2xl hidden group-hover:flex flex-col z-50">
+            <li><a onclick="switchPage('neuroverse', true)" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#161d2a]">The Neuroverse</a></li>
+            <li><a onclick="switchPage('petition', true)" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#161d2a]">The Petition</a></li>
+            <li><a onclick="switchPage('civic', true)" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#161d2a]">Civic & Passes</a></li>
           </ul>
         </li>
 
         <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
       </ul>
 
-      <!-- Right-Side Action Deck (Search, Socials, Stacked Buttons, Trolley) -->
-      <div class="flex items-center gap-3">
-        
+      <!-- Right: Compact Action Deck -->
+      <div class="flex items-center gap-2.5 shrink-0">
         <!-- Expanding Search Box -->
         <div class="relative flex items-center">
           <button id="search-icon-btn" onclick="toggleHeaderSearch(event)" title="Search Community Directory" class="w-9 h-9 rounded-lg bg-[#161d2a] border border-slate-700 flex items-center justify-center text-sm text-[#d4af37] hover:border-[#d4af37] transition shadow-sm z-10 cursor-pointer">
@@ -1246,35 +1244,34 @@
           <input type="text" id="header-search-input" oninput="handleHeaderSearchInput(event)" onkeydown="handleHeaderSearchKey(event)" placeholder="Search directory..." class="absolute right-0 w-0 opacity-0 bg-[#0b0e14] border border-[#d4af37]/60 rounded-xl py-2 pl-3 pr-9 text-xs text-white outline-none transition-all duration-300 ease-in-out z-0 pointer-events-none">
         </div>
 
-        <!-- Stacked Socials (TikTok Top, Insta Bottom) -->
+        <!-- Stacked Socials -->
         <div class="flex flex-col gap-1">
-          <a href="https://www.tiktok.com/@audhmehub" target="_blank" rel="noopener noreferrer" title="TikTok" class="text-slate-300 hover:text-white text-xs px-1.5 py-0.5 rounded bg-[#161d2a] border border-slate-800 text-center">
+          <a href="https://www.tiktok.com/@audhmehub" target="_blank" rel="noopener noreferrer" title="TikTok" class="text-slate-300 hover:text-white text-[11px] px-1.5 py-0.5 rounded bg-[#161d2a] border border-slate-800 text-center">
             <i class="fa-brands fa-tiktok"></i>
           </a>
-          <a href="https://www.instagram.com/audhmehub/" target="_blank" rel="noopener noreferrer" title="Instagram" class="text-slate-300 hover:text-white text-xs px-1.5 py-0.5 rounded bg-[#161d2a] border border-slate-800 text-center">
+          <a href="https://www.instagram.com/audhmehub/" target="_blank" rel="noopener noreferrer" title="Instagram" class="text-slate-300 hover:text-white text-[11px] px-1.5 py-0.5 rounded bg-[#161d2a] border border-slate-800 text-center">
             <i class="fa-brands fa-instagram"></i>
           </a>
         </div>
 
         <!-- Stacked Profile & Space Pass -->
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1">
           <div id="user-display">
-            <button onclick="openAuthModal('signup')" class="px-3 py-1 rounded-lg bg-[#161d2a] border border-slate-700 text-[11px] font-bold text-sky-300 hover:border-sky-400 block w-full text-left">
+            <button onclick="openAuthModal('signup')" class="px-2.5 py-1 rounded-lg bg-[#161d2a] border border-slate-700 text-[11px] font-bold text-sky-300 hover:border-sky-400 block w-full text-left truncate max-w-[120px]">
               👤 Sign Up / In
             </button>
           </div>
-          <button onclick="openCrisisHud('NC-53', 'Non-Verbal State Active', 'My speech is offline right now due to sensory or cognitive overload. I can understand you, so please give me quiet space and do not force me to speak.')" class="px-3 py-1 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-[10px] font-extrabold uppercase transition block w-full text-center">
+          <button onclick="openCrisisHud('NC-53', 'Non-Verbal State Active', 'My speech is offline right now due to sensory or cognitive overload. I can understand you, so please give me quiet space and do not force me to speak.')" class="px-2.5 py-0.5 rounded-lg bg-[#d4af37]/15 border border-[#d4af37] text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-[9px] font-extrabold uppercase transition block w-full text-center">
             🛡️ Space Pass
           </button>
         </div>
 
-        <!-- Compact Trolley Basket Icon -->
-        <button onclick="toggleCartModal()" title="Shopping Basket" class="relative w-10 h-10 rounded-xl bg-[#d4af37] text-[#0b0e14] flex items-center justify-center font-bold text-base hover:bg-amber-300 transition cursor-pointer">
+        <!-- Compact Basket Trolley Icon -->
+        <button onclick="toggleCartModal()" title="Shopping Basket" class="relative w-9 h-9 rounded-xl bg-[#d4af37] text-[#0b0e14] flex items-center justify-center font-bold text-sm hover:bg-amber-300 transition cursor-pointer">
           🛒
-          <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-sky-400 text-[#0b0e14] text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-[#0b0e14]">0</span>
+          <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-sky-400 text-[#0b0e14] text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-[#0b0e14]">0</span>
         </button>
 
-        <!-- Mobile Menu Trigger -->
         <button class="audh-hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">
           <span></span><span></span><span></span>
         </button>
@@ -3655,7 +3652,8 @@
       const publicViewCard = document.getElementById('profile-public-view');
       
       if (badgesContainer) {
-        const isFounder = (currentUser.username || '').toLowerCase() === 'jason_fable';
+        // Checks if username is Jason or jason_fable, or if email matches your admin email
+        const isFounder = (currentUser.username || '').toLowerCase().includes('jason') || (currentUser.email || '').toLowerCase().includes('jason');
         
         if (isFounder && publicViewCard) {
           publicViewCard.className = "bg-[#121721] border-2 border-[#d4af37] shadow-lg shadow-[#d4af37]/10 rounded-2xl p-8 space-y-6";
@@ -3687,7 +3685,6 @@
       const settingsView = document.getElementById('profile-settings-view');
       if (settingsView) settingsView.classList.add('hidden');
     }
-
     function renderCommunityDirectory(searchQuery = '') {
       const grid = document.getElementById('members-grid');
       if (!grid) return;
@@ -3719,7 +3716,7 @@
         const bioText = member.bio || 'No bio added yet.';
         const memberTypes = member.neurotypes || [];
         
-        const isFounder = (member.username || '').toLowerCase() === 'jason_fable';
+        const isFounder = (member.username || '').toLowerCase().includes('jason') || (member.email || '').toLowerCase().includes('jason');
         const founderBadge = isFounder ? '<span class="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold">✨ Sanctuary Founder</span>' : '';
         
         const badges = memberTypes.length === 0 
