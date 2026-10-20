@@ -3544,7 +3544,8 @@
       }
     }
 
-    function switchView(viewName) {
+   function switchView(viewName) {
+      // Hide all standard embeds
       var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
       allEmbeds.forEach(function(id) {
         var el = document.getElementById(id);
