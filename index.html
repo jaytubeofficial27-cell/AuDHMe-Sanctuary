@@ -252,10 +252,9 @@
       transition: width 0.12s linear;
     }
 
-    /* ==========================================================================
-       2. PREDICTABLE, LOW-FRICTION PAGE TRANSITIONS
+  /* ==========================================================================
+       2. PREDICTABLE, INSTANT LOW-MOTION TRANSITIONS
        ========================================================================== */
-  /* Lock the body width and prevent horizontal shift */
     html {
       overflow-y: scroll !important;
     }
@@ -265,69 +264,46 @@
       width: 100vw;
     }
 
-    /* Smooth, gentle opacity crossfade for page transitions */
+    /* Clean instant swap with zero sluggish lag */
     #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
       display: none !important;
-      visibility: hidden !important;
       opacity: 0;
     }
 
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
       display: block !important;
-      visibility: visible !important;
-      animation: gentleFadeIn 0.35s ease-in-out forwards;
+      opacity: 1;
+      animation: quickSettle 0.18s ease-out forwards;
     }
 
-    #embed03.leaving-embed, #embed35.leaving-embed, #embed13.leaving-embed, #embed09.leaving-embed, #embed41.leaving-embed, #embed07.leaving-embed, #embed06.leaving-embed, #embed11.leaving-embed, #embed04.leaving-embed {
-      display: block !important;
-      visibility: visible !important;
-      position: absolute !important;
-      top: 0;
-      left: 0;
-      width: 100%;
-      pointer-events: none;
-      animation: gentleFadeOut 0.2s ease-out forwards;
-    }
-
-    @keyframes gentleFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes gentleFadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-
-    @keyframes calmSanctuaryExit {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-6px); }
-    }
-
-    @keyframes calmSanctuaryReveal {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .active-embed .orbital-card,
-    .active-embed .series-block-container,
-    .active-embed .demand-card,
-    .active-embed .civic-card,
-    .active-embed .backing-card,
-    .active-embed .nh-step {
-      animation: gentleCardSettle 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
-    .active-embed .orbital-card:nth-child(1) { animation-delay: 0.03s; }
-    .active-embed .orbital-card:nth-child(2) { animation-delay: 0.07s; }
-    .active-embed .orbital-card:nth-child(3) { animation-delay: 0.11s; }
-    .active-embed .orbital-card:nth-child(4) { animation-delay: 0.15s; }
-    .active-embed .orbital-card:nth-child(5) { animation-delay: 0.19s; }
-    .active-embed .orbital-card:nth-child(6) { animation-delay: 0.23s; }
-    .active-embed .orbital-card:nth-child(7) { animation-delay: 0.27s; }
-
-    @keyframes gentleCardSettle {
-      from { opacity: 0; transform: translateY(12px); }
+    @keyframes quickSettle {
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Clean Dropdown Fixes */
+    .group { position: relative; }
+    .group ul {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 160px;
+      background: #121721;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 6px 0;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+      z-index: 1005;
+    }
+    .group:hover ul {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* Expanding Header Search Animation */
+    #header-search-input {
+      transition: width 0.25s ease-in-out, opacity 0.25s ease-in-out;
     }
 
     /* ==========================================================================
@@ -2597,8 +2573,9 @@
       if (links) links.classList.toggle('active');
     }
 
+    var currentPageKey = 'home';
+
     function switchPage(pageKey, updateHistory) {
-      if (pageSwitchLock) return;
       playTactileClick(310, 0.04);
 
       var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
@@ -2614,6 +2591,13 @@
       else if (pageKey === 'build') targetEmbeds = ['embed11'];
       else if (pageKey === 'creator') targetEmbeds = ['embed04'];
 
+      // Hide profile and directory views when navigating standard pages
+      const profilePage = document.getElementById('profile-page');
+      const directoryView = document.getElementById('directory-view');
+      if (profilePage) profilePage.classList.add('hidden');
+      if (directoryView) directoryView.classList.add('hidden');
+
+      // Update active nav state
       document.querySelectorAll('.nav-item').forEach(function(item) {
         item.classList.toggle('active', item.getAttribute('data-target') === pageKey);
       });
@@ -2621,45 +2605,23 @@
       var links = document.querySelector('.audh-links');
       if (links) links.classList.remove('active');
 
-      if (document.body.classList.contains('low-input-active') || !updateHistory) {
-        allEmbeds.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.classList.remove('active-embed', 'leaving-embed');
-        });
-        targetEmbeds.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.classList.add('active-embed');
-        });
-        currentPageKey = pageKey;
-        return;
-      }
-
-      pageSwitchLock = true;
-      var currentlyActive = document.querySelectorAll('.active-embed');
-      currentlyActive.forEach(function(el) {
-        el.classList.remove('active-embed');
-        el.classList.add('leaving-embed');
+      // Instantly hide all and show target embeds without delay
+      allEmbeds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active-embed');
       });
 
-      setTimeout(function() {
-        allEmbeds.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.classList.remove('active-embed', 'leaving-embed');
-        });
+      targetEmbeds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('active-embed');
+      });
 
-        targetEmbeds.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.classList.add('active-embed');
-        });
+      if (updateHistory) {
+        try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
+      }
 
-        if (updateHistory) {
-          try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
-        }
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        currentPageKey = pageKey;
-        pageSwitchLock = false;
-      }, 210);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      currentPageKey = pageKey;
     }
 
     function handleInitialRoute() {
