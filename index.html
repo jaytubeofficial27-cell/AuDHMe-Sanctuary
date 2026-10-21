@@ -423,11 +423,13 @@
       border-radius: 2px;
     }
 
-        @media (max-width: 1024px) {
-      .audh-logo img { height: 56px; max-width: 190px; }
+            @media (max-width: 1024px) {
+      .audh-logo img { height: 48px; max-width: 160px; }
       .audh-hamburger { display: flex; }
+      
+      /* Keep basket, search, socials, and sign-in visible, only hide the link list in the drawer */
       .audh-links {
-        display: none;
+        display: none !important;
         position: absolute;
         top: 100%;
         left: 0;
@@ -435,15 +437,23 @@
         background: #121721;
         flex-direction: column;
         align-items: stretch;
-        padding: 1rem 1.25rem;
-        gap: 0.5rem;
+        padding: 1.25rem;
+        gap: 0.75rem;
         border-bottom: 2px solid var(--brass);
-        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.9);
         z-index: 1002;
       }
-      .audh-links.active { display: flex !important; }
-      .audh-links a { padding: 12px 14px; font-size: 1rem; }
+      
+      .audh-links.active { 
+        display: flex !important; 
+      }
+      
+      .audh-links a { 
+        padding: 12px 14px; 
+        font-size: 1rem; 
+      }
     }
+
 
 
     /* ==========================================================================
@@ -1200,7 +1210,8 @@
       </a>
 
       <!-- Center: Clean Grouped Navigation -->
-      <ul class="audh-links flex items-center gap-1 mx-auto">
+      <ul id="mobile-menu-drawer" class="audh-links flex items-center gap-1 mx-auto">
+
         <li><a onclick="switchPage('home', true)" class="nav-item active" data-target="home">Home</a></li>
         
         <!-- Knowledge Dropdown (Points straight to Neuropedia & Build) -->
@@ -2584,9 +2595,9 @@
     var pageSwitchLock = false;
 
     function toggleMobileMenu() {
-      var links = document.querySelector('.audh-links');
-      if (links) links.classList.toggle('active');
-    }
+  var links = document.getElementById('mobile-menu-drawer') || document.querySelector('.audh-links');
+  if (links) links.classList.toggle('active');
+}
 
     var currentPageKey = 'home';
 
