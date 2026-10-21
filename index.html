@@ -13,31 +13,34 @@
 
   <style>
     /* ==========================================================================
-       GLOBAL FLUID SITE-WIDE RESPONSIVENESS (SCALES WITH SCREEN)
+       GLOBAL FLUID SITE-WIDE RESPONSIVENESS & CLEAN SCROLL LOCK
        ========================================================================== */
-     html, body {
+    html {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      overflow-y: scroll !important;
+      overflow-x: clip !important;
+      scrollbar-gutter: stable !important;
+      box-sizing: border-box !important;
+      scroll-behavior: smooth;
+    }
+
+    body {
       margin: 0 !important;
       padding: 0 !important;
       width: 100% !important;
       max-width: 100% !important;
-      height: 100% !important;
       background-color: var(--bg-linen) !important;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+        radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 0);
+      background-size: 100% 100%, 24px 24px;
       color: var(--text-primary);
       font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      box-sizing: border-box !important;
-    }
-
-    html {
-      overflow-y: scroll !important;
-      scrollbar-gutter: stable !important;
+      overflow-y: visible !important;
       overflow-x: hidden !important;
-    }
-
-    body {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      position: relative !important;
-      min-height: 100vh !important;
+      line-height: 1.65;
     }
 
     /* Lock minimum height across all page panes to prevent height collapse */
@@ -267,29 +270,22 @@
     }
 
   /* ==========================================================================
-       2. PREDICTABLE, INSTANT LOW-MOTION TRANSITIONS
+       2. PREDICTABLE, BUTTERY-SMOOTH FADE TRANSITIONS (ZERO JITTER)
        ========================================================================== */
-    /* Smooth, elegant page transitions that hide any height snaps */
     #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04, #profile-page, #directory-view {
       display: none !important;
       opacity: 0;
-      transform: translateY(6px);
     }
 
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
       display: block !important;
-      animation: smoothSanctuaryFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: smoothFadeOnly 0.2s ease-in-out forwards;
     }
 
-    @keyframes smoothSanctuaryFade {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes smoothFadeOnly {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     }
     /* Clean Dropdown Fixes */
     .group { position: relative; }
