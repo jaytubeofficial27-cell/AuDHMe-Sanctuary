@@ -423,12 +423,11 @@
       border-radius: 2px;
     }
 
-                       @media (max-width: 1024px) {
+      @media (max-width: 1024px) {
       .audh-logo img { height: 48px; max-width: 160px; }
       .audh-hamburger { display: flex; }
 
-      /* Hide the desktop utility container from the top bar on mobile */
-      header .flex.items-center.gap-2\.5 > .hidden.lg\3:flex,
+      /* Hide desktop utilities on mobile */
       header .flex.items-center.gap-2\.5 > .hidden.lg\:flex {
         display: none !important;
       }
@@ -453,8 +452,6 @@
         display: flex !important;
       }
     }
-
-      
       /* Keep basket, search, socials, and sign-in visible, only hide the link list in the drawer */
       .audh-links {
         display: none !important;
@@ -481,9 +478,7 @@
         font-size: 1rem; 
       }
     }
-
-
-
+    
     /* ==========================================================================
        4. TACTILE LINEN CARDS & PREDICTABLE GRID LAYOUTS
        ========================================================================== */
@@ -1239,6 +1234,15 @@
 
       <!-- Center: Clean Grouped Navigation -->
       <ul id="mobile-menu-drawer" class="audh-links flex items-center gap-1 mx-auto">
+        <li><a onclick="switchPage('home', true); toggleMobileMenu();" class="nav-item active" data-target="home">Home</a></li>
+        <!-- your dropdowns and links here -->
+        
+        <!-- Mobile Drawer Extras -->
+        <li class="pt-3 mt-2 border-t border-[#d4af37]/20 flex flex-col gap-2.5 lg:hidden w-full">
+          <a onclick="toggleMobileMenu(); openAuthModal('signup');" href="#signin" class="text-center py-2.5 px-4 bg-[#161d2a] border border-[#d4af37]/40 rounded-lg text-white font-semibold text-sm">Sign Up / In</a>
+          <a onclick="toggleMobileMenu(); openCrisisHud('NC-53', 'Non-Verbal State Active', 'My speech is offline right now...');" href="#spacepass" class="text-center py-2.5 px-4 bg-[#161d2a] border border-[#d4af37]/40 rounded-lg text-amber-300 font-semibold text-sm">🛡️ Space Pass</a>
+        </li>
+      </ul>
 
         <li><a onclick="switchPage('home', true)" class="nav-item active" data-target="home">Home</a></li>
         
