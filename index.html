@@ -2586,34 +2586,11 @@
       var overlay = document.getElementById('os-boot-overlay');
       var fill = document.getElementById('boot-bar-fill');
       var pct = document.getElementById('boot-pct-label');
-      var phase = document.getElementById('boot-phase-text');
       if (!overlay) return;
 
       overlay.classList.remove('boot-complete');
-      bootProgress = 0;
-      bootPaused = false;
-      if (bootInterval) clearInterval(bootInterval);
-
-      bootInterval = setInterval(function() {
-        if (bootPaused) return;
-        bootProgress += 1.1;
-        if (bootProgress > 100) bootProgress = 100;
-
-        var r = Math.floor(bootProgress);
-        if (fill) fill.style.width = r + '%';
-        if (pct) pct.textContent = r + '%';
-
-        if (phase) {
-          if (r < 35) phase.textContent = 'Breathe in slowly as the circle expands...';
-          else if (r < 70) phase.textContent = 'Hold gently... no rush, no pressure.';
-          else phase.textContent = 'Breathe out slowly... entering sanctuary.';
-        }
-
-        if (bootProgress >= 100) {
-          clearInterval(bootInterval);
-          setTimeout(dismissBootSequence, 300);
-        }
-      }, 50);
+      if (fill) fill.style.width = '100%';
+      if (pct) pct.textContent = '100%';
     }
 
     function toggleBootPause() {
@@ -2625,10 +2602,11 @@
       playTactileClick(bootPaused ? 240 : 360, 0.06);
     }
 
-    function dismissBootSequence() {
-      if (bootInterval) clearInterval(bootInterval);
+  function dismissBootSequence() {
       var overlay = document.getElementById('os-boot-overlay');
-      if (overlay) overlay.classList.add('boot-complete');
+      if (overlay) {
+        overlay.classList.add('boot-complete');
+      }
       playTactileClick(440, 0.08);
     }
 
