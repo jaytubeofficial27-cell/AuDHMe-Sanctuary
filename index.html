@@ -423,9 +423,15 @@
       border-radius: 2px;
     }
 
-           {@media (max-width: 1024px)} {
+               @media (max-width: 1024px) {
       .audh-logo img { height: 48px; max-width: 160px; }
       .audh-hamburger { display: flex; }
+
+      /* Target ONLY the desktop utility buttons container to hide them from the top bar */
+      header .flex.items-center.gap-2\.5 > .hidden.lg\:flex {
+        display: none !important;
+      }
+    }
       
       /* Keep basket, search, socials, and sign-in visible, only hide the link list in the drawer */
       .audh-links {
