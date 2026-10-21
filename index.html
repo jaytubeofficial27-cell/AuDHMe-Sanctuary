@@ -15,26 +15,29 @@
     /* ==========================================================================
        GLOBAL FLUID SITE-WIDE RESPONSIVENESS (SCALES WITH SCREEN)
        ========================================================================== */
-     html {
-      overflow-y: scroll !important;
-      scrollbar-gutter: stable !important;
+     html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100% !important;
+      background-color: var(--bg-linen) !important;
+      color: var(--text-primary);
+      font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       box-sizing: border-box !important;
     }
 
-    body {
-      margin: 0 !important;
-      padding: 0 !important;
-      background-color: var(--bg-linen) !important;
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
-        radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 0);
-      background-size: 100% 100%, 24px 24px;
-      color: var(--text-primary);
-      font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    html {
+      overflow-y: scroll !important;
+      scrollbar-gutter: stable !important;
       overflow-x: hidden !important;
-      overflow-y: visible !important;
-      scroll-behavior: smooth;
-      line-height: 1.65;
+    }
+
+    body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      position: relative !important;
+      min-height: 100vh !important;
     }
 
     /* Lock minimum height across all page panes to prevent height collapse */
@@ -266,15 +269,6 @@
   /* ==========================================================================
        2. PREDICTABLE, INSTANT LOW-MOTION TRANSITIONS
        ========================================================================== */
-    html {
-      overflow-y: scroll !important;
-    }
-    
-    body {
-      overflow-x: hidden !important;
-      width: 100vw;
-    }
-
     /* Clean instant swap with zero sluggish lag */
     #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
       display: none !important;
@@ -284,14 +278,13 @@
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
       display: block !important;
       opacity: 1;
-      animation: quickSettle 0.18s ease-out forwards;
+      animation: quickSettle 0.15s ease-out forwards;
     }
 
     @keyframes quickSettle {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
     /* Clean Dropdown Fixes */
     .group { position: relative; }
     .group ul {
