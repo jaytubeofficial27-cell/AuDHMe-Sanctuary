@@ -2616,16 +2616,19 @@
       var links = document.querySelector('.audh-links');
       if (links) links.classList.remove('active');
 
-      // Instantly hide all and show target embeds without delay
+      // Instantly hide all embeds
       allEmbeds.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.classList.remove('active-embed');
       });
 
-      targetEmbeds.forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.classList.add('active-embed');
-      });
+      // Decouple target display by one frame to let scrollbar gutter lock in
+      setTimeout(function() {
+        targetEmbeds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.classList.add('active-embed');
+        });
+      }, 10);
 
       if (updateHistory) {
         try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
