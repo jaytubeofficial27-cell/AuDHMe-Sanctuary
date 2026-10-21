@@ -36,6 +36,11 @@
       scroll-behavior: smooth;
       line-height: 1.65;
     }
+
+    /* Lock minimum height across all page panes to prevent height collapse */
+    .neuro-pane, #pane-home, #pane-neuroverse, #pane-build, #profile-page, #directory-view {
+      min-height: calc(100vh - 110px) !important;
+    }
     
     :root {
       /* Fluid scaling for headings across all devices */
