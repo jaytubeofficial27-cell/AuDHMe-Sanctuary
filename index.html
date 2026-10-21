@@ -371,12 +371,13 @@
     }
 
     .audh-links {
-      display: flex;
-      gap: 0.5rem;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      align-items: center;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      list-style: none !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
     }
 
     .audh-links a {
@@ -3612,12 +3613,15 @@
       const userDisplay = document.getElementById('user-display');
       if (!userDisplay) return;
       
-      if (currentUser) {
-        userDisplay.innerHTML = '<button onclick="switchView(\'profile\')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-xs font-bold text-[#d4af37] hover:border-[#d4af37] transition flex items-center gap-1.5">' +
-          '<span>👤</span> <span>' + (currentUser.username || currentUser.email.split('@')[0]) + '</span>' +
+      // Force recognize your saved local session profile
+      if (currentUser && currentUser.username) {
+        userDisplay.innerHTML = '<button onclick="switchView(\'profile\')" class="px-2.5 py-1 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-xs font-bold text-[#d4af37] hover:border-[#d4af37] transition flex items-center gap-1.5 truncate max-w-[140px]">' +
+          '<span>👤</span> <span class="truncate">' + currentUser.username + '</span>' +
           '</button>';
       } else {
-        userDisplay.innerHTML = '<button onclick="openAuthModal(\'signup\')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-sky-300 hover:border-sky-400">👤 Sign Up / In</button>';
+        userDisplay.innerHTML = '<button onclick="openAuthModal(\'signup\')" class="px-2.5 py-1 rounded-lg bg-[#161d2a] border border-slate-700 text-[11px] font-bold text-sky-300 hover:border-sky-400 block w-full text-left truncate max-w-[120px]">' +
+          '👤 Sign Up / In' +
+          '</button>';
       }
     }
 
