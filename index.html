@@ -269,21 +269,27 @@
   /* ==========================================================================
        2. PREDICTABLE, INSTANT LOW-MOTION TRANSITIONS
        ========================================================================== */
-    /* Clean instant swap with zero sluggish lag */
-    #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04 {
+    /* Smooth, elegant page transitions that hide any height snaps */
+    #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04, #profile-page, #directory-view {
       display: none !important;
       opacity: 0;
+      transform: translateY(6px);
     }
 
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
       display: block !important;
-      opacity: 1;
-      animation: quickSettle 0.15s ease-out forwards;
+      animation: smoothSanctuaryFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    @keyframes quickSettle {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    @keyframes smoothSanctuaryFade {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     /* Clean Dropdown Fixes */
     .group { position: relative; }
@@ -3557,14 +3563,10 @@
     }
 
    function switchView(viewName) {
-      // Hide all standard embeds
       var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
       allEmbeds.forEach(function(id) {
         var el = document.getElementById(id);
-        if (el) {
-          el.classList.remove('active-embed', 'leaving-embed');
-          el.style.display = 'none';
-        }
+        if (el) el.classList.remove('active-embed');
       });
 
       const profilePage = document.getElementById('profile-page');
