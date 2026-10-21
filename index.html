@@ -15,6 +15,28 @@
     /* ==========================================================================
        GLOBAL FLUID SITE-WIDE RESPONSIVENESS (SCALES WITH SCREEN)
        ========================================================================== */
+     html {
+      overflow-y: scroll !important;
+      scrollbar-gutter: stable !important;
+      box-sizing: border-box !important;
+    }
+
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background-color: var(--bg-linen) !important;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
+        radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 0);
+      background-size: 100% 100%, 24px 24px;
+      color: var(--text-primary);
+      font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      scroll-behavior: smooth;
+      line-height: 1.65;
+    }
+    
     :root {
       /* Fluid scaling for headings across all devices */
       --fluid-heading: clamp(1.5rem, 4vw, 2.5rem);
@@ -67,22 +89,6 @@
 
     *, *::before, *::after {
       box-sizing: border-box;
-    }
-
-    body {
-      margin: 0 !important;
-      padding: 0 !important;
-      background-color: var(--bg-linen) !important;
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 60%),
-        radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 0);
-      background-size: 100% 100%, 24px 24px;
-      color: var(--text-primary);
-      font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-      scroll-behavior: smooth;
-      line-height: 1.65;
     }
 
     body.theme-warm-slate {
