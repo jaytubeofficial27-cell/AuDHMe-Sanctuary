@@ -423,7 +423,7 @@
       border-radius: 2px;
     }
 
-    @media (max-width: 1024px) {
+        @media (max-width: 1024px) {
       .audh-logo img { height: 56px; max-width: 190px; }
       .audh-hamburger { display: flex; }
       .audh-links {
@@ -439,10 +439,12 @@
         gap: 0.5rem;
         border-bottom: 2px solid var(--brass);
         box-shadow: 0 16px 32px rgba(0, 0, 0, 0.8);
+        z-index: 1002;
       }
-      .audh-links.active { display: flex; }
+      .audh-links.active { display: flex !important; }
       .audh-links a { padding: 12px 14px; font-size: 1rem; }
     }
+
 
     /* ==========================================================================
        4. TACTILE LINEN CARDS & PREDICTABLE GRID LAYOUTS
@@ -1054,7 +1056,14 @@
       border-radius: 14px; padding: 18px; box-shadow: 0 16px 40px rgba(0,0,0,0.85);
       display: flex; flex-direction: column; gap: 12px; opacity: 0; visibility: hidden; transform: translateY(8px); transition: all 0.2s ease;
     }
-    #audhme-widget-wrapper.panel-open #audhme-widget-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+        #audhme-widget-wrapper { 
+      position: fixed !important; 
+      bottom: 20px !important; 
+      right: 20px !important; 
+      z-index: 999990 !important; 
+      font-family: 'JetBrains Mono', monospace; 
+    }
+
   </style>
 </head>
 <body>
