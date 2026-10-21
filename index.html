@@ -423,11 +423,16 @@
       border-radius: 2px;
     }
 
-                   @media (max-width: 1024px) {
+                       @media (max-width: 1024px) {
       .audh-logo img { height: 48px; max-width: 160px; }
       .audh-hamburger { display: flex; }
 
-      /* Force the mobile menu drawer to stay completely hidden until active */
+      /* Hide the desktop utility container from the top bar on mobile */
+      header .flex.items-center.gap-2\.5 > .hidden.lg\3:flex,
+      header .flex.items-center.gap-2\.5 > .hidden.lg\:flex {
+        display: none !important;
+      }
+
       #mobile-menu-drawer {
         display: none !important;
         position: absolute;
@@ -444,11 +449,11 @@
         z-index: 1002;
       }
 
-      /* Show it only when the toggle adds the active class */
       #mobile-menu-drawer.active {
         display: flex !important;
       }
     }
+
       
       /* Keep basket, search, socials, and sign-in visible, only hide the link list in the drawer */
       .audh-links {
