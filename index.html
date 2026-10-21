@@ -16,15 +16,18 @@
        GLOBAL FLUID SITE-WIDE RESPONSIVENESS (SCALES WITH SCREEN)
        ========================================================================== */
     /* Force permanent scrollbar visibility to eliminate jump/flicker */
-    html {
-      overflow-y: scroll !important;
-    }
-    body {
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background-color: var(--bg-linen) !important;
+      color: var(--text-primary);
+      font-family: 'Atkinson Hyperlegible', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       width: 100% !important;
-      max-width: 100vw !important;
+      max-width: 100% !important;
       overflow-x: hidden !important;
+      overflow-y: scroll !important;
+      box-sizing: border-box !important;
     }
-    :root {
       /* Fluid scaling for headings across all devices */
       --fluid-heading: clamp(1.5rem, 4vw, 2.5rem);
       --fluid-subheading: clamp(1.1rem, 2.5vw, 1.5rem);
