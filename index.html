@@ -270,28 +270,22 @@
     }
 
   /* ==========================================================================
-       2. PREDICTABLE, BUTTERY-SMOOTH FADE TRANSITIONS
+       2. PREDICTABLE, BUTTERY-SMOOTH FADE TRANSITIONS (ZERO JITTER)
        ========================================================================== */
     #embed03, #embed35, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04, #profile-page, #directory-view {
       display: none !important;
       opacity: 0;
-      transition: opacity 0.3s ease-in-out !important;
     }
 
     #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
       display: block !important;
-      animation: butterFade 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+      animation: smoothFadeOnly 0.2s ease-in-out forwards;
     }
 
-    @keyframes butterFade {
-      0% {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes smoothFadeOnly {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     }
     /* Clean Dropdown Fixes */
     .group { position: relative; }
