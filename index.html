@@ -1236,6 +1236,17 @@
         <li><a onclick="switchPage('creator', true)" class="nav-item" data-target="creator">The Creator</a></li>
       </ul>
 
+<!-- Mobile Drawer Extras: Sign up, Space Pass, and Socials -->
+        <li class="pt-3 mt-2 border-t border-[#d4af37]/20 flex flex-col gap-2.5 lg:hidden">
+          <a onclick="toggleMobileMenu()" href="#signin" class="text-center py-2.5 px-4 bg-[#161d2a] border border-[#d4af37]/40 rounded-lg text-white font-semibold text-sm">Sign Up / In</a>
+          <a onclick="toggleMobileMenu()" href="#spacepass" class="text-center py-2.5 px-4 bg-[#161d2a] border border-[#d4af37]/40 rounded-lg text-amber-300 font-semibold text-sm">🛡️ Space Pass</a>
+          <div class="flex items-center justify-center gap-4 py-2">
+            <!-- Social links inside drawer -->
+            <a href="https://tiktok.com" target="_blank" class="text-slate-300 hover:text-white text-sm font-medium">TikTok</a>
+            <a href="https://instagram.com" target="_blank" class="text-slate-300 hover:text-white text-sm font-medium">Instagram</a>
+          </div>
+        </li>
+
       <!-- Right: Compact Action Deck -->
       <div class="flex items-center gap-2.5 shrink-0">
         <!-- Expanding Search Box -->
