@@ -3606,6 +3606,18 @@
       }, 3500);
     }
 
+    let cart = JSON.parse(localStorage.getItem('test_cart')) || [];
+    let registeredUsers = JSON.parse(localStorage.getItem('test_users_db')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('test_current_user')) || {
+      username: "Jason Parish",
+      email: "jason@audhme.org",
+      neurotypes: ["AuDHD (Autism + ADHD)"],
+      bio: "Founder of AuDHMe"
+    };
+    if (!localStorage.getItem('test_current_user')) {
+      localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+    }
+
     function updateUI() {
       const countEl = document.getElementById('cart-count');
       if (countEl) countEl.textContent = cart.length;
@@ -3613,7 +3625,6 @@
       const userDisplay = document.getElementById('user-display');
       if (!userDisplay) return;
       
-      // Force recognize your saved local session profile
       if (currentUser && currentUser.username) {
         userDisplay.innerHTML = '<button onclick="switchView(\'profile\')" class="px-2.5 py-1 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-xs font-bold text-[#d4af37] hover:border-[#d4af37] transition flex items-center gap-1.5 truncate max-w-[140px]">' +
           '<span>👤</span> <span class="truncate">' + currentUser.username + '</span>' +
