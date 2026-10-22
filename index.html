@@ -5,7 +5,7 @@
   <link rel="shortcut icon" type="image/png" href="https://cdn.phototourl.com/member/2026-10-18-d6bd8663-e397-4d9a-808d-e9c8e23ae590.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AuDHM // Neurodivergent Sanctuary &amp; Practical Infrastructure</title>
+  <title>AuDHMe™ // Neurodivergent Sanctuary &amp; Practical Infrastructure</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -277,7 +277,7 @@
       opacity: 0;
     }
 
-    #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed {
+    #embed03.active-embed, #embed35.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed, #profile-page.active-embed, #directory-view.active-embed {
       display: block !important;
       animation: smoothFadeOnly 0.2s ease-in-out forwards;
     }
@@ -2150,10 +2150,8 @@
         <span class="text-xs text-slate-400 uppercase tracking-wider font-mono block">Neurotypes & Profiles:</span>
         <div id="profile-view-neurotypes" class="flex flex-wrap gap-2"></div>
       </div>
-
       <!-- Custom Links Container -->
       <div id="profile-links-container" class="flex flex-wrap gap-2 pt-2"></div>
-
       <!-- Welcome Discount Perk Box -->
       <div id="owner-perk-box" class="bg-[#161d2a] border border-[#d4af37]/40 rounded-xl p-4 space-y-1">
         <span class="text-xs font-bold text-[#d4af37] flex items-center gap-1.5"><span>🎁</span> New Member Perk</span>
@@ -2206,27 +2204,22 @@
             <input type="text" id="edit-link-1-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
             <input type="url" id="edit-link-1-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input type="text" id="edit-link-2-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
             <input type="url" id="edit-link-2-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input type="text" id="edit-link-3-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
             <input type="url" id="edit-link-3-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input type="text" id="edit-link-4-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
             <input type="url" id="edit-link-4-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input type="text" id="edit-link-5-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
             <input type="url" id="edit-link-5-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input type="text" id="edit-link-6-label" placeholder="Link Name" class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
             <input type="url" id="edit-link-6-url" placeholder="https://..." class="bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-xs text-white outline-none focus:border-[#d4af37]">
@@ -2246,6 +2239,7 @@
         </button>
       </div>
     </div>
+  </div>
 
   </div>
 
@@ -2579,6 +2573,8 @@
       if (links) links.classList.toggle('active');
     }
 
+    var currentPageKey = 'home';
+
     function switchPage(pageKey, updateHistory) {
       playTactileClick(310, 0.04);
 
@@ -2595,11 +2591,13 @@
       else if (pageKey === 'build') targetEmbeds = ['embed11'];
       else if (pageKey === 'creator') targetEmbeds = ['embed04'];
 
+      // Hide profile and directory views when navigating standard pages
       const profilePage = document.getElementById('profile-page');
       const directoryView = document.getElementById('directory-view');
       if (profilePage) profilePage.classList.add('hidden');
       if (directoryView) directoryView.classList.add('hidden');
 
+      // Update active nav state
       document.querySelectorAll('.nav-item').forEach(function(item) {
         item.classList.toggle('active', item.getAttribute('data-target') === pageKey);
       });
@@ -2607,11 +2605,13 @@
       var links = document.querySelector('.audh-links');
       if (links) links.classList.remove('active');
 
+      // Instantly hide all embeds
       allEmbeds.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.classList.remove('active-embed');
       });
 
+      // Decouple target display by one frame to let scrollbar gutter lock in
       setTimeout(function() {
         targetEmbeds.forEach(function(id) {
           var el = document.getElementById(id);
@@ -2673,8 +2673,47 @@
           openCrisisHud(code, title, desc);
         };
 
+        function enhanceAllFlipCards() {
+      document.querySelectorAll('.flip-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          playTactileClick(card.classList.contains('flipped') ? 350 : 230, 0.045);
+        });
+
+        var back = card.querySelector('.flip-card-back');
+        if (!back || back.querySelector('.card-action-bar')) return;
+
+        var codeEl = back.querySelector('.card-code-mini');
+        var titleEl = back.querySelector('.card-title-mini');
+        var descEl = back.querySelector('.card-desc');
+
+        var code = codeEl ? codeEl.textContent.trim() : 'NC-00';
+        var title = titleEl ? titleEl.textContent.trim() : 'Neuro-Code';
+        var desc = descEl ? descEl.textContent.trim() : '';
+
+        var bar = document.createElement('div');
+        bar.className = 'card-action-bar';
+
+        var pinBtn = document.createElement('button');
+        pinBtn.className = 'pin-code-btn';
+        pinBtn.textContent = 'PIN TO TOP';
+        pinBtn.onclick = function(e) {
+          e.stopPropagation();
+          togglePinCode(code, title, pinBtn);
+        };
+
+        var hudBtn = document.createElement('button');
+        hudBtn.className = 'hud-pass-btn';
+        hudBtn.innerHTML = '🛡️ FULLSCREEN';
+        hudBtn.onclick = function(e) {
+          e.stopPropagation();
+          openCrisisHud(code, title, desc);
+        };
+
         bar.appendChild(pinBtn);
         bar.appendChild(hudBtn);
+        back.appendChild(bar);
+      });
+    }
         back.appendChild(bar);
       });
     }
@@ -2786,6 +2825,664 @@
       }).join('');
     }
 
+    /* 24-Profile Compact Condition & Symptom Atlas Data */
+    var fullSpectrumConditions = [
+      {
+        code: 'ND-01',
+        name: 'Executive Age (The 30% Rule)',
+        shortTag: 'Chronological vs Executive Battery',
+        category: 'Executive',
+        summary: 'Why an intellectually sharp 26-year-old neurodivergent adult can have the working memory, impulse pacing, or task-initiation battery of an 18-year-old when tired.',
+        symptoms: [
+          'Your intellectual intelligence matches or exceeds your birth certificate, but your executive regulation age lags roughly 30% behind',
+          'Being able to design complex systems or university-level projects, yet feeling completely overwhelmed by tidying your room or booking a dentist appointment',
+          'Emotional floodgates and frustration tolerance dropping rapidly once your daily executive battery hits zero'
+        ],
+        internalReality: 'Having a Formula 1 engine for deep thinking bolted onto the fuel tank and brakes of a much younger nervous system.',
+        externalView: 'People say "You\'re so smart, how can you struggle with something so basic?"',
+        maskingTax: 'Hiding your executive exhaustion and feeling like an impostor adult every time daily life admin piles up.',
+        sanctuaryAdjustment: 'Respecting the 30% rule without shame: externalise reminders, use body-doubling (NC-02), and separate intellectual respect from executive support.',
+        relatedCodes: ['NC-24', 'NC-41', 'NC-64']
+      },
+      {
+        code: 'ND-02',
+        name: 'Executive Dysfunction & Paralysis',
+        shortTag: 'Why "Just Do It" Fails',
+        category: 'Executive',
+        summary: 'When knowing what to do and actually starting it are disconnected, sitting frozen for hours screaming at yourself internally to stand up.',
+        symptoms: [
+          'Task Initiation Block (NC-41): wanting to do the task, knowing how to do it, and still being physically unable to cross the starting line',
+          'Decision Paralysis (NC-48): two equal options crashing your brain\'s sorting system completely',
+          'Out of Sight, De-Indexed (NC-47): the second an object or bill goes inside a drawer, your brain deletes its existence'
+        ],
+        internalReality: 'Revving a car engine to the redline while the clutch is snapped, loads of noise and smoke, zero forward motion.',
+        externalView: 'Mislabelled as laziness, procrastination, or "not caring enough".',
+        maskingTax: 'Pulling frantic 3:00 AM panic-adrenaline marathons to hide how frozen you were all afternoon.',
+        sanctuaryAdjustment: 'Shrink the first step until it feels ridiculous ("just touch the laptop"), use a body double (NC-02), or flip a coin to break decision paralysis.',
+        relatedCodes: ['NC-02', 'NC-24', 'NC-41', 'NC-47', 'NC-48']
+      },
+      {
+        code: 'ND-03',
+        name: 'Waiting Mode & Time Blindness',
+        shortTag: '"Now" vs "Not Now" Time',
+        category: 'Executive',
+        summary: 'Why a 4:00 PM appointment paralyses your entire day from 9:00 AM onwards.',
+        symptoms: [
+          'Experiencing time in only two buckets: "Right Now" and "Not Now"',
+          'Waiting Mode: your brain locks itself into standby all morning because it knows if you start a task, you\'ll hyperfocus and miss the 4:00 PM event',
+          'Underestimating travel and prep time consistently'
+        ],
+        internalReality: 'Clocks don\'t feel real inside your head, you either watch the clock like a hawk all day or fall through a time trapdoor.',
+        externalView: 'People ask "Why didn\'t you get your work done this morning?"',
+        maskingTax: 'Arriving 45 minutes early terrified of being late, or sprinting in apologising.',
+        sanctuaryAdjustment: 'Book appointments first thing in the morning whenever possible, set "leave the house" alarms, and use visual countdown timers.',
+        relatedCodes: ['NC-23', 'NC-41', 'NC-42']
+      },
+      {
+        code: 'ND-04',
+        name: 'AuDHD (Autism + ADHD Combined)',
+        shortTag: 'The Dual-Engine Tug-of-War',
+        category: 'Executive',
+        summary: 'Living with two opposite roommates in one head: your autistic side craves routine and quiet, while your ADHD side gets bored in 48 hours.',
+        symptoms: [
+          'Building an elaborate colour-coded planner in hyperfocus, then abandoning it two days later',
+          'Simultaneous sensory seeking and sensory overload: needing music or movement, then suddenly hitting a wall',
+          'Social contradiction: chatty and high-energy for an hour, then needing three days alone in the dark'
+        ],
+        internalReality: 'Whatever you do to feed your ADHD side accidentally overwhelms your autistic side.',
+        externalView: 'People assume you\'re "fine" because your ADHD masks your autism in public.',
+        maskingTax: 'Policing both sensory distress and physical restlessness at the same time.',
+        sanctuaryAdjustment: 'Flexible "menu routines" and pairing quiet spaces with tactile stims.',
+        relatedCodes: ['NC-10', 'NC-11', 'NC-23', 'NC-30', 'NC-64']
+      },
+      {
+        code: 'ND-05',
+        name: 'Autism (Monotropism & Sensory Intake)',
+        shortTag: 'Deep Focus & Literal Clarity',
+        category: 'Executive',
+        summary: 'A bottom-up, deep-channel operating system built on pattern recognition, raw sensory intake, and zero-subtext honesty.',
+        symptoms: [
+          'Monotropic focus tunnels: pulling 100% of focus into one deep channel, making interruptions jarring',
+          'Bottom-up thinking: needing all foundational details and "why" before a rule makes sense',
+          'Zero-subtext communication: saying exactly what you mean and getting exhausted by social riddles'
+        ],
+        internalReality: 'Manually calculating eye contact, facial expressions, and tone while every light and noise in the room comes in unfiltered.',
+        externalView: 'Misread as "blunt" or "aloof" when you\'re simply being direct.',
+        maskingTax: 'Rehearsing scripts and forcing eye contact (NC-33) until speech goes offline (NC-53).',
+        sanctuaryAdjustment: 'Say what you mean directly, give advance notice of changes (NC-45), and respect solitary recharge (NC-34).',
+        relatedCodes: ['NC-10', 'NC-22', 'NC-31', 'NC-32', 'NC-33', 'NC-50']
+      },
+      {
+        code: 'ND-06',
+        name: 'ADHD (Interest-Based Nervous System)',
+        shortTag: 'Novelty, Urgency & Hyperfocus',
+        category: 'Executive',
+        summary: 'Not a deficit of attention, but a nervous system regulated by interest, novelty, urgency, and challenge.',
+        symptoms: [
+          'Unable to force focus on boring admin, yet able to hyperfocus for 12 hours straight on a creative build',
+          'Working memory drop-outs and internal or physical restlessness',
+          'Dopamine crashes when high-stimulation projects finish'
+        ],
+        internalReality: 'Thirty browser tabs open at once with no mouse cursor until deadline panic or fascination locks the lens.',
+        externalView: 'Labelled "inconsistent" because you can solve a crisis effortlessly but forget basic admin.',
+        maskingTax: 'Running on pure anxiety and last-minute adrenaline to meet neurotypical deadlines.',
+        sanctuaryAdjustment: 'Body-doubling (NC-02), sprint-based work, and visualised boards.',
+        relatedCodes: ['NC-02', 'NC-21', 'NC-23', 'NC-40', 'NC-41', 'NC-42']
+      },
+      {
+        code: 'ND-07',
+        name: 'PDA (Pervasive Drive for Autonomy)',
+        shortTag: 'Autonomic Demand Avoidance',
+        category: 'Executive',
+        summary: 'When any demand, expectation, or loss of choice triggers an involuntary nervous-system threat response.',
+        symptoms: [
+          'Being about to do a task, and the second someone tells you to do it, your body locks up',
+          'Internal demand avoidance: basic biological needs registering as threatening demands',
+          'Needing equal, collaborative communication rather than top-down authority'
+        ],
+        internalReality: 'Your nervous system mistakes a routine expectation for a physical trap.',
+        externalView: 'Mislabelled as "stubborn" or "defiant".',
+        maskingTax: 'People-pleasing until you hit total autonomy burnout.',
+        sanctuaryAdjustment: 'Low-pressure, declarative phrasing ("Food is there if you fancy it") and real choices (NC-44).',
+        relatedCodes: ['NC-41', 'NC-44', 'NC-54', 'NC-56', 'NC-57']
+      },
+      {
+        code: 'ND-08',
+        name: 'RSD (Rejection Sensitive Dysphoria)',
+        shortTag: 'Acute Rejection / Critique Pain',
+        category: 'Sensory',
+        summary: 'An intense, physical nervous-system gut-punch triggered by perceived rejection, criticism, or failure.',
+        symptoms: [
+          'A short text like "K." or "We need to talk" setting off an immediate adrenaline spike and chest pain',
+          'Replaying a minor awkward social moment for days',
+          'Perfectionism and people-pleasing to avoid critique at all costs'
+        ],
+        internalReality: 'Small social friction hits your nervous system like a physical burn.',
+        externalView: 'Told you\'re "taking things too personally" or "overreacting".',
+        maskingTax: 'Hiding physical panic behind a calm face while your heart races.',
+        sanctuaryAdjustment: 'Clear tone tags, direct reassurance, and zero vague cliffhanger messages.',
+        relatedCodes: ['NC-01', 'NC-56', 'NC-60']
+      },
+      {
+        code: 'ND-09',
+        name: 'Autistic & AuDHD Burnout',
+        shortTag: 'Skill Regression & System Crash',
+        category: 'Sensory',
+        summary: 'A full neurological system crash caused by years of over-masking, sensory overload, and pushing past limits.',
+        symptoms: [
+          'Skill regression: losing access to skills you used to have (cooking, speaking smoothly, managing noise)',
+          'Sensory thresholds dropping so every light and sound feels unbearable',
+          'Sleep doesn\'t fix it, waking up exhausted'
+        ],
+        internalReality: 'Your brain has pulled the main circuit breaker to stop you from frying the wiring.',
+        externalView: 'Often misdiagnosed as depression, when standard advice to "go socialise" makes burnout worse.',
+        maskingTax: 'The ultimate bill for years of paying the Masking Tax.',
+        sanctuaryAdjustment: 'Radical demand reduction, dropping the mask completely, and sensory darkness/quiet.',
+        relatedCodes: ['NC-30', 'NC-50', 'NC-64']
+      },
+      {
+        code: 'ND-10',
+        name: 'Revenge Bedtime Procrastination & DSPS',
+        shortTag: 'Circadian Drift & Night Peace',
+        category: 'Sensory',
+        summary: 'When your brain only finally feels quiet, unmasked, and in control at 1:30 AM.',
+        symptoms: [
+          'Staying awake late scrolling or doing hobbies because night-time is the only hour with zero demands',
+          'Delayed Sleep Phase: feeling exhausted all afternoon, then getting a second wind at 11:00 PM',
+          'Racing thoughts at bedtime because your brain finally has silence'
+        ],
+        internalReality: 'Staying up late feels like reclaiming your own existence from a day full of demands.',
+        externalView: 'Told to "just go to bed earlier".',
+        maskingTax: 'Running on chronic sleep debt (NC-43) to fit an 8:00 AM world.',
+        sanctuaryAdjustment: 'Guilt-free daytime decompression time and bedtime brown noise anchors.',
+        relatedCodes: ['NC-34', 'NC-43', 'NC-64']
+      },
+      {
+        code: 'ND-11',
+        name: 'OCD (Intrusive Doubt Loops)',
+        shortTag: 'Ego-Dystonic Alarms & Rituals',
+        category: 'Sensory',
+        summary: 'A threat-detection loop that throws unwanted "what if" thoughts at you and demands rituals for certainty.',
+        symptoms: [
+          'Intrusive thoughts attacking the values you care about most',
+          'Checking, counting, or mental reviewing loops',
+          '"Just Right" physical symmetry urges'
+        ],
+        internalReality: 'A faulty fire alarm screaming in your head over a 0.001% possibility.',
+        externalView: 'Trivialised as "liking things tidy".',
+        maskingTax: 'Performing mental rituals silently while acting normal.',
+        sanctuaryAdjustment: 'Neutral external redirection (NC-58) without shame.',
+        relatedCodes: ['NC-21', 'NC-48', 'NC-58', 'NC-64']
+      },
+      {
+        code: 'ND-12',
+        name: 'Dyslexia (3D Spatial vs 2D Text)',
+        shortTag: 'Big-Picture Systems Thinking',
+        category: 'Learning',
+        summary: 'A 3D, interconnected spatial brain forced to squeeze ideas through flat, 2D lines of phonetic spelling.',
+        symptoms: [
+          'Visual glare and letter crowding when reading dense paragraphs (NC-14)',
+          'Seeing the whole system architecture instantly, but losing stamina when spelling sequentially',
+          'Reading slower under timed pressure despite high conceptual intelligence'
+        ],
+        internalReality: 'Thinking in 3D IMAX cinema, then pushing it through a tiny letterbox one letter at a time.',
+        externalView: 'Unfairly judged by spelling speed rather than idea depth.',
+        maskingTax: 'Triple-checking messages and swapping big words for smaller ones.',
+        sanctuaryAdjustment: 'Atkinson Hyperlegible font, wide spacing, Bionic bold anchors, and matte dark backgrounds.',
+        relatedCodes: ['NC-14', 'NC-16', 'NC-20', 'NC-27']
+      },
+      {
+        code: 'ND-13',
+        name: 'Dyscalculia (Number & Time Slippage)',
+        shortTag: 'Numerical Working Memory',
+        category: 'Learning',
+        summary: 'When numbers, quantities, and time estimates refuse to hold a solid shape in working memory.',
+        symptoms: [
+          'Needing to count items one-by-one because quantities don\'t group automatically',
+          'Digits flipping or vanishing during mental maths',
+          'Struggling to judge distances or how many minutes have passed (NC-42)'
+        ],
+        internalReality: 'Numbers feel like wet soap, try to hold two together and one slips out.',
+        externalView: 'Told you "aren\'t a maths person".',
+        maskingTax: 'Panic when put on the spot for figures or prices (NC-57).',
+        sanctuaryAdjustment: 'Visual progress bars and zero-shame calculator access.',
+        relatedCodes: ['NC-16', 'NC-21', 'NC-42', 'NC-57']
+      },
+      {
+        code: 'ND-14',
+        name: 'Dysgraphia (Brain-to-Pen Bottleneck)',
+        shortTag: 'Fine-Motor Transcription',
+        category: 'Learning',
+        summary: 'When thoughts run at 100mph in full sentences, but the physical wire to a pen scrambles and cramps your hand.',
+        symptoms: [
+          'Physical hand and forearm pain after writing just a few lines',
+          'Inconsistent letter sizes because your brain is three sentences ahead of your pen',
+          'Fluent expression when typing or speaking'
+        ],
+        internalReality: 'Your mind is a laser printer, but your hand is stuck buffering.',
+        externalView: 'Judged for "messy handwriting".',
+        maskingTax: 'Gripping pens until your hand aches to force neatness.',
+        sanctuaryAdjustment: 'Digital-first forms, keyboard access, and voice-to-text parity.',
+        relatedCodes: ['NC-25', 'NC-46', 'NC-57']
+      },
+      {
+        code: 'ND-15',
+        name: 'Dyspraxia / DCD (Motor & Spatial GPS)',
+        shortTag: '"Body in Space" Calibration',
+        category: 'Motor',
+        summary: 'A calibration gap between your brain planning a movement and your body executing it smoothly.',
+        symptoms: [
+          'Proprioception gaps (NC-46): bumping into doorframes or misjudging grip force',
+          'Consciously thinking through physical sequences that others do on autopilot',
+          'Postural fatigue from standing still'
+        ],
+        internalReality: 'Knowing the move you want, but the Wi-Fi signal to your limbs drops packets.',
+        externalView: 'Written off as "clumsy".',
+        maskingTax: 'Hyper-monitoring every movement in public.',
+        sanctuaryAdjustment: 'Uncluttered walkways and supportive seating.',
+        relatedCodes: ['NC-24', 'NC-36', 'NC-46', 'NC-57']
+      },
+      {
+        code: 'ND-16',
+        name: 'Tourette Syndrome & Tic Disorders',
+        shortTag: 'Premonitory Urges & Tics',
+        category: 'Motor',
+        summary: 'Involuntary motor and vocal tics driven by a mounting physical urge that resets only upon release.',
+        symptoms: [
+          'Premonitory sensory urge: an internal physical itch or pressure before a tic',
+          'Motor and vocal tics spiking under stress, fluorescent lights, or when stared at (NC-57)',
+          'Exhaustion after suppressing tics in public'
+        ],
+        internalReality: 'Holding in a tic takes 90% of your brainpower.',
+        externalView: 'Stared at or treated like a voluntary habit.',
+        maskingTax: 'Muscle pain and exhaustion from holding tics back.',
+        sanctuaryAdjustment: 'Total normalisation of regulatory movement (NC-37), don\'t stare, just carry on.',
+        relatedCodes: ['NC-11', 'NC-30', 'NC-37', 'NC-57', 'NC-63']
+      },
+      {
+        code: 'ND-17',
+        name: 'Auditory Processing Disorder (APD)',
+        shortTag: 'Hearing vs Decoding Speech',
+        category: 'Sensory',
+        summary: 'Your ears work fine, but your brain\'s sound-mixing desk can\'t isolate a voice from background noise.',
+        symptoms: [
+          'The "Auditory Wall" (NC-18): background noise merges at the same volume as speech',
+          'The 3-Second Lag (NC-20): saying "What?" then answering before they repeat it',
+          'Needing subtitles on TV'
+        ],
+        internalReality: 'Every sound arrives on one flat audio track, speech sounds like garbled Sims language.',
+        externalView: 'Accused of "not listening".',
+        maskingTax: 'Nodding and guessing from facial expressions.',
+        sanctuaryAdjustment: 'Written-over-verbal communication (NC-25) and waiting 5 seconds.',
+        relatedCodes: ['NC-12', 'NC-18', 'NC-20', 'NC-25', 'NC-59']
+      },
+      {
+        code: 'ND-18',
+        name: 'Misophonia (Sound Panic)',
+        shortTag: 'Autonomic Trigger Sounds',
+        category: 'Sensory',
+        summary: 'When specific repetitive sounds bypass logic and trigger instant fight-or-flight panic.',
+        symptoms: [
+          'Instant surge of visceral rage or skin-crawling distress at mouth or tapping sounds',
+          'Unable to think of anything else while the sound happens',
+          'Intense guilt afterwards'
+        ],
+        internalReality: 'The sound hot-wires straight into your amygdala\'s survival alarm.',
+        externalView: 'Told to "just ignore it".',
+        maskingTax: 'Digging nails into palms to hide panic.',
+        sanctuaryAdjustment: 'Zero-shame headphone/earplug use and background brown noise.',
+        relatedCodes: ['NC-10', 'NC-12']
+      },
+      {
+        code: 'ND-19',
+        name: 'ARFID & Sensory Safe-Food Profiles',
+        shortTag: 'Sensory Food Safety',
+        category: 'Sensory',
+        summary: 'When unpredictable food textures, smells, or temperatures trigger an involuntary gag or threat reflex.',
+        symptoms: [
+          'Relying on "samefoods" that taste and feel the exact same every time',
+          'One unexpected texture in a meal making it impossible to continue',
+          'Preferring starvation over unsafe textures'
+        ],
+        internalReality: 'Your sensory system flags an unpredictable texture the same way neurotypicals flag eating gravel.',
+        externalView: 'Shamed as "fussy".',
+        maskingTax: 'Anxiety around social meals and restaurants.',
+        sanctuaryAdjustment: 'Never comment on someone\'s plate, provide predictable options.',
+        relatedCodes: ['NC-13', 'NC-15', 'NC-40']
+      },
+      {
+        code: 'ND-20',
+        name: 'Sensory Processing Disorder (SPD)',
+        shortTag: 'Hypersensitive & Sensory Seeking',
+        category: 'Sensory',
+        summary: 'When your sensory volume knobs are turned up to 11 with no limiter.',
+        symptoms: [
+          'Tactile pain from clothing tags or seams (NC-13)',
+          'Visual & olfactory overload from strip lights (NC-14) or perfumes (NC-15)',
+          'Thermal drain (NC-17) wiping out cognitive battery'
+        ],
+        internalReality: 'Living without sensory calluses in a loud, bright world.',
+        externalView: 'Called "dramatic" for needing sunglasses or headphones.',
+        maskingTax: 'Enduring physical sensory pain silently.',
+        sanctuaryAdjustment: 'Tagless clothing, dimmable warm lights, and fragrance-free zones.',
+        relatedCodes: ['NC-10', 'NC-11', 'NC-13', 'NC-14', 'NC-15', 'NC-17']
+      },
+      {
+        code: 'ND-21',
+        name: 'Alexithymia & Interoception',
+        shortTag: 'Missed Body & Emotion Cues',
+        category: 'Sensory',
+        summary: 'When internal dashboard gauges for hunger, thirst, temperature, and emotions don\'t ping until 0%.',
+        symptoms: [
+          'Not noticing hunger or bathroom needs for hours until shakiness hits (NC-40)',
+          'Delayed emotional processing (taking days to realise how you felt)',
+          'Feeling emotions as physical body sensations'
+        ],
+        internalReality: 'Your body skips warnings and jumps straight to shutdown.',
+        externalView: 'Pressured to "tell me how you feel right now".',
+        maskingTax: 'Inventing fake emotional answers.',
+        sanctuaryAdjustment: 'Use concrete Neuro-Codes instead of vague questions.',
+        relatedCodes: ['NC-17', 'NC-20', 'NC-36', 'NC-40', 'NC-64']
+      },
+      {
+        code: 'ND-22',
+        name: 'BFRBs (Skin Picking & Hair Pulling)',
+        shortTag: 'Body-Focused Repetitive Stims',
+        category: 'Motor',
+        summary: 'Automatic, sensory-driven grooming/regulation loops triggered by understimulation or stress.',
+        symptoms: [
+          'Scanning skin or hair on autopilot while reading or stressed',
+          'Seeking tactile feedback to keep your brain anchored',
+          'Shame spirals from unhelpful comments'
+        ],
+        internalReality: 'An unconscious sensory-motor regulation loop keeping your brain anchored.',
+        externalView: 'Misunderstood as self-harm.',
+        maskingTax: 'Hiding hands and carrying guilt.',
+        sanctuaryAdjustment: 'Keep tactile fidgets in every pocket.',
+        relatedCodes: ['NC-11', 'NC-13', 'NC-37', 'NC-58']
+      },
+      {
+        code: 'ND-23',
+        name: 'Hyperlexia & Aphantasia',
+        shortTag: 'Visual & Linguistic Extremes',
+        category: 'Learning',
+        summary: 'Operating at the extremes of pattern-reading and mental imagery, from precocious decoding to a picture-free mind\'s eye.',
+        symptoms: [
+          'Hyperlexia: precocious reading and pattern decoding',
+          'Aphantasia: having zero visual pictures in your mind\'s eye, thinking purely in abstract concepts and words'
+        ],
+        internalReality: 'Assuming everyone else\'s head works the same way.',
+        externalView: 'Teaching methods assuming universal visualisation.',
+        maskingTax: 'Translating internal concepts into linear explanations.',
+        sanctuaryAdjustment: 'Multi-modal tools combining text and concrete structures.',
+        relatedCodes: ['NC-25', 'NC-27', 'NC-32']
+      },
+      {
+        code: 'ND-24',
+        name: 'Synaesthesia & CPTSD Overlap',
+        shortTag: 'Cross-Wired Senses & Vigilance',
+        category: 'Sensory',
+        summary: 'How cross-wired sensory channels and the cumulative trauma of growing up unaccommodated shape the nervous system.',
+        symptoms: [
+          'Synaesthesia: letters having colours, sounds having shapes',
+          'CPTSD & Tone Trigger (NC-56): hyper-vigilance from years of being punished for unchangeable traits'
+        ],
+        internalReality: 'Your nervous system remembers every time you were penalised for stimming.',
+        externalView: 'Wondering why you are guarded around authority.',
+        maskingTax: 'Living in chronic fight-or-flight.',
+        sanctuaryAdjustment: 'Explicit safety signals (NC-01) and full bodily autonomy.',
+        relatedCodes: ['NC-01', 'NC-30', 'NC-54', 'NC-56']
+      }
+    ];
+
+    var currentCondCategory = 'all';
+
+    function setCondCategory(cat) {
+      playTactileClick(300, 0.035);
+      currentCondCategory = cat;
+      document.querySelectorAll('.cond-pill').forEach(function(btn) {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#d4af37] text-[#0b0e14]';
+        } else {
+          btn.className = 'cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#0b0e14] text-slate-300 border border-slate-700';
+        }
+      });
+      renderConditionGuide();
+    }
+
+    function renderConditionGuide() {
+      var mount = document.getElementById('condition-cards-mount');
+      if (!mount) return;
+      var q = (document.getElementById('cond-search-input').value || '').toLowerCase().trim();
+
+      var filtered = fullSpectrumConditions.filter(function(c) {
+        var matchCat = (currentCondCategory === 'all') || (c.category === currentCondCategory);
+        var matchQ = !q ||
+          c.code.toLowerCase().includes(q) ||
+          c.name.toLowerCase().includes(q) ||
+          c.shortTag.toLowerCase().includes(q) ||
+          c.summary.toLowerCase().includes(q) ||
+          c.internalReality.toLowerCase().includes(q) ||
+          c.maskingTax.toLowerCase().includes(q) ||
+          c.sanctuaryAdjustment.toLowerCase().includes(q) ||
+          c.symptoms.some(function(s) { return s.toLowerCase().includes(q); });
+        return matchCat && matchQ;
+      });
+
+      if (!filtered.length) {
+        mount.innerHTML = '<div class="col-span-full p-8 text-center bg-[#121721] border border-slate-800 rounded-xl font-mono text-sm text-slate-400">NO MATCHING PROFILES FOUND // Try clearing your search box.</div>';
+        return;
+      }
+
+      mount.innerHTML = filtered.map(function(c) {
+        return '<div class="cond-compact-card" onclick="openConditionModal(\'' + c.code + '\')">' +
+          '<span class="card-code-badge">' + c.code + '</span>' +
+          '<span class="card-title">' + c.name + '</span>' +
+          '<span class="text-xs text-sky-300 font-medium leading-snug px-1">' + c.shortTag + '</span>' +
+          '<span class="tap-hint">TAP TO OPEN FULL PROFILE &rarr;</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    function openConditionModal(code) {
+      var c = fullSpectrumConditions.find(function(item) { return item.code === code; });
+      if (!c) return;
+      playTactileClick(380, 0.05);
+
+      var symList = c.symptoms.map(function(s) {
+        return '<li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#d4af37] mt-0.5">◆</span><span>' + s + '</span></li>';
+      }).join('');
+
+      var codeBadges = c.relatedCodes.map(function(rc) {
+        return '<button onclick="closeConditionModal(); switchNeuropediaMode(\'codes\'); document.getElementById(\'nc-search-input\').value=\'' + rc + '\'; filterNeuroCodes();" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/50 text-[#d4af37] hover:bg-[#d4af37] hover:text-[#0b0e14] font-mono text-xs font-bold transition">' + rc + ' &rarr;</button>';
+      }).join('');
+
+      var content = document.getElementById('condition-modal-content');
+      content.innerHTML =
+        '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">' +
+          '<span class="organic-badge">' + c.code + ' // ' + c.category.toUpperCase() + ' PROFILE</span>' +
+          '<button onclick="closeConditionModal()" class="px-3.5 py-1.5 rounded-lg bg-[#0b0e14] border border-slate-700 text-slate-300 hover:text-white hover:border-[#d4af37] font-mono text-xs font-extrabold transition">' +
+            '✕ CLOSE PROFILE [ESC]' +
+          '</button>' +
+        '</div>' +
+        '<h2 class="text-2xl sm:text-3xl font-black text-white mb-2">' + c.name + '</h2>' +
+        '<p class="text-sky-300 text-base font-medium leading-relaxed mb-5">' + c.summary + '</p>' +
+        '<div class="mb-5 p-4 rounded-xl bg-[#0b0e14] border border-slate-800">' +
+          '<div class="font-mono text-xs font-extrabold text-[#d4af37] uppercase tracking-wider mb-2.5">WHAT IT ACTUALLY LOOKS &amp; FEELS LIKE:</div>' +
+          '<ul class="space-y-2.5 m-0 p-0 list-none">' + symList + '</ul>' +
+        '</div>' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-sky-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-sky-400 uppercase mb-1">01 // INSIDE YOUR HEAD</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.internalReality + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-slate-800">' +
+            '<div class="font-mono text-xs font-extrabold text-slate-400 uppercase mb-1">02 // HOW OTHERS MISREAD IT</div>' +
+            '<p class="text-slate-300 text-xs sm:text-sm leading-relaxed m-0">' + c.externalView + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-rose-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-rose-400 uppercase mb-1">03 // THE MASKING TAX</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.maskingTax + '</p>' +
+          '</div>' +
+          '<div class="p-4 rounded-xl bg-[#0b0e14] border border-emerald-500/30">' +
+            '<div class="font-mono text-xs font-extrabold text-emerald-400 uppercase mb-1">04 // WHAT ACTUALLY HELPS (SANCTUARY FIX)</div>' +
+            '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.sanctuaryAdjustment + '</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">' +
+          '<span class="font-mono text-xs text-slate-400">USE THESE NEURO-CODES WHEN THIS HITS:</span>' +
+          '<div class="flex flex-wrap gap-1.5">' + codeBadges + '</div>' +
+        '</div>';
+
+      document.getElementById('condition-detail-modal').classList.add('modal-open');
+    }
+
+    function closeConditionModal() {
+      var modal = document.getElementById('condition-detail-modal');
+      if (modal && modal.classList.contains('modal-open')) {
+        playTactileClick(240, 0.04);
+        modal.classList.remove('modal-open');
+      }
+    }
+
+    /* Storefront Hoodie Carousel */
+    (function() {
+      function switchSlide(dir, idx) {
+        playTactileClick(290, 0.04);
+        var s = document.querySelectorAll('#pane-neuroverse .hud-slide'),
+            t = document.querySelectorAll('#pane-neuroverse .dot');
+        if (!s.length) return;
+        var c = 0;
+        s.forEach(function(x, i) { if (x.classList.contains('active-slide')) c = i; });
+        var i = (idx !== undefined) ? idx : (c + dir + s.length) % s.length;
+        s.forEach(function(x, k) { x.classList.toggle('active-slide', k === i); });
+        t.forEach(function(x, k) { x.classList.toggle('active-dot', k === i); });
+      }
+      document.addEventListener('click', function(e) {
+        var d = e.target.closest('.dot');
+        if (d) switchSlide(0, parseInt(d.getAttribute('data-target'), 10));
+      });
+      var startX = 0, startY = 0;
+      document.addEventListener('touchstart', function(e) {
+        var a = e.target.closest('#hoodie-swipe-area');
+        if (a) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }
+      }, { passive: true });
+      document.addEventListener('touchend', function(e) {
+        var a = e.target.closest('#hoodie-swipe-area');
+        if (!a || !startX) return;
+        var dX = e.changedTouches[0].clientX - startX,
+            dY = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dX) > 30 && Math.abs(dX) > Math.abs(dY)) { switchSlide(dX < 0 ? 1 : -1); }
+        startX = 0;
+      }, { passive: true });
+    })();
+
+    window.setSanctuaryAudio = function(mode) {
+      try {
+        if (sanctuaryNode) {
+          try { sanctuaryNode.stop(); } catch(e) {}
+          try { sanctuaryNode.disconnect(); } catch(e) {}
+          sanctuaryNode = null;
+        }
+        if (mode === 'off') return;
+
+        var ctx = getAudioContext();
+        if (!ctx) return;
+
+        sanctuaryGain = ctx.createGain();
+        var volEl = document.getElementById('sanctuary-vol');
+        var vol = volEl ? parseFloat(volEl.value) : 0.12;
+        sanctuaryGain.gain.setValueAtTime(vol, ctx.currentTime);
+        sanctuaryGain.connect(ctx.destination);
+
+        if (mode === 'gamma') {
+          var osc1 = ctx.createOscillator();
+          var osc2 = ctx.createOscillator();
+          var merger = ctx.createGain();
+          osc1.type = 'sine';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(160, ctx.currentTime);
+          osc2.frequency.setValueAtTime(200, ctx.currentTime);
+          osc1.connect(merger);
+          osc2.connect(merger);
+          merger.gain.setValueAtTime(0.4, ctx.currentTime);
+          merger.connect(sanctuaryGain);
+          osc1.start();
+          osc2.start();
+          sanctuaryNode = {
+            stop: function() { osc1.stop(); osc2.stop(); },
+            disconnect: function() { merger.disconnect(); }
+          };
+        } else {
+          var bufferSize = 2 * ctx.sampleRate;
+          var noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          var output = noiseBuffer.getChannelData(0);
+          var lastOut = 0.0;
+          for (var i = 0; i < bufferSize; i++) {
+            var white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= (mode === 'brown' ? 3.2 : 1.8);
+          }
+          var whiteNoise = ctx.createBufferSource();
+          whiteNoise.buffer = noiseBuffer;
+          whiteNoise.loop = true;
+
+          var filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(mode === 'brown' ? 420 : 950, ctx.currentTime);
+
+          whiteNoise.connect(filter);
+          filter.connect(sanctuaryGain);
+          whiteNoise.start(0);
+          sanctuaryNode = whiteNoise;
+        }
+      } catch (e) {}
+    };
+
+    window.updateSanctuaryVolume = function(val) {
+      if (sanctuaryGain && audioCtx) {
+        sanctuaryGain.gain.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+      }
+    };
+
+    window.toggleWidgetPanel = function() {
+      playTactileClick(320, 0.04);
+      var wrapper = document.getElementById('audhme-widget-wrapper');
+      if (wrapper) wrapper.classList.toggle('panel-open');
+    };
+
+    window.toggleLowInputMode = function(enabled) {
+      document.body.classList.toggle('low-input-active', enabled);
+    };
+
+    function toggleBionicReading(enable) {
+      document.querySelectorAll('.bionic-text').forEach(function(el) {
+        if (!el.getAttribute('data-orig')) {
+          el.setAttribute('data-orig', el.innerHTML);
+        }
+        if (!enable) {
+          el.innerHTML = el.getAttribute('data-orig');
+        } else {
+          var raw = el.getAttribute('data-orig');
+          el.innerHTML = raw.replace(/(^|>)\s*([^<]+)/g, function(m, pfx, txt) {
+            var words = txt.split(' ').map(function(w) {
+              if (w.length <= 2) return '<b>' + w + '</b>';
+              var cut = Math.ceil(w.length * 0.45);
+              return '<b class="text-white font-extrabold">' + w.slice(0, cut) + '</b>' + w.slice(cut);
+            }).join(' ');
+            return pfx + words;
+          });
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      enhanceAllFlipCards();
+      handleInitialRoute();
+      renderConditionGuide();
+      startGroundingBoot();
+    });
     let cart = JSON.parse(localStorage.getItem('test_cart')) || [];
     let registeredUsers = JSON.parse(localStorage.getItem('test_users_db')) || [];
     let currentUser = JSON.parse(localStorage.getItem('test_current_user')) || null;
@@ -2814,7 +3511,7 @@
         return '<label class="flex items-center gap-2.5 cursor-pointer hover:text-white">' +
           '<input type="checkbox" name="neurotype-option" value="' + type + '" ' + isChecked + ' class="rounded bg-slate-800 border-slate-600 text-amber-400 focus:ring-0">' +
           '<span>' + type + '</span>' +
-          '</label>';
+        '</label>';
       }).join('');
     }
 
@@ -2855,7 +3552,14 @@
       }
     }
 
-    function switchView(viewName) {
+   function switchView(viewName) {
+      // Force close any active modal backdrops safely
+      var cartModal = document.getElementById('cart-modal');
+      var authModal = document.getElementById('auth-modal');
+      if (cartModal) { cartModal.classList.remove('flex'); cartModal.classList.add('hidden'); }
+      if (authModal) { authModal.classList.remove('flex'); authModal.classList.add('hidden'); }
+
+      // Hide all standard content embeds using your actual embed IDs
       var allEmbeds = ['embed03', 'embed35', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04'];
       allEmbeds.forEach(function(id) {
         var el = document.getElementById(id);
@@ -2865,21 +3569,33 @@
       const profilePage = document.getElementById('profile-page');
       const directoryView = document.getElementById('directory-view');
 
-      if (profilePage) profilePage.classList.add('hidden');
-      if (directoryView) directoryView.classList.add('hidden');
+      if (profilePage) {
+        profilePage.classList.add('hidden');
+        profilePage.style.display = 'none';
+      }
+      if (directoryView) {
+        directoryView.classList.add('hidden');
+        directoryView.style.display = 'none';
+      }
 
       if (viewName === 'profile') {
         if (!currentUser) {
           openAuthModal('signup');
           return;
         }
-        if (profilePage) profilePage.classList.remove('hidden');
+        if (profilePage) {
+          profilePage.classList.remove('hidden');
+          profilePage.style.display = 'block'; // Forces it visible without breaking other elements
+        }
         renderProfile();
       } else if (viewName === 'directory') {
-        if (directoryView) directoryView.classList.remove('hidden');
+        if (directoryView) {
+          directoryView.classList.remove('hidden');
+          directoryView.style.display = 'block';
+        }
         renderCommunityDirectory();
       } else {
-        switchPage('home', true);
+        switchPage('home', true); // Uses your main router function
       }
     }
 
@@ -2916,15 +3632,13 @@
       const publicViewCard = document.getElementById('profile-public-view');
       
       if (badgesContainer) {
-        const isFounder = (currentUser.username || '').toLowerCase().includes('jason') || (currentUser.email || '').toLowerCase().includes('jason');
-        
+        const isFounder = (currentUser.username || '').toLowerCase() === 'jason_fable';
         if (isFounder && publicViewCard) {
           publicViewCard.className = "bg-[#121721] border-2 border-[#d4af37] shadow-lg shadow-[#d4af37]/10 rounded-2xl p-8 space-y-6";
         }
 
         const founderBadge = isFounder ? '<span class="px-3 py-1 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md"><span>✨</span> Sanctuary Founder & Architect</span>' : '';
         const memberBadge = '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">Verified Member</span>';
-        
         badgesContainer.innerHTML = founderBadge + memberBadge;
       }
       
@@ -2948,7 +3662,7 @@
       const settingsView = document.getElementById('profile-settings-view');
       if (settingsView) settingsView.classList.add('hidden');
     }
-
+    
     function renderCommunityDirectory(searchQuery = '') {
       const grid = document.getElementById('members-grid');
       if (!grid) return;
@@ -3224,7 +3938,7 @@
 
    function toggleCartModal() {
       const authModal = document.getElementById('auth-modal');
-      if (authModal && !authModal.classList.contains('hidden')) return;
+      if (authModal && !authModal.classList.contains('hidden')) return; // Block basket if auth modal is open
 
       const modal = document.getElementById('cart-modal');
       if (!modal) return;
