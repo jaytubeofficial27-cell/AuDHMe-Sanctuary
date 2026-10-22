@@ -11,6 +11,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <!-- Firebase Authentication -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -2310,9 +2311,19 @@
       </div>
 
       <div class="space-y-2 flex flex-col items-center">
-        <button type="button" onclick="signInWithGoogle()" class="w-full py-3 rounded-xl bg-white text-slate-900 font-extrabold text-xs uppercase tracking-wider hover:bg-slate-100 transition">
-          Continue with Google
-        </button>
+        <div id="g_id_onload"
+             data-client_id="588550369427-tevnfs7vn4smfurr54qho9ppntcpjsoo.apps.googleusercontent.com"
+             data-callback="handleGoogleSignIn"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin w-full flex justify-center"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="continue_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
       </div>
 
       <div class="flex items-center gap-3 my-2">
@@ -4077,16 +4088,14 @@
       }
     }
 
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(function(result) {
+    function handleGoogleSignIn(response) {
+      if (!response || !response.credential) return;
+      auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(response.credential))
+        .then(function() {
           closeAuthModal();
-          if (result.user && !result.user.displayName) openOnboardingModal();
-          else showToast('Signed in with Google securely.');
+          showToast('Signed in with Google securely.');
         })
-        .catch(function(error) {
-          if (error && error.code === 'auth/popup-closed-by-user') return;
+        .catch(function() {
           showToast('Google sign-in could not be completed.');
         });
     }
