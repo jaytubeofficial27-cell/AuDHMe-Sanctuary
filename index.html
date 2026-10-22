@@ -3524,12 +3524,6 @@
     let tempAuthEmail = null;
     let isSearchOpen = false;
 
-    if (currentUser && !currentUser.bio) {
-      currentUser.bio = "Founder of AuDHMe";
-      currentUser.neurotypes = ["AuDHD (Autism + ADHD)", "Sensory Processing Difference / Sensitivity"];
-      localStorage.setItem('test_current_user', JSON.stringify(currentUser));
-    }
-
     const availableNeurotypes = [
       "AuDHD (Autism + ADHD)", "Autism / Autistic Spectrum", "ADHD (Attention Deficit Hyperactivity Disorder)",
       "Dyslexia", "Dyscalculia", "Dyspraxia / DCD", "Dysgraphia", "Sensory Processing Difference / Sensitivity",
@@ -3561,7 +3555,12 @@
       if (!container) return;
       const toast = document.createElement('div');
       toast.className = 'pointer-events-auto bg-[#161d2a] border border-[#d4af37] text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-bold toast-animate flex items-center gap-2';
-      toast.innerHTML = '<span class="text-[#d4af37]">✨</span> ' + message;
+      const icon = document.createElement('span');
+      icon.className = 'text-[#d4af37]';
+      icon.textContent = '✨';
+      const text = document.createElement('span');
+      text.textContent = String(message);
+      toast.append(icon, text);
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
@@ -3577,13 +3576,38 @@
       const userDisplay = document.getElementById('user-display');
       if (!userDisplay) return;
       
-      if (currentUser) {
-        userDisplay.innerHTML = '<button onclick="switchView(\'profile\')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-xs font-bold text-[#d4af37] hover:border-[#d4af37] transition flex items-center gap-1.5">' +
-          '<span>👤</span> <span>' + (currentUser.username || currentUser.email.split('@')[0]) + '</span>' +
-          '</button>';
-      } else {
-        userDisplay.innerHTML = '<button onclick="openAuthModal(\'signup\')" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-sky-300 hover:border-sky-400">👤 Sign Up / In</button>';
+      const button = document.createElement('button');
+      button.className = currentUser
+        ? 'px-3 py-1.5 rounded-lg bg-[#161d2a] border border-[#d4af37]/40 text-xs font-bold text-[#d4af37] hover:border-[#d4af37] transition flex items-center gap-1.5'
+        : 'px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-sky-300 hover:border-sky-400';
+      button.type = 'button';
+      button.addEventListener('click', function() {
+        if (currentUser) switchView('profile');
+        else openAuthModal('signup');
+      });
+      button.textContent = currentUser ? '👤 ' + (currentUser.username || currentUser.email.split('@')[0]) : '👤 Sign Up / In';
+      userDisplay.replaceChildren(button);
+    }
+
+    function safeProfileUrl(value) {
+      try {
+        const url = new URL(String(value), window.location.origin);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+      } catch (e) {
+        return null;
       }
+    }
+
+    function addProfileLink(container, link) {
+      const url = safeProfileUrl(link.url);
+      if (!url) return;
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      anchor.className = 'px-3 py-1.5 rounded-xl bg-[#161d2a] border border-slate-700 hover:border-[#d4af37] text-xs font-bold text-sky-300 transition flex items-center gap-1.5 shadow-sm';
+      anchor.textContent = '🔗 ' + String(link.label || 'Profile link');
+      container.appendChild(anchor);
     }
 
    function switchView(viewName) {
@@ -3639,11 +3663,19 @@
       
       const avatarWrap = document.getElementById('profile-view-avatar-wrap');
       if (avatarWrap) {
-        if (currentUser.avatar) {
-          avatarWrap.innerHTML = `<img src="${currentUser.avatar}" alt="Avatar" class="w-full h-full object-cover">`;
+        const avatarUrl = safeProfileUrl(currentUser.avatar);
+        if (avatarUrl) {
+          const image = document.createElement('img');
+          image.src = avatarUrl;
+          image.alt = 'Avatar';
+          image.className = 'w-full h-full object-cover';
+          avatarWrap.replaceChildren(image);
         } else {
           const initial = (currentUser.username || 'A').charAt(0).toUpperCase();
-          avatarWrap.innerHTML = `<span class="text-3xl font-bold text-[#d4af37]">${initial}</span>`;
+          const fallback = document.createElement('span');
+          fallback.className = 'text-3xl font-bold text-[#d4af37]';
+          fallback.textContent = initial;
+          avatarWrap.replaceChildren(fallback);
         }
       }
       
@@ -3653,13 +3685,18 @@
       const neurotypesContainer = document.getElementById('profile-view-neurotypes');
       if (neurotypesContainer) {
         const userTypes = currentUser.neurotypes || [];
+        neurotypesContainer.replaceChildren();
         if (userTypes.length === 0) {
-          neurotypesContainer.innerHTML = '<span class="text-xs text-slate-400 italic">No neurotypes selected</span>';
-        } else {
-          neurotypesContainer.innerHTML = userTypes.map(t => 
-            '<span class="px-3 py-1 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/40 text-[#d4af37] text-xs font-mono font-bold">' + t + '</span>'
-          ).join('');
-        }
+          const empty = document.createElement('span');
+          empty.className = 'text-xs text-slate-400 italic';
+          empty.textContent = 'No neurotypes selected';
+          neurotypesContainer.appendChild(empty);
+        } else userTypes.forEach(function(type) {
+          const badge = document.createElement('span');
+          badge.className = 'px-3 py-1 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/40 text-[#d4af37] text-xs font-mono font-bold';
+          badge.textContent = String(type);
+          neurotypesContainer.appendChild(badge);
+        });
       }
 
       const badgesContainer = document.getElementById('profile-header-badges');
@@ -3679,15 +3716,8 @@
       const linksContainer = document.getElementById('profile-links-container');
       if (linksContainer) {
         const userLinks = currentUser.links || [];
-        if (userLinks.length === 0) {
-          linksContainer.innerHTML = '';
-        } else {
-          linksContainer.innerHTML = userLinks.map(l => 
-            `<a href="${l.url}" target="_blank" class="px-3 py-1.5 rounded-xl bg-[#161d2a] border border-slate-700 hover:border-[#d4af37] text-xs font-bold text-sky-300 transition flex items-center gap-1.5 shadow-sm">
-              <span>🔗</span> <span>${l.label}</span>
-            </a>`
-          ).join('');
-        }
+        linksContainer.replaceChildren();
+        userLinks.forEach(function(link) { addProfileLink(linksContainer, link); });
       }
 
       const publicView = document.getElementById('profile-public-view');
@@ -3700,56 +3730,11 @@
     function renderCommunityDirectory(searchQuery = '') {
       const grid = document.getElementById('members-grid');
       if (!grid) return;
-
-      const users = JSON.parse(localStorage.getItem('test_users_db')) || [];
-
-      if (users.length === 0) {
-        grid.innerHTML = '<p class="text-xs text-slate-400 italic col-span-2 text-center py-8">No community members registered yet.</p>';
-        return;
-      }
-
-      const query = searchQuery.toLowerCase();
-      const filtered = users.filter(u => {
-        const username = (u.username || '').toLowerCase();
-        return username.startsWith(query);
-      });
-
-      if (filtered.length === 0) {
-        grid.innerHTML = '<p class="text-xs text-slate-400 italic col-span-2 text-center py-8">No members found matching your search.</p>';
-        return;
-      }
-
-      grid.innerHTML = filtered.map(member => {
-        const initial = (member.username || 'A').charAt(0).toUpperCase();
-        const avatarHtml = member.avatar 
-          ? `<img src="${member.avatar}" alt="Avatar" class="w-full h-full object-cover">`
-          : `<span class="text-xl font-bold text-[#d4af37]">${initial}</span>`;
-        
-        const bioText = member.bio || 'No bio added yet.';
-        const memberTypes = member.neurotypes || [];
-        
-        const isFounder = (member.username || '').toLowerCase().includes('jason') || (member.email || '').toLowerCase().includes('jason');
-        const founderBadge = isFounder ? '<span class="px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold">✨ Sanctuary Founder</span>' : '';
-        
-        const badges = memberTypes.length === 0 
-          ? '<span class="text-[11px] text-slate-500 italic">No neurotypes specified</span>'
-          : memberTypes.map(t => '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">' + t + '</span>').join('');
-
-        return '<div class="bg-[#121721] border border-slate-700 rounded-xl p-5 space-y-3 flex flex-col justify-between">' +
-          '<div class="flex items-center gap-3">' +
-            '<div class="w-14 h-14 rounded-full bg-[#0b0e14] border border-[#d4af37] overflow-hidden flex items-center justify-center shrink-0">' + avatarHtml + '</div>' +
-            '<div>' +
-              '<h3 class="font-bold text-white text-base">' + (member.username || 'Member') + '</h3>' +
-              '<div class="flex items-center gap-1.5 mt-1 flex-wrap">' +
-                founderBadge +
-                '<span class="text-[10px] font-mono text-[#d4af37] bg-[#d4af37]/10 px-2.5 py-0.5 rounded border border-[#d4af37]/20">Sanctuary Member</span>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-          '<p class="text-xs text-slate-300 italic bg-[#0b0e14] p-3 rounded-lg border border-slate-800">' + bioText + '</p>' +
-          '<div class="flex flex-wrap gap-1.5 pt-1">' + badges + '</div>' +
-        '</div>';
-      }).join('');
+      grid.replaceChildren();
+      const message = document.createElement('p');
+      message.className = 'text-xs text-slate-400 italic col-span-2 text-center py-8';
+      message.textContent = 'Community profiles are unavailable until a secure server-backed directory is configured.';
+      grid.appendChild(message);
     }
 
     function toggleHeaderSearch(event) {
@@ -3937,14 +3922,6 @@
       currentUser.neurotypes = newNeurotypes;
 
       const saveAndFinish = () => {
-        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
-
-        const userIndex = registeredUsers.findIndex(u => u.email === currentUser.email || u.username === currentUser.username);
-        if (userIndex !== -1) {
-          registeredUsers[userIndex] = currentUser;
-          localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
-        }
-
         showToast('✨ Sanctuary profile updated successfully!');
         renderProfile();
       };
@@ -4004,14 +3981,27 @@
       }
 
       let subtotal = 0;
-      list.innerHTML = cart.map((item, index) => {
+      list.replaceChildren();
+      cart.forEach((item, index) => {
         subtotal += item.price;
-        return '<div class="flex justify-between items-center bg-[#0b0e14] p-2.5 rounded-lg text-sm">' +
-          '<div>' + item.name + ' <span class="text-xs text-slate-400">(Size: ' + item.size + ')</span></div>' +
-          '<div class="flex items-center gap-3"><span class="text-[#d4af37]">£' + item.price.toFixed(2) + '</span>' +
-          '<button onclick="removeItem(' + index + ')" class="text-rose-400 text-xs font-bold">✕</button></div>' +
-        '</div>';
-      }).join('');
+        const row = document.createElement('div');
+        row.className = 'flex justify-between items-center bg-[#0b0e14] p-2.5 rounded-lg text-sm';
+        const description = document.createElement('div');
+        description.textContent = String(item.name || 'Item') + ' (Size: ' + String(item.size || '') + ')';
+        const actions = document.createElement('div');
+        actions.className = 'flex items-center gap-3';
+        const price = document.createElement('span');
+        price.className = 'text-[#d4af37]';
+        price.textContent = '£' + Number(item.price || 0).toFixed(2);
+        const removeButton = document.createElement('button');
+        removeButton.className = 'text-rose-400 text-xs font-bold';
+        removeButton.type = 'button';
+        removeButton.textContent = '✕';
+        removeButton.addEventListener('click', function() { removeItem(index); });
+        actions.append(price, removeButton);
+        row.append(description, actions);
+        list.appendChild(row);
+      });
 
       if (subtotalEl) subtotalEl.textContent = '£' + subtotal.toFixed(2);
 
@@ -4099,39 +4089,15 @@
     }
 
     function handleGoogleSignIn(response) {
-      const responsePayload = parseJwt(response.credential);
-      const email = responsePayload.email;
-      const name = responsePayload.name || email.split('@')[0];
-
-      closeAuthModal();
-
-      let user = registeredUsers.find(u => u.email === email);
-      if (!user) {
-        tempAuthEmail = email;
-        user = { email: email, password: 'google_oauth_auth', username: name, neurotypes: [] };
-        registeredUsers.push(user);
-        localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
-        
-        setTimeout(() => {
-          openOnboardingModal();
-          const onboardName = document.getElementById('onboard-username');
-          if (onboardName) onboardName.value = name;
-        }, 200);
-      } else {
-        currentUser = user;
-        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
-        showToast('Welcome back, ' + currentUser.username + '! Signed in with Google.');
-        updateUI();
-      }
-    }
-
-    function parseJwt(token) {
-      var base64Url = token.split('.')[1];
-      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(jsonPayload);
+      if (!response || !response.credential) return;
+      auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(response.credential))
+        .then(function() {
+          closeAuthModal();
+          showToast('Signed in with Google securely.');
+        })
+        .catch(function() {
+          showToast('Google sign-in could not be completed.');
+        });
     }
 
     function openOnboardingModal() {
@@ -4151,13 +4117,12 @@
       const username = usernameInput ? usernameInput.value.trim() : '';
       const neurotypes = getSelectedCheckboxes('onboard-neurotypes-container');
 
-      const user = registeredUsers.find(u => u.email === tempAuthEmail);
-      if (user) {
-        user.username = username;
-        user.neurotypes = neurotypes;
-        currentUser = user;
-        localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
-        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
+      if (currentUser) {
+        currentUser.username = username;
+        currentUser.neurotypes = neurotypes;
+        if (auth.currentUser) {
+          auth.currentUser.updateProfile({ displayName: username }).catch(function() {});
+        }
       }
 
       const onboardingModal = document.getElementById('onboarding-modal');
@@ -4194,7 +4159,14 @@
         return;
       }
       closeForgotPassModal();
-      showToast('Password reset link sent to ' + email + '! (Simulated)');
+      auth.sendPasswordResetEmail(email)
+        .then(function() {
+          closeForgotPassModal();
+          showToast('Password reset email sent.');
+        })
+        .catch(function() {
+          showToast('Unable to send the password reset email.');
+        });
     }
 
     function handleLogout() {
@@ -4217,13 +4189,6 @@
         if (!currentUser.hasRedeemedPerk) {
           discount = subtotal * 0.15;
           currentUser.hasRedeemedPerk = true;
-          localStorage.setItem('test_current_user', JSON.stringify(currentUser));
-          
-          const userIndex = registeredUsers.findIndex(u => u.email === currentUser.email);
-          if (userIndex !== -1) {
-            registeredUsers[userIndex] = currentUser;
-            localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
-          }
           showToast('✨ AUDHFREE15 applied! One-time new member discount redeemed.');
         } else {
           showToast('Notice: You have already used your one-time AUDHFREE15 member discount.');
