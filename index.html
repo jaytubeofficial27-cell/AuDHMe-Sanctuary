@@ -2113,7 +2113,6 @@
        ========================================================================= -->
   <!-- ================= PAGE 2: FULL-PAGE SANCTUARY PROFILE ================= -->
   <div id="profile-page" class="max-w-4xl mx-auto space-y-6 hidden" style="padding: 24px 16px;">
-    
     <!-- Top Action Bar -->
     <div class="flex justify-between items-center bg-[#121721] border border-slate-800 rounded-xl p-4">
       <button onclick="switchView('store')" class="text-xs text-sky-400 font-bold hover:underline bg-transparent border-0 cursor-pointer">
@@ -3579,14 +3578,14 @@
       }
 
       if (viewName === 'profile') {
-        if (!currentUser) {
-          openAuthModal('signup');
-          return;
-        }
-        if (profilePage) {
-          profilePage.classList.remove('hidden');
-          profilePage.style.display = 'block'; // Forces it visible without breaking other elements
-        }
+      if (!currentUser) {
+        openAuthModal('signup');
+        return;
+      }
+      if (profilePage) {
+        profilePage.classList.remove('hidden');
+        profilePage.classList.add('active-embed'); // This unlocks the CSS display rule!
+      }
         renderProfile();
       } else if (viewName === 'directory') {
         if (directoryView) {
