@@ -7,6 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AuDHMe™ // Neurodivergent Sanctuary &amp; Practical Infrastructure</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase App (Core) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<!-- Firebase Authentication -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -3482,9 +3486,43 @@
       renderConditionGuide();
       startGroundingBoot();
     });
-    let cart = JSON.parse(localStorage.getItem('test_cart')) || [];
-    let registeredUsers = JSON.parse(localStorage.getItem('test_users_db')) || [];
-    let currentUser = JSON.parse(localStorage.getItem('test_current_user')) || null;
+   // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBO3dJRsRDb011tFC37T3O6X7kUIBAJSW4",
+    authDomain: "audhme-sanctuary-b73dd.firebaseapp.com",
+    projectId: "audhme-sanctuary-b73dd",
+    storageBucket: "audhme-sanctuary-b73dd.appspot.com",
+    messagingSenderId: "986253884870",
+    appId: "1:986253884870:web:77935412b2171aeac746c7",
+    measurementId: "G-C5Z47VWZ58"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Replace your old local storage user variables with these:
+  let cart = JSON.parse(localStorage.getItem('test_cart')) || [];
+  let currentUser = null;
+  let isLoginMode = false;
+  let isSearchOpen = false;
+
+  // Listen for secure login state changes automatically from Google's cloud
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      currentUser = {
+        email: user.email,
+        username: user.displayName || user.email.split('@')[0],
+        avatar: user.photoURL || null,
+        bio: "Founder of AuDHMe",
+        neurotypes: ["AuDHD (Autism + ADHD)", "Sensory Processing Difference / Sensitivity"]
+      };
+      updateUI();
+    } else {
+      currentUser = null;
+      updateUI();
+    }
+  });
     let isLoginMode = false;
     let tempAuthEmail = null;
     let isSearchOpen = false;
@@ -4039,32 +4077,28 @@
       const password = passwordInput ? passwordInput.value : '';
 
       if (!isLoginMode) {
-        const existing = registeredUsers.find(u => u.email === email);
-        if (existing) {
-          showToast('An account with this email already exists! Try logging in.');
-          return;
-        }
-
-        tempAuthEmail = email;
-        const newUser = { email, password, username: email.split('@')[0], neurotypes: [] };
-        registeredUsers.push(newUser);
-        localStorage.setItem('test_users_db', JSON.stringify(registeredUsers));
-
-        closeAuthModal();
-        openOnboardingModal();
+        // --- SECURE SIGN UP WITH FIREBASE ---
+        auth.createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            showToast('Account created securely!');
+            closeAuthModal();
+            openOnboardingModal();
+          })
+          .catch((error) => {
+            showToast('Error: ' + error.message);
+          });
       } else {
-        const user = registeredUsers.find(u => u.email === email && u.password === password);
-        if (!user) {
-          showToast('Invalid email or password.');
-          return;
-        }
-        currentUser = user;
-        localStorage.setItem('test_current_user', JSON.stringify(currentUser));
-        showToast('Welcome back, ' + currentUser.username + '! 15% member discount active.');
-        closeAuthModal();
+        // --- SECURE SIGN IN WITH FIREBASE ---
+        auth.signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            showToast('Welcome back! Logged in securely.');
+            closeAuthModal();
+            updateUI();
+          })
+          .catch((error) => {
+            showToast('Invalid email or password.');
+          });
       }
-
-      updateUI();
     }
 
     function handleGoogleSignIn(response) {
@@ -4167,12 +4201,11 @@
     }
 
     function handleLogout() {
-      currentUser = null;
-      localStorage.removeItem('test_current_user');
-      updateUI();
+    auth.signOut().then(() => {
+      showToast('Signed out successfully.');
       switchPage('home', true);
-      showToast('Signed out successfully. Member discount paused.');
-    }
+    });
+  }
 
     function proceedToCheckout() {
       if (cart.length === 0) {
