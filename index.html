@@ -4224,28 +4224,36 @@
       renderGoogleSignInButton();
     }
 
-    function renderGoogleSignInButton() {
-      const container = document.getElementById('google-signin-button');
-      if (!container) return;
-      container.replaceChildren();
-      if (!window.google || !google.accounts || !google.accounts.id) {
-        container.textContent = 'Google sign-in is temporarily unavailable. Please use email sign-in.';
-        return;
+    // Native Firebase popup sign-in (replaces the old Google script setup)
+function handleGoogleSignIn() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  
+  auth.signInWithPopup(provider)
+    .then(function(result) {
+      closeAuthModal();
+      showToast('Signed in with Google securely.');
+      if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
+        openOnboardingModal();
       }
-      if (!googleSignInInitialized) {
-        google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: handleGoogleSignIn,
-          auto_select: false
-        });
-        googleSignInInitialized = true;
-      }
-      google.accounts.id.renderButton(container, {
-        type: 'standard', shape: 'rectangular', theme: 'outline',
-        text: 'continue_with', size: 'large', logo_alignment: 'left',
-        width: Math.min(container.clientWidth || 360, 360)
-      });
-    }
+    })
+    .catch(function(error) {
+      console.error('Firebase Google sign-in failed:', error.code || error.message);
+      showToast('Google sign-in could not be completed (' + (error.code || 'auth/unknown') + ').');
+    });
+}
+
+function renderGoogleSignInButton() {
+  const container = document.getElementById('google-signin-button');
+  if (!container) return;
+  
+  container.replaceChildren();
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'w-full py-3 rounded-xl bg-white text-slate-900 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-slate-100 transition';
+  btn.innerHTML = '<span>🌐</span> Continue with Google';
+  btn.onclick = handleGoogleSignIn;
+  container.appendChild(btn);
+}
 
     function closeAuthModal() {
       const modal = document.getElementById('auth-modal');
