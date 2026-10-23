@@ -3831,11 +3831,13 @@
       const directoryView = document.getElementById('directory-view');
 
       if (profilePage) {
-        profilePage.classList.add('hidden');
-        profilePage.style.display = 'none';
-      }
+  profilePage.classList.add('hidden');
+  profilePage.classList.remove('active-embed');
+  profilePage.style.display = 'none';
+}
       if (directoryView) {
         directoryView.classList.add('hidden');
+        directoryView.classList.remove('active-embed');
         directoryView.style.display = 'none';
       }
 
