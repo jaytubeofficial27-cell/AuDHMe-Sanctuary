@@ -3764,6 +3764,15 @@
       }
     }
 
+    function safeAvatarSource(value) {
+      if (typeof value !== 'string') return null;
+      if (/^data:image\/(?:jpeg|png|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(value)
+         && value.length <= 700000) {
+        return value;
+      }
+      return safeProfileUrl(value);
+    }
+    
     function addProfileLink(container, link) {
       const url = safeProfileUrl(link.url);
       if (!url) return;
@@ -3829,7 +3838,7 @@
       
       const avatarWrap = document.getElementById('profile-view-avatar-wrap');
       if (avatarWrap) {
-        const avatarUrl = safeProfileUrl(currentUser.avatar);
+        const avatarUrl = safeAvatarSource(currentUser.avatar);
         if (avatarUrl) {
           const image = document.createElement('img');
           image.src = avatarUrl;
@@ -3877,7 +3886,7 @@
         }
 
         const founderBadge = isFounder ? '<span class="px-3 py-1 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md"><span>✨</span> Sanctuary Founder & Architect</span>' : '';
-        const memberBadge = '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">Signed-in Member</span>';
+        const memberBadge = '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">Sanctuary Member</span>';
         badgesContainer.innerHTML = founderBadge + memberBadge;
       }
       
