@@ -2243,6 +2243,34 @@
             Save Changes
           </button>
         </div>
+
+        <div id="username-confirm-modal"
+     class="fixed inset-0 z-[999999] hidden items-center justify-center bg-black/80 p-4"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="username-confirm-title">
+  <div class="w-full max-w-md rounded-2xl border border-[#d4af37] bg-[#121721] p-6 shadow-2xl">
+    <h2 id="username-confirm-title" class="mb-3 text-xl font-bold text-white">
+      Change your username?
+    </h2>
+    <p class="mb-6 text-slate-300">
+      Changing your username will lock this field and prevent further changes for 30 days.
+      Would you like to continue?
+    </p>
+    <div class="flex justify-end gap-3">
+      <button type="button"
+              onclick="cancelUsernameChange()"
+              class="rounded-lg border border-slate-600 px-4 py-2 text-white">
+        No
+      </button>
+      <button type="button"
+              onclick="confirmUsernameChange()"
+              class="rounded-lg bg-[#d4af37] px-4 py-2 font-bold text-[#0b0e14]">
+        Yes, change it
+      </button>
+    </div>
+  </div>
+</div>
       </form>
 
       <div class="pt-6 border-t border-slate-800 flex justify-between items-center">
@@ -4050,6 +4078,8 @@
       return db.collection('users').doc(user.uid).set(profile, { merge: true });
     }
 
+    let usernameChangeConfirmed = false;
+    
     function handleProfileUpdate(event) {
       event.preventDefault();
       if (!currentUser || !auth.currentUser) return;
@@ -4083,7 +4113,16 @@
           showToast('Username is locked. You can change it again in ' + daysLeft + ' days.');
           return;
         }
-        if (!window.confirm('Are you sure? Changing your username will lock this field and prevent further changes for 30 days.')) return;
+        if (!usernameChangeConfirmed) {
+  const modal = document.getElementById('username-confirm-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+  return;
+}
+
+usernameChangeConfirmed = false;
         currentUser.username = newUsername;
         currentUser.lastUsernameChange = now;
       }
@@ -4113,6 +4152,27 @@
       });
     }
 
+    function closeUsernameConfirmModal() {
+  const modal = document.getElementById('username-confirm-modal');
+  if (modal) {
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+  }
+}
+
+function cancelUsernameChange() {
+  usernameChangeConfirmed = false;
+  closeUsernameConfirmModal();
+}
+
+function confirmUsernameChange() {
+  usernameChangeConfirmed = true;
+  closeUsernameConfirmModal();
+
+  const form = document.querySelector('#profile-settings-view form');
+  if (form) form.requestSubmit();
+}
+    
     function addProductToCart(sku, sizeSelectId) {
       const product = CART_PRODUCTS[sku];
       if (!product) return;
