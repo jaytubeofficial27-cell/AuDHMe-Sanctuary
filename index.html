@@ -11,6 +11,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <!-- Firebase Authentication -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <!-- Firestore and Cloud Functions must load after Firebase App -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -1693,7 +1696,10 @@
               <p>A heavyweight, comforting statement piece designed to bring our mission into everyday life, featuring the geometric AuDHMe™ compass emblem on the chest.</p>
               <div class="nh-meta"><b>Available Shades:</b> Black, Navy Blazer, Charcoal Heather, Vintage Black, Forest Green, White</div>
               <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight grounding fabric (8.5 oz) | Unisex</div>
-              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
+              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping (UK orders only)</small></div>
+              <label class="text-xs text-slate-300 block mt-2" for="hoodie-size-core">Size</label>
+              <select id="hoodie-size-core" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-sm text-white"><option>S</option><option>M</option><option>L</option></select>
+              <button type="button" onclick="addProductToCart('core-hoodie', 'hoodie-size-core')" class="nh-btn-gld">Add to Basket</button>
               <a href="https://buy.stripe.com/14A00l1qdcYYfBL9iLeQM03" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
             </div>
           </div>
@@ -1706,7 +1712,10 @@
               <p>A bold frontline piece celebrating neurodivergent agency, with our flagship tagline across the chest in high-contrast typography.</p>
               <div class="nh-meta"><b>Base Colour:</b> Deep Obsidian Black</div>
               <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight grounding fabric (8.5 oz) | Unisex</div>
-              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
+              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping (UK orders only)</small></div>
+              <label class="text-xs text-slate-300 block mt-2" for="hoodie-size-black">Size</label>
+              <select id="hoodie-size-black" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-sm text-white"><option>S</option><option>M</option><option>L</option></select>
+              <button type="button" onclick="addProductToCart('spectrum-hoodie-black', 'hoodie-size-black')" class="nh-btn-gld">Add to Basket</button>
               <a href="https://buy.stripe.com/6oUfZj2uhcYY4X70MfeQM02" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
             </div>
           </div>
@@ -1719,7 +1728,10 @@
               <p>A bold frontline piece celebrating neurodivergent agency, with our flagship tagline across the chest in high-contrast typography.</p>
               <div class="nh-meta"><b>Base Colour:</b> Pure Platinum White</div>
               <div class="nh-specs">65% ring-spun cotton, 35% polyester | Heavyweight grounding fabric (8.5 oz) | Unisex</div>
-              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping | + £12.00 International</small></div>
+              <div class="nh-price">£39.99<small>+ £6.50 UK Shipping (UK orders only)</small></div>
+              <label class="text-xs text-slate-300 block mt-2" for="hoodie-size-white">Size</label>
+              <select id="hoodie-size-white" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2 text-sm text-white"><option>S</option><option>M</option><option>L</option></select>
+              <button type="button" onclick="addProductToCart('spectrum-hoodie-white', 'hoodie-size-white')" class="nh-btn-gld">Add to Basket</button>
               <a href="https://buy.stripe.com/8x2fZjfh36AA2OZ66zeQM04" target="_blank" rel="noopener noreferrer" class="nh-btn-gld">Buy Now</a>
             </div>
           </div>
@@ -2118,10 +2130,7 @@
   <!-- ================= PAGE 2: FULL-PAGE SANCTUARY PROFILE ================= -->
   <div id="profile-page" class="max-w-4xl mx-auto space-y-6 hidden" style="padding: 24px 16px;">
     <!-- Top Action Bar -->
-    <div class="flex justify-between items-center bg-[#121721] border border-slate-800 rounded-xl p-4">
-      <button onclick="switchView('store')" class="text-xs text-sky-400 font-bold hover:underline bg-transparent border-0 cursor-pointer">
-        &larr; Back to Main Site
-      </button>
+    <div class="flex justify-end items-center bg-[#121721] border border-slate-800 rounded-xl p-4">
       <div class="flex items-center gap-3">
         <button id="owner-settings-btn" onclick="openSettingsView()" class="px-3 py-1.5 rounded-lg bg-[#161d2a] border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition">
           ⚙️ Account Settings
@@ -2129,7 +2138,7 @@
       </div>
     </div>
 
-    <!-- PUBLIC PROFILE VIEW -->
+    <!-- PRIVATE PROFILE VIEW: populated only from the signed-in account's own UID -->
     <div id="profile-public-view" class="bg-[#121721] border border-[#d4af37]/30 rounded-2xl p-8 space-y-6">
       <div class="flex items-center gap-5 border-b border-slate-800 pb-6">
         <div id="profile-view-avatar-wrap" class="w-24 h-24 rounded-full bg-[#0b0e14] border-2 border-[#d4af37] overflow-hidden flex items-center justify-center shrink-0">
@@ -2158,8 +2167,7 @@
       <!-- Welcome Discount Perk Box -->
       <div id="owner-perk-box" class="bg-[#161d2a] border border-[#d4af37]/40 rounded-xl p-4 space-y-1">
         <span class="text-xs font-bold text-[#d4af37] flex items-center gap-1.5"><span>🎁</span> New Member Perk</span>
-        <p class="text-xs text-slate-300">Your 15% one-time welcome discount code:</p>
-        <div class="font-mono text-sm font-black text-white bg-[#0b0e14] px-3 py-1.5 rounded border border-slate-700 inline-block">AUDHFREE15</div>
+        <p class="text-xs text-slate-300">Your 15% first-order discount is applied automatically at secure checkout while eligible.</p>
       </div>
     </div>
 
@@ -2168,19 +2176,20 @@
       <div class="flex justify-between items-center border-b border-slate-800 pb-4">
         <h3 class="text-lg font-bold text-white">Account Settings & Security</h3>
         <button onclick="closeSettingsView()" class="text-xs text-sky-400 hover:underline bg-transparent border-0 cursor-pointer">
-          &larr; Back to Public Profile
+          &larr; Back to Profile
         </button>
       </div>
 
       <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
+        <p class="text-xs text-slate-400">This profile is private to your signed-in account. Neurotype selections and your bio are not published in the community directory.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="text-xs text-slate-400 block mb-1">Username / Alias (30-day cooldown):</label>
             <input type="text" id="edit-username" required class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#d4af37]">
           </div>
           <div>
-            <label class="text-xs text-slate-400 block mb-1">Email Address (Private, 30-day cooldown):</label>
-            <input type="email" id="edit-email" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#d4af37]">
+            <label class="text-xs text-slate-400 block mb-1">Account Email (managed by your sign-in provider):</label>
+            <input type="email" id="edit-email" readonly class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-slate-400 outline-none">
           </div>
         </div>
 
@@ -2278,13 +2287,17 @@
           <span class="font-bold text-[#d4af37] block">Member Welcome Perk</span>
           <span class="text-slate-300">15% one-time discount for new members</span>
         </div>
-        <span class="font-mono bg-[#d4af37]/15 text-[#d4af37] px-2 py-1 rounded border border-[#d4af37]/30 font-bold">AUDHFREE15</span>
+          <span class="font-mono bg-[#d4af37]/15 text-[#d4af37] px-2 py-1 rounded border border-[#d4af37]/30 font-bold">FIRST ORDER</span>
       </div>
 
       <div class="border-t border-slate-800 pt-3 space-y-1 text-sm">
         <div class="flex justify-between text-slate-400 text-xs">
           <span>Subtotal:</span>
           <span id="cart-subtotal">£0.00</span>
+        </div>
+        <div id="shipping-row" class="flex justify-between text-slate-400 text-xs hidden">
+          <span>UK shipping:</span>
+          <span id="cart-shipping">£6.50</span>
         </div>
         <div id="discount-row" class="flex justify-between text-emerald-400 text-xs hidden">
           <span>Member Discount (15%):</span>
@@ -2294,6 +2307,7 @@
           <span>Total:</span>
           <span id="cart-total" class="text-[#d4af37]">£0.00</span>
         </div>
+        <p class="text-[10px] text-slate-500">Estimate only. Secure Checkout confirms the final amount. UK shipping is charged once per order.</p>
       </div>
 
       <button onclick="proceedToCheckout()" class="w-full py-3 rounded-xl bg-sky-400 text-[#0b0e14] font-extrabold text-xs uppercase tracking-wider hover:bg-sky-300 transition">
@@ -2311,19 +2325,7 @@
       </div>
 
       <div class="space-y-2 flex flex-col items-center">
-        <div id="g_id_onload"
-             data-client_id="588550369427-tevnfs7vn4smfurr54qho9ppntcpjsoo.apps.googleusercontent.com"
-             data-callback="handleGoogleSignIn"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin w-full flex justify-center"
-             data-type="standard"
-             data-shape="rectangular"
-             data-theme="outline"
-             data-text="continue_with"
-             data-size="large"
-             data-logo_alignment="left">
-        </div>
+        <div id="google-signin-button" class="w-full flex justify-center"></div>
       </div>
 
       <div class="flex items-center gap-3 my-2">
@@ -2334,7 +2336,7 @@
       
       <form onsubmit="handleAuthSubmit(event)" class="space-y-3">
         <div>
-          <label class="text-xs text-slate-400 block mb-1">Email Address:</label>
+            <label class="text-xs text-slate-400 block mb-1">Account Email (managed by sign-in provider):</label>
           <input type="email" id="auth-email" required placeholder="name@example.com" class="w-full bg-[#0b0e14] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-sky-400">
         </div>
         <div id="password-field-wrap">
@@ -2403,7 +2405,7 @@
   </div>
 
   <!-- Toast Container -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-5 right-5 flex flex-col gap-2 pointer-events-none" style="z-index: 999999;"></div>
   <div id="audhme-widget-wrapper">
     <div id="audhme-widget-panel">
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -3500,26 +3502,190 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    let cart = JSON.parse(localStorage.getItem('test_cart')) || [];
+    async function saveUserProfile(userId, profileData) {
+      try {
+        await db.collection("users").doc(userId).set({
+          username: profileData.username,
+          bio: profileData.bio,
+          neurotypes: profileData.neurotypes,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        console.log("Profile successfully saved to Firestore!");
+      } catch (error) {
+        console.error("Error writing profile to Firestore: ", error);
+      }
+    }
+
+    async function loadUserProfile(userId) {
+      try {
+        const docRef = db.collection("users").doc(userId);
+        const doc = await docRef.get();
+        if (doc.exists) {
+          return doc.data();
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.error("Error loading profile: ", error);
+      }
+    }
+
+    const functions = firebase.app().functions('europe-west2');
+    const GOOGLE_CLIENT_ID = '588550369427-tevnfs7vn4smfurr54qho9ppntcpjsoo.apps.googleusercontent.com';
+    let googleSignInInitialized = false;
+    const FOUNDER_AUTH_UID = '4grgpBnKA9ROGhxJ0MoPn3yP3MV2';
+
+    const CART_STORAGE_KEY = 'audhme_cart_v1';
+    const CART_PRODUCTS = {
+      'core-hoodie': { name: 'The AuDHMe™ Core Hoodie', price: 39.99, sizes: ['S', 'M', 'L'] },
+      'spectrum-hoodie-black': { name: 'The Spectrum Hoodie (Black)', price: 39.99, sizes: ['S', 'M', 'L'] },
+      'spectrum-hoodie-white': { name: 'The Spectrum Hoodie (White)', price: 39.99, sizes: ['S', 'M', 'L'] }
+    };
+
+    function normalizeCart(value) {
+      if (!Array.isArray(value)) return [];
+      return value.slice(0, 10).reduce(function(items, item) {
+        if (!item || typeof item !== 'object') return items;
+        const sku = item.sku || '';
+        const product = CART_PRODUCTS[sku];
+        const size = String(item.size || 'L').toUpperCase();
+        if (!product || !product.sizes.includes(size)) return items;
+        items.push({ sku: sku, size: size });
+        return items;
+      }, []);
+    }
+
+    function persistCart() {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      } catch (error) {
+        console.warn('Basket could not be saved in this browser:', error);
+      }
+    }
+
+    function loadCart() {
+      try {
+        const saved = localStorage.getItem(CART_STORAGE_KEY) || localStorage.getItem('test_cart');
+        return normalizeCart(saved ? JSON.parse(saved) : []);
+      } catch (error) {
+        console.warn('Saved basket was unreadable and has been reset.');
+        return [];
+      }
+    }
+
+    let cart = loadCart();
+    let checkoutInProgress = false;
+    let checkoutReturnHandled = false;
+    let userProfileReady = Promise.resolve();
+    persistCart();
     let currentUser = null;
 
-  // Listen for secure login state changes automatically from Google's cloud
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      currentUser = {
-        email: user.email,
-        username: user.displayName || user.email.split('@')[0],
-        avatar: user.photoURL || null,
-        bio: "Founder of AuDHMe",
-        neurotypes: ["AuDHD (Autism + ADHD)", "Sensory Processing Difference / Sensitivity"]
-      };
-      updateUI();
-    } else {
+    function finishCheckoutReturn() {
+      if (checkoutReturnHandled) return;
+      const params = new URLSearchParams(window.location.search);
+      const result = params.get('checkout');
+      if (!result) return;
+      if (result === 'cancelled') {
+        checkoutReturnHandled = true;
+        history.replaceState(null, '', window.location.pathname + window.location.hash);
+        if (auth.currentUser) {
+          db.collection('users').doc(auth.currentUser.uid).get().then(function(snapshot) {
+            if (snapshot.exists && currentUser && currentUser.uid === auth.currentUser.uid) {
+              const profile = snapshot.data();
+              currentUser.perkRedeemedAt = profile.perkRedeemedAt || null;
+              currentUser.perkReservationId = profile.perkReservationId || null;
+              updateUI();
+            }
+          }).catch(function() {});
+        }
+        showToast('Checkout cancelled. Your basket is still saved.');
+        return;
+      }
+      if (result !== 'success' || !params.get('session_id') || !auth.currentUser) return;
+      checkoutReturnHandled = true;
+      functions.httpsCallable('verifyCheckoutSession')({ sessionId: params.get('session_id') })
+        .then(function(response) {
+          history.replaceState(null, '', window.location.pathname + window.location.hash);
+          if (!response.data || !response.data.paid) {
+            showToast('Payment has not been confirmed yet. Your basket is still saved.');
+            return;
+          }
+          if (currentUser && auth.currentUser && currentUser.uid === auth.currentUser.uid) {
+            currentUser.perkRedeemedAt = currentUser.perkRedeemedAt || Date.now();
+            currentUser.perkReservationId = null;
+          }
+          cart = [];
+          persistCart();
+          updateUI();
+          const cartModal = document.getElementById('cart-modal');
+          if (cartModal && !cartModal.classList.contains('hidden')) renderCartItems();
+          showToast('Payment confirmed. Thank you for supporting AuDHMe.');
+        })
+        .catch(function(error) {
+          console.error('Checkout return verification failed:', error.code || error.message);
+          showToast('Payment is processing. Your basket will clear after confirmation.');
+        });
+    }
+
+    let authStateVersion = 0;
+    auth.onAuthStateChanged(function(user) {
+      const version = ++authStateVersion;
+      if (!user) {
+        currentUser = null;
+        updateUI();
+        finishCheckoutReturn();
+        return;
+      }
+
       currentUser = null;
       updateUI();
-    }
-  });
+      const profileRef = db.collection('users').doc(user.uid);
+      userProfileReady = profileRef.get().then(function(snapshot) {
+        if (version !== authStateVersion || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
+        const saved = snapshot.exists ? snapshot.data() : {};
+        const isFounderAccount = user.uid === FOUNDER_AUTH_UID;
+        const savedBio = typeof saved.bio === 'string' ? saved.bio : (isFounderAccount ? 'Founder of AuDHMe' : '');
+        currentUser = {
+          uid: user.uid,
+          email: user.email || '',
+          username: typeof saved.username === 'string' && saved.username.trim() ? saved.username.trim() : (user.displayName || (user.email || '').split('@')[0]),
+          avatar: typeof saved.avatar === 'string' ? saved.avatar : (user.photoURL || null),
+          bio: isFounderAccount ? savedBio : (savedBio === 'Founder of AuDHMe' ? '' : savedBio),
+          neurotypes: Array.isArray(saved.neurotypes) ? saved.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
+          links: Array.isArray(saved.links) ? saved.links : [],
+          lastUsernameChange: Number(saved.lastUsernameChange) || null,
+          perkRedeemedAt: saved.perkRedeemedAt || null,
+          perkReservationId: saved.perkReservationId || null
+        };
+        if (!snapshot.exists) {
+          return profileRef.set({
+            uid: user.uid,
+            username: currentUser.username,
+            avatar: currentUser.avatar,
+            bio: isFounderAccount ? 'Founder of AuDHMe' : '',
+            neurotypes: [],
+            links: []
+        }).then(function() { updateUI(); finishCheckoutReturn(); });
+        }
+        updateUI();
+        finishCheckoutReturn();
+      }).catch(function(error) {
+        if (version !== authStateVersion) return;
+        console.error('Error loading private user profile:', error.code || error.message);
+        currentUser = {
+          uid: user.uid,
+          email: user.email || '',
+          username: user.displayName || (user.email || '').split('@')[0],
+          avatar: user.photoURL || null,
+          bio: '', neurotypes: [], links: [], perkRedeemedAt: null
+        };
+        updateUI();
+        finishCheckoutReturn();
+        showToast('Your account is signed in, but the private profile could not be loaded.');
+      });
+    });
     let isLoginMode = false;
     let tempAuthEmail = null;
     let isSearchOpen = false;
@@ -3703,13 +3869,15 @@
       const publicViewCard = document.getElementById('profile-public-view');
       
       if (badgesContainer) {
-        const isFounder = (currentUser.username || '').toLowerCase() === 'jason_fable';
-        if (isFounder && publicViewCard) {
-          publicViewCard.className = "bg-[#121721] border-2 border-[#d4af37] shadow-lg shadow-[#d4af37]/10 rounded-2xl p-8 space-y-6";
+        const isFounder = Boolean(auth.currentUser && auth.currentUser.uid === FOUNDER_AUTH_UID);
+        if (publicViewCard) {
+          publicViewCard.className = isFounder
+            ? 'bg-[#121721] border-2 border-[#d4af37] shadow-lg shadow-[#d4af37]/10 rounded-2xl p-8 space-y-6'
+            : 'bg-[#121721] border border-slate-700 rounded-2xl p-8 space-y-6';
         }
 
         const founderBadge = isFounder ? '<span class="px-3 py-1 rounded-lg bg-[#d4af37] text-[#0b0e14] text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md"><span>✨</span> Sanctuary Founder & Architect</span>' : '';
-        const memberBadge = '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">Verified Member</span>';
+        const memberBadge = '<span class="px-2.5 py-0.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-[10px] font-mono">Signed-in Member</span>';
         badgesContainer.innerHTML = founderBadge + memberBadge;
       }
       
@@ -3855,96 +4023,101 @@
       }
     }
 
+    function persistUserProfile() {
+      const user = auth.currentUser;
+      if (!user || !currentUser || currentUser.uid !== user.uid) {
+        return Promise.reject(new Error('No matching signed-in account.'));
+      }
+      const profile = {
+        uid: user.uid,
+        username: String(currentUser.username || '').trim().slice(0, 40),
+        avatar: currentUser.avatar || null,
+        bio: String(currentUser.bio || '').slice(0, 150),
+        neurotypes: Array.isArray(currentUser.neurotypes) ? currentUser.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
+        links: Array.isArray(currentUser.links) ? currentUser.links.slice(0, 6) : [],
+        lastUsernameChange: Number(currentUser.lastUsernameChange) || null,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      return db.collection('users').doc(user.uid).set(profile, { merge: true });
+    }
+
     function handleProfileUpdate(event) {
       event.preventDefault();
-      
+      if (!currentUser || !auth.currentUser) return;
+
       const usernameInput = document.getElementById('edit-username');
-      const emailInput = document.getElementById('edit-email');
       const avatarFileInput = document.getElementById('edit-avatar-file');
       const bioInput = document.getElementById('edit-bio');
-      
       const newUsername = usernameInput ? usernameInput.value.trim() : currentUser.username;
-      const newEmail = emailInput ? emailInput.value.trim() : currentUser.email;
       const newBio = bioInput ? bioInput.value.trim() : currentUser.bio;
       const newNeurotypes = getSelectedCheckboxes('edit-neurotypes-container');
-
-      const links = [
-        { label: document.getElementById('edit-link-1-label').value.trim(), url: document.getElementById('edit-link-1-url').value.trim() },
-        { label: document.getElementById('edit-link-2-label').value.trim(), url: document.getElementById('edit-link-2-url').value.trim() },
-        { label: document.getElementById('edit-link-3-label').value.trim(), url: document.getElementById('edit-link-3-url').value.trim() },
-        { label: document.getElementById('edit-link-4-label').value.trim(), url: document.getElementById('edit-link-4-url').value.trim() },
-        { label: document.getElementById('edit-link-5-label').value.trim(), url: document.getElementById('edit-link-5-url').value.trim() },
-        { label: document.getElementById('edit-link-6-label').value.trim(), url: document.getElementById('edit-link-6-url').value.trim() }
-      ].filter(l => l.label && l.url);
-
-      const nsfwKeywords = ['onlyfans.com', 'fansly.com', 'pornhub.com', 'xvideos.com', 'redtube.com'];
-      for (let link of links) {
-        if (nsfwKeywords.some(domain => link.url.toLowerCase().includes(domain))) {
-          showToast('Adult or NSFW links are not permitted in the Sanctuary directory.');
-          return;
-        }
+      const file = avatarFileInput && avatarFileInput.files ? avatarFileInput.files[0] : null;
+      if (file && (!file.type.startsWith('image/') || file.size > 250000)) {
+        showToast('Choose an image smaller than 250 KB.');
+        return;
+      }
+      const links = [];
+      for (let i = 1; i <= 6; i++) {
+        const labelEl = document.getElementById('edit-link-' + i + '-label');
+        const urlEl = document.getElementById('edit-link-' + i + '-url');
+        const label = labelEl ? labelEl.value.trim().slice(0, 50) : '';
+        const url = urlEl ? safeProfileUrl(urlEl.value.trim()) : null;
+        if (label && url) links.push({ label: label, url: url });
       }
 
-      currentUser.links = links;
-      
-      const now = new Date().getTime();
+      const now = Date.now();
       const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-
+      const previous = Object.assign({}, currentUser);
       if (newUsername !== currentUser.username) {
-        if (currentUser.lastUsernameChange && (now - currentUser.lastUsernameChange < thirtyDaysMs)) {
+        if (currentUser.lastUsernameChange && now - currentUser.lastUsernameChange < thirtyDaysMs) {
           const daysLeft = Math.ceil((thirtyDaysMs - (now - currentUser.lastUsernameChange)) / (1000 * 60 * 60 * 24));
-          showToast(`Username is locked. You can change it again in ${daysLeft} days.`);
+          showToast('Username is locked. You can change it again in ' + daysLeft + ' days.');
           return;
         }
-        
-        const confirmChange = window.confirm("Are you sure? Changing your username will lock this field and prevent further changes for 30 days.");
-        if (!confirmChange) return;
-
+        if (!window.confirm('Are you sure? Changing your username will lock this field and prevent further changes for 30 days.')) return;
         currentUser.username = newUsername;
         currentUser.lastUsernameChange = now;
       }
 
-      if (newEmail && newEmail !== currentUser.email) {
-        if (currentUser.lastEmailChange && (now - currentUser.lastEmailChange < thirtyDaysMs)) {
-          const daysLeft = Math.ceil((thirtyDaysMs - (now - currentUser.lastEmailChange)) / (1000 * 60 * 60 * 24));
-          showToast(`Email is locked. You can change it again in ${daysLeft} days.`);
-          return;
-        }
-
-        const confirmEmailChange = window.confirm("Are you sure? Changing your email will lock this field and prevent further changes for 30 days.");
-        if (!confirmEmailChange) return;
-
-        currentUser.email = newEmail;
-        currentUser.lastEmailChange = now;
-      }
-
+      currentUser.email = auth.currentUser.email || '';
       currentUser.bio = newBio;
       currentUser.neurotypes = newNeurotypes;
+      currentUser.links = links;
 
-      const saveAndFinish = () => {
-        showToast('✨ Sanctuary profile updated successfully!');
-        renderProfile();
-      };
-
-      if (avatarFileInput && avatarFileInput.files && avatarFileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          currentUser.avatar = e.target.result;
-          saveAndFinish();
-        };
-        reader.readAsDataURL(avatarFileInput.files[0]);
-      } else {
-        saveAndFinish();
+      let avatarPromise = Promise.resolve();
+      if (file) {
+        avatarPromise = new Promise(function(resolve, reject) {
+          const reader = new FileReader();
+          reader.onload = function(e) { currentUser.avatar = e.target.result; resolve(); };
+          reader.onerror = function() { reject(new Error('Image could not be read.')); };
+          reader.readAsDataURL(file);
+        });
       }
+
+      avatarPromise.then(persistUserProfile).then(function() {
+        showToast('✨ Private profile saved to your account.');
+        renderProfile();
+      }).catch(function(error) {
+        currentUser = previous;
+        console.error('Profile save failed:', error.code || error.message);
+        showToast('Profile could not be saved. Check your connection and try again.');
+      });
     }
 
-    function addJumperToCart() {
-      const sizeInput = document.getElementById('jumper-size');
-      const size = sizeInput ? sizeInput.value : 'L';
-      cart.push({ name: "The AuDHFree Jumper", price: 39.99, size: size });
-      localStorage.setItem('test_cart', JSON.stringify(cart));
+    function addProductToCart(sku, sizeSelectId) {
+      const product = CART_PRODUCTS[sku];
+      if (!product) return;
+      const sizeInput = document.getElementById(sizeSelectId);
+      const requestedSize = sizeInput ? String(sizeInput.value).toUpperCase() : 'L';
+      const size = product.sizes.includes(requestedSize) ? requestedSize : 'L';
+      if (cart.length >= 10) {
+        showToast('Your basket can contain up to 10 items per checkout.');
+        return;
+      }
+      cart.push({ sku: sku, size: size });
+      persistCart();
       updateUI();
-      showToast('Added AuDHFree Jumper (Size: ' + size + ') to basket!');
+      showToast('Added ' + product.name + ' (Size: ' + size + ') to basket.');
     }
 
    function toggleCartModal() {
@@ -3966,6 +4139,8 @@
     function renderCartItems() {
       const list = document.getElementById('cart-items-list');
       const subtotalEl = document.getElementById('cart-subtotal');
+      const shippingRow = document.getElementById('shipping-row');
+      const shippingEl = document.getElementById('cart-shipping');
       const discountRow = document.getElementById('discount-row');
       const discountAmountEl = document.getElementById('cart-discount-amount');
       const totalEl = document.getElementById('cart-total');
@@ -3975,6 +4150,7 @@
       if (cart.length === 0) {
         list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Your basket is empty.</p>';
         if (subtotalEl) subtotalEl.textContent = '£0.00';
+        if (shippingRow) shippingRow.classList.add('hidden');
         if (discountRow) discountRow.classList.add('hidden');
         if (totalEl) totalEl.textContent = '£0.00';
         return;
@@ -3983,16 +4159,18 @@
       let subtotal = 0;
       list.replaceChildren();
       cart.forEach((item, index) => {
-        subtotal += item.price;
+        const product = CART_PRODUCTS[item.sku];
+        if (!product) return;
+        subtotal += product.price;
         const row = document.createElement('div');
         row.className = 'flex justify-between items-center bg-[#0b0e14] p-2.5 rounded-lg text-sm';
         const description = document.createElement('div');
-        description.textContent = String(item.name || 'Item') + ' (Size: ' + String(item.size || '') + ')';
+        description.textContent = product.name + ' (Size: ' + item.size + ')';
         const actions = document.createElement('div');
         actions.className = 'flex items-center gap-3';
         const price = document.createElement('span');
         price.className = 'text-[#d4af37]';
-        price.textContent = '£' + Number(item.price || 0).toFixed(2);
+        price.textContent = '£' + product.price.toFixed(2);
         const removeButton = document.createElement('button');
         removeButton.className = 'text-rose-400 text-xs font-bold';
         removeButton.type = 'button';
@@ -4003,23 +4181,26 @@
         list.appendChild(row);
       });
 
+      const shipping = 6.50;
       if (subtotalEl) subtotalEl.textContent = '£' + subtotal.toFixed(2);
+      if (shippingRow) shippingRow.classList.remove('hidden');
+      if (shippingEl) shippingEl.textContent = '£' + shipping.toFixed(2);
 
-      if (currentUser) {
+      if (currentUser && !currentUser.perkRedeemedAt && !currentUser.perkReservationId) {
         let discount = subtotal * 0.15;
-        let finalTotal = subtotal - discount;
+        let finalTotal = subtotal - discount + shipping;
         if (discountRow) discountRow.classList.remove('hidden');
         if (discountAmountEl) discountAmountEl.textContent = '-£' + discount.toFixed(2);
         if (totalEl) totalEl.textContent = '£' + finalTotal.toFixed(2);
       } else {
         if (discountRow) discountRow.classList.add('hidden');
-        if (totalEl) totalEl.textContent = '£' + subtotal.toFixed(2);
+        if (totalEl) totalEl.textContent = '£' + (subtotal + shipping).toFixed(2);
       }
     }
 
     function removeItem(index) {
       cart.splice(index, 1);
-      localStorage.setItem('test_cart', JSON.stringify(cart));
+      persistCart();
       updateUI();
       renderCartItems();
       showToast('Item removed from basket.');
@@ -4040,6 +4221,30 @@
         modal.classList.remove('hidden');
         modal.classList.add('flex');
       }
+      renderGoogleSignInButton();
+    }
+
+    function renderGoogleSignInButton() {
+      const container = document.getElementById('google-signin-button');
+      if (!container) return;
+      container.replaceChildren();
+      if (!window.google || !google.accounts || !google.accounts.id) {
+        container.textContent = 'Google sign-in is temporarily unavailable. Please use email sign-in.';
+        return;
+      }
+      if (!googleSignInInitialized) {
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn,
+          auto_select: false
+        });
+        googleSignInInitialized = true;
+      }
+      google.accounts.id.renderButton(container, {
+        type: 'standard', shape: 'rectangular', theme: 'outline',
+        text: 'continue_with', size: 'large', logo_alignment: 'left',
+        width: Math.min(container.clientWidth || 360, 360)
+      });
     }
 
     function closeAuthModal() {
@@ -4089,20 +4294,26 @@
     }
 
     function handleGoogleSignIn(response) {
-      if (!response || !response.credential) return;
+      if (!response || !response.credential) {
+        showToast('Google did not return a sign-in credential. Please try again.');
+        return;
+      }
       auth.signInWithCredential(firebase.auth.GoogleAuthProvider.credential(response.credential))
-        .then(function() {
+        .then(function(result) {
           closeAuthModal();
           showToast('Signed in with Google securely.');
+          if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) openOnboardingModal();
         })
-        .catch(function() {
-          showToast('Google sign-in could not be completed.');
+        .catch(function(error) {
+          console.error('Firebase Google sign-in failed:', error.code || error.message);
+          showToast('Google sign-in could not be completed (' + (error.code || 'auth/unknown') + ').');
         });
     }
 
     function openOnboardingModal() {
       const onboardName = document.getElementById('onboard-username');
-      if (onboardName) onboardName.value = tempAuthEmail ? tempAuthEmail.split('@')[0] : '';
+      const email = auth.currentUser ? auth.currentUser.email : tempAuthEmail;
+      if (onboardName) onboardName.value = auth.currentUser && auth.currentUser.displayName ? auth.currentUser.displayName : (email ? email.split('@')[0] : '');
       renderCheckboxList('onboard-neurotypes-container');
       const modal = document.getElementById('onboarding-modal');
       if (modal) {
@@ -4116,22 +4327,44 @@
       const usernameInput = document.getElementById('onboard-username');
       const username = usernameInput ? usernameInput.value.trim() : '';
       const neurotypes = getSelectedCheckboxes('onboard-neurotypes-container');
-
-      if (currentUser) {
-        currentUser.username = username;
-        currentUser.neurotypes = neurotypes;
-        if (auth.currentUser) {
-          auth.currentUser.updateProfile({ displayName: username }).catch(function() {});
+      const user = auth.currentUser;
+      if (!user || !username) {
+        showToast('Sign in and choose a username before saving your profile.');
+        return;
+      }
+      userProfileReady.then(function() {
+        if (!auth.currentUser || auth.currentUser.uid !== user.uid) throw new Error('Account changed before profile save.');
+        if (!currentUser || currentUser.uid !== user.uid) {
+          currentUser = {
+            uid: user.uid, email: user.email || '',
+            username: user.displayName || (user.email || '').split('@')[0],
+            avatar: user.photoURL || null,
+            bio: user.uid === FOUNDER_AUTH_UID ? 'Founder of AuDHMe' : '',
+            neurotypes: [], links: [], perkRedeemedAt: null
+          };
         }
-      }
-
-      const onboardingModal = document.getElementById('onboarding-modal');
-      if (onboardingModal) {
-        onboardingModal.classList.remove('flex');
-        onboardingModal.classList.add('hidden');
-      }
-      updateUI();
-      showToast('🎉 Sanctuary profile created! Your 15% code (AUDFREE15) is active.');
+        const previous = Object.assign({}, currentUser);
+        currentUser.username = username.slice(0, 40);
+        currentUser.neurotypes = neurotypes.filter(function(type) { return availableNeurotypes.includes(type); });
+        return Promise.all([
+          user.updateProfile({ displayName: currentUser.username }),
+          persistUserProfile()
+        ]).catch(function(error) {
+          currentUser = previous;
+          throw error;
+        });
+      }).then(function() {
+        const onboardingModal = document.getElementById('onboarding-modal');
+        if (onboardingModal) {
+          onboardingModal.classList.remove('flex');
+          onboardingModal.classList.add('hidden');
+        }
+        updateUI();
+        showToast('Your private profile and neurotype choices have been saved.');
+      }).catch(function(error) {
+        console.error('Onboarding profile save failed:', error.code || error.message);
+        showToast('Profile could not be saved. Please try again.');
+      });
     }
 
     function openForgotPassModal() {
@@ -4181,26 +4414,39 @@
         showToast('Your basket is empty!');
         return;
       }
-
-      let subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-      let discount = 0;
-
-      if (currentUser) {
-        if (!currentUser.hasRedeemedPerk) {
-          discount = subtotal * 0.15;
-          currentUser.hasRedeemedPerk = true;
-          showToast('✨ AUDHFREE15 applied! One-time new member discount redeemed.');
-        } else {
-          showToast('Notice: You have already used your one-time AUDHFREE15 member discount.');
-        }
+      if (!auth.currentUser) {
+        showToast('Sign in before checkout so your order can be linked to your account.');
+        openAuthModal('login');
+        return;
       }
-
-      let finalTotal = (subtotal - discount).toFixed(2);
-      showToast('Redirecting to secure checkout (Total: £' + finalTotal + ')...');
-      toggleCartModal();
+      if (checkoutInProgress) return;
+      checkoutInProgress = true;
+      const checkoutButton = document.querySelector('#cart-modal button[onclick="proceedToCheckout()"]');
+      if (checkoutButton) checkoutButton.disabled = true;
+      Promise.resolve(userProfileReady).then(function() {
+        return functions.httpsCallable('createCheckoutSession')({
+          items: cart.map(function(item) { return { sku: item.sku, size: item.size }; })
+        });
+      }).then(function(result) {
+        if (!result.data || !result.data.url) throw new Error('Checkout URL missing.');
+        window.location.assign(result.data.url);
+      }).catch(function(error) {
+        console.error('Checkout session could not be created:', error.code || error.message);
+        showToast('Checkout could not start. Please try again shortly.');
+        checkoutInProgress = false;
+        if (checkoutButton) checkoutButton.disabled = false;
+      });
     }
 
     updateUI();
+
+    const googleIdentityScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (googleIdentityScript) {
+      googleIdentityScript.addEventListener('load', function() {
+        const authModal = document.getElementById('auth-modal');
+        if (authModal && !authModal.classList.contains('hidden')) renderGoogleSignInButton();
+      });
+    }
   </script>
 </body>
 </html>
