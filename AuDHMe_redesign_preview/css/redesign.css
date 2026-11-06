@@ -4152,7 +4152,7 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
   border-radius: 14px 14px 0 0;
   background: #101516;
   color: var(--text-secondary);
-  cursor: zoom-in;
+  cursor: pointer;
 }
 .profile-media-preview > span:first-child:not(.profile-media-count) {
   display: grid;
