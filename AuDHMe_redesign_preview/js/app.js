@@ -3186,6 +3186,8 @@ var bootScreenActive = false;
       const summary=document.getElementById('profile-privacy-summary'); if(summary) summary.textContent=isOwner?(profile.communityVisible?'Your profile is visible to signed-in Sanctuary members. Gallery items can still be kept private individually.':'Your profile is private. Items you choose to share can still appear to signed-in Sanctuary members.'):(profile.communityVisible?'Shared by this member with signed-in Sanctuary members.':'This member has shared selected gallery items.');
       const perk=document.getElementById('owner-perk-box'); if(perk) perk.classList.toggle('hidden',!isOwner);
       const visibility=document.getElementById('profile-community-visible'); if(visibility) visibility.checked=isOwner&&profile.communityVisible===true;
+      ['owner-profile-visibility','owner-gallery-controls'].forEach(function(id){const control=document.getElementById(id);if(control)control.classList.toggle('hidden',!isOwner);});
+      if(!isOwner) document.querySelectorAll('.profile-gallery-upload[open], #profile-gallery-archive[open]').forEach(function(details){details.open=false;});
       const detailsVisible=isOwner||profile.communityVisible===true;
       ['profile-bio-section','profile-neurotypes-section','profile-links-section'].forEach(function(id){const section=document.getElementById(id);if(section)section.classList.toggle('hidden',!detailsVisible);});
       renderPrivateInterestGallery(profile,isOwner);
@@ -3197,6 +3199,7 @@ var bootScreenActive = false;
     const MAX_INTEREST_IMAGE_BYTES = 12 * 1024 * 1024;
     const MAX_INTEREST_VIDEO_BYTES = 30 * 1024 * 1024;
     let interestObjectUrls = [];
+    let profileChangePending = false;
 
     function isInterestMediaPath(path, uid) {
       if (typeof path !== 'string' || typeof uid !== 'string') return false;
@@ -3211,26 +3214,84 @@ var bootScreenActive = false;
     }
 
     function renderPrivateInterestGallery(profile,isOwner) {
-      profile=profile||currentUser; isOwner=isOwner!==false; const grid=document.getElementById('profile-interest-grid'), viewer=auth.currentUser; if(!grid)return;
-      interestObjectUrls.forEach(function(url){URL.revokeObjectURL(url);}); interestObjectUrls=[]; grid.replaceChildren();
-      let items=profile&&Array.isArray(profile.interestMedia)?profile.interestMedia.slice(0,MAX_PRIVATE_INTEREST_ITEMS):[];
-      if(!isOwner) items=items.filter(function(item){return item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private');});
-      if(!viewer||(isOwner&&(!currentUser||currentUser.uid!==viewer.uid))||!items.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=isOwner?'Your gallery is ready when you are. Add a photo or video of something you love.':'This member has not shared any gallery items.';grid.appendChild(empty);return;}
-      items.forEach(function(item){
-        if(!item||!isInterestMediaPath(item.path,profile.uid))return;
+      profile=profile||currentUser; isOwner=isOwner!==false;
+      const grid=document.getElementById('profile-interest-grid'), archiveGrid=document.getElementById('profile-archive-grid'), archive=document.getElementById('profile-gallery-archive'), viewer=auth.currentUser;
+      if(!grid||!archiveGrid||!archive)return;
+      interestObjectUrls.forEach(function(url){URL.revokeObjectURL(url);}); interestObjectUrls=[]; grid.replaceChildren(); archiveGrid.replaceChildren();
+      const validViewer=viewer&&(!isOwner||(currentUser&&currentUser.uid===viewer.uid));
+      const items=validViewer&&profile&&Array.isArray(profile.interestMedia)?profile.interestMedia.slice(0,MAX_PRIVATE_INTEREST_ITEMS).filter(function(item){return item&&isInterestMediaPath(item.path,profile.uid);}):[];
+      const visible=items.filter(function(item){return !item.archived&&(isOwner||item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));});
+      const archived=isOwner?items.filter(function(item){return item.archived===true;}):[];
+      archive.classList.toggle('hidden',!isOwner||!archived.length);
+      if(!archived.length) archive.open=false;
+      document.getElementById('profile-archive-count').textContent='('+archived.length+')';
+      if(!visible.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=isOwner?'Your gallery is ready when you are. Add a photo or video of something you love.':'This member has not shared any gallery items.';grid.appendChild(empty);}
+      function renderItem(item, target) {
         const card=document.createElement('figure');card.className='profile-interest-card';
         loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){if(!card.isConnected)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.controls=true;media.preload='metadata';}else{media=document.createElement('img');media.alt=String(item.name||'Special interest photo').slice(0,100);}media.src=url;media.className='profile-interest-media';card.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('p');message.textContent='This item could not be loaded right now.';card.prepend(message);}});
         const caption=document.createElement('figcaption');caption.textContent=String(item.name||'A special interest').slice(0,100);card.appendChild(caption);
-        if(isOwner){const shared=item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private');const button=document.createElement('button');button.type='button';button.className='profile-media-share';button.textContent=shared?(item.visibility==='community'&&!profile.communityVisible?'Shared with members · Make private':'Shared via profile · Make private'):'Private · Share with members';button.addEventListener('click',function(){setInterestMediaVisibility(item.path,shared?'private':'community');});card.appendChild(button);const remove=document.createElement('button');remove.type='button';remove.className='profile-media-remove';remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+String(item.name||'gallery item'));remove.addEventListener('click',function(){deletePrivateInterestMedia(item.path);});card.appendChild(remove);}
-        grid.appendChild(card);
-      });
+        if(isOwner){
+          const shared=!item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));
+          const state=document.createElement('span');state.className='profile-media-state';state.textContent=item.archived?'Archived':shared?'Shared':'Private';caption.appendChild(state);
+          const menu=document.createElement('details');menu.className='profile-media-menu';
+          const trigger=document.createElement('summary');trigger.setAttribute('aria-label','Options for '+String(item.name||'gallery item'));trigger.textContent='⋯';menu.appendChild(trigger);
+          const actions=document.createElement('div');actions.className='profile-media-actions';
+          function addAction(label, action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;action();});actions.appendChild(button);}
+          if(item.archived){addAction('Restore to gallery',function(){setInterestMediaArchived(item.path,false);});}
+          else {
+            addAction(shared?'Make private':'Share with members',function(){setInterestMediaVisibility(item.path,shared?'private':'community');});
+            addAction('Archive',function(){setInterestMediaArchived(item.path,true);});
+          }
+          addAction('Delete',function(){if(window.confirm('Permanently delete this gallery item?'))deletePrivateInterestMedia(item.path);});
+          menu.appendChild(actions);card.appendChild(menu);
+        }
+        target.appendChild(card);
+      }
+      visible.forEach(function(item){renderItem(item,grid);});
+      archived.forEach(function(item){renderItem(item,archiveGrid);});
     }
+
+    document.addEventListener('click',function(event){
+      document.querySelectorAll('.profile-media-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
+    });
+    document.addEventListener('keydown',function(event){
+      if(event.key!=='Escape')return;
+      const menu=document.querySelector('.profile-media-menu[open]');
+      if(menu){menu.open=false;menu.querySelector('summary').focus();event.stopPropagation();}
+    });
 
     async function setInterestMediaVisibility(path,visibility){
       const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!['private','community'].includes(visibility))return;
-      const previous=Array.isArray(currentUser.interestMedia)?currentUser.interestMedia.slice():[],item=previous.find(function(entry){return entry.path===path;});if(!item||!isInterestMediaPath(path,user.uid))return;
-      const oldVisibility=item.visibility||'profile';try{await storage.ref(path).updateMetadata({customMetadata:{visibility:visibility}});currentUser.interestMedia=previous.map(function(entry){return entry.path===path?Object.assign({},entry,{visibility:visibility}):entry;});await persistUserProfile();renderProfile(currentUser,true);showToast(visibility==='community'?'This item is shared with signed-in members.':'This item is private to you.');}
-      catch(error){currentUser.interestMedia=previous;await storage.ref(path).updateMetadata({customMetadata:{visibility:oldVisibility}}).catch(function(){});renderProfile(currentUser,true);showToast('That sharing change could not be saved. Please try again.');}
+      const item=Array.isArray(currentUser.interestMedia)&&currentUser.interestMedia.find(function(entry){return entry.path===path;});if(!item||item.archived||!isInterestMediaPath(path,user.uid))return;
+      await updateInterestMedia(path,{visibility:visibility},visibility==='community'?'This item is shared with signed-in members.':'This item is private to you.');
+    }
+
+    async function setInterestMediaArchived(path,archived){
+      const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!isInterestMediaPath(path,user.uid))return;
+      const item=Array.isArray(currentUser.interestMedia)&&currentUser.interestMedia.find(function(entry){return entry.path===path;});
+      if(!item||Boolean(item.archived)===archived)return;
+      await updateInterestMedia(path,{visibility:'private',archived:archived},archived?'Item archived and made private.':'Item restored as private.');
+    }
+
+    async function updateInterestMedia(path,changes,message) {
+      if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      profileChangePending=true;
+      try {
+        await storage.ref(path).updateMetadata({customMetadata:{visibility:changes.visibility}});
+        currentUser.interestMedia=currentUser.interestMedia.map(function(entry){return entry.path===path?Object.assign({},entry,changes):entry;});
+        await persistUserProfile();
+        renderProfile(currentUser,true);
+        showToast(message);
+      } catch(error) {
+        console.error('Gallery change failed:',error.code||error.message);
+        try {
+          await storage.ref(path).updateMetadata({customMetadata:{visibility:'private'}});
+          currentUser.interestMedia=currentUser.interestMedia.map(function(entry){return entry.path===path?Object.assign({},entry,{visibility:'private'}):entry;});
+          await persistUserProfile();
+        } catch(cleanupError) { console.error('Gallery privacy recovery failed:',cleanupError.code||cleanupError.message); }
+        renderProfile(currentUser,true);
+        showToast('That gallery change could not be saved. Please check its visibility and try again.');
+      } finally { profileChangePending=false; }
     }
 
     async function uploadInterestMedia() {
@@ -3238,6 +3299,7 @@ var bootScreenActive = false;
       const status = document.getElementById('interest-upload-status');
       const user = auth.currentUser;
       if (!user || !currentUser || currentUser.uid !== user.uid) { showToast('Sign in to add to your private gallery.'); return; }
+      if (profileChangePending) { showToast('Please wait for the current profile change to finish.'); return; }
       const files = input && input.files ? Array.from(input.files) : [];
       const captionInput=document.getElementById('interest-media-caption');
       const chosenCaption=captionInput?captionInput.value.trim().slice(0,80):'';
@@ -3255,6 +3317,7 @@ var bootScreenActive = false;
         }
       }
       const button = document.querySelector('.profile-upload-panel .calm-primary-button');
+      profileChangePending = true;
       if (button) button.disabled = true;
       if (status) status.textContent = 'Uploading your files…';
       const uploadedRefs = [];
@@ -3286,6 +3349,7 @@ var bootScreenActive = false;
         if (status) status.textContent = 'Upload failed. Your profile was not updated.';
         showToast('The gallery upload could not be completed. Check Storage setup and try again.');
       } finally {
+        profileChangePending = false;
         if (button) button.disabled = false;
       }
     }
@@ -3293,17 +3357,22 @@ var bootScreenActive = false;
     async function deletePrivateInterestMedia(path) {
       const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!isInterestMediaPath(path,user.uid))return;
       const previous=Array.isArray(currentUser.interestMedia)?currentUser.interestMedia.slice():[],item=previous.find(function(entry){return entry.path===path;});if(!item)return;
+      if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      profileChangePending=true;
       try {
         await storage.ref(path).updateMetadata({customMetadata:{visibility:'private'}});
         currentUser.interestMedia=previous.filter(function(entry){return entry.path!==path;});
         await persistUserProfile();renderPrivateInterestGallery();
-        await storage.ref(path).delete().catch(function(error){console.warn('Private gallery file cleanup pending:',error.code||error.message);});
-        showToast('Gallery item removed.');
+        await storage.ref(path).delete();
+        showToast('Gallery item deleted.');
       } catch(error) {
         currentUser.interestMedia=previous;
-        await storage.ref(path).updateMetadata({customMetadata:{visibility:item.visibility||'profile'}}).catch(function(){});
-        await persistUserProfile().catch(function(){});renderPrivateInterestGallery();showToast('That gallery item could not be removed. Please try again.');
-      }
+        console.error('Gallery deletion failed:',error.code||error.message);
+        await storage.ref(path).updateMetadata({customMetadata:{visibility:'private'}}).catch(function(recoveryError){console.error('Gallery privacy recovery failed:',recoveryError.code||recoveryError.message);});
+        currentUser.interestMedia=previous.map(function(entry){return entry.path===path?Object.assign({},entry,{visibility:'private'}):entry;});
+        await persistUserProfile().catch(function(recoveryError){console.error('Gallery profile recovery failed:',recoveryError.code||recoveryError.message);});
+        renderPrivateInterestGallery();showToast('That gallery item could not be removed. Please check its visibility and try again.');
+      } finally {profileChangePending=false;}
     }
 
     let directoryProfiles=null; let directoryLoadPromise=null;
@@ -3483,9 +3552,6 @@ var bootScreenActive = false;
       
       const bioInput = document.getElementById('edit-bio');
       if (bioInput) bioInput.value = currentUser.bio || '';
-      const visibilityInput=document.getElementById('profile-community-visible');
-      if (visibilityInput) visibilityInput.checked=currentUser.communityVisible===true;
-      
       const avatarFile = document.getElementById('edit-avatar-file');
       if (avatarFile) avatarFile.value = '';
       
@@ -3521,7 +3587,7 @@ var bootScreenActive = false;
     function syncCommunityProfile(profile) {
       const user=auth.currentUser; if(!user||!profile||profile.uid!==user.uid) return Promise.reject(new Error('Profile owner mismatch.'));
       const ref=db.collection('communityProfiles').doc(user.uid);
-      const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(function(item){return item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private');}).slice(0,12):[];
+      const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(function(item){return !item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));}).slice(0,12):[];
       const profileVisible=profile.communityVisible===true;
       if(!profileVisible&&!items.length) return ref.delete().catch(function(error){if(error.code==='not-found')return;throw error;});
       const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){return {path:item.path,type:item.type,name:item.name,visibility:item.visibility};}),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
@@ -3549,6 +3615,34 @@ var bootScreenActive = false;
       return db.collection('users').doc(user.uid).set(profile, { merge: true }).then(function(result){directoryProfiles=null;return syncCommunityProfile(profile).then(function(){return result;});});
     }
 
+    async function setProfileCommunityVisibility(visible) {
+      const control=document.getElementById('profile-community-visible');
+      const user=auth.currentUser;
+      if(!user||!currentUser||currentUser.uid!==user.uid||profileChangePending){
+        if(control)control.checked=Boolean(currentUser&&currentUser.communityVisible);
+        showToast('Please wait for the current profile change to finish.');
+        return;
+      }
+      profileChangePending=true;
+      if(control)control.disabled=true;
+      currentUser.communityVisible=visible;
+      try {
+        await persistUserProfile();
+        renderProfile(currentUser,true);
+        showToast(visible?'Your profile is shared with signed-in members.':'Your profile is private. Individually shared items remain visible.');
+      } catch(error) {
+        console.error('Profile visibility change failed:',error.code||error.message);
+        currentUser.communityVisible=false;
+        try { await persistUserProfile(); }
+        catch(recoveryError) { console.error('Profile privacy recovery failed:',recoveryError.code||recoveryError.message); }
+        renderProfile(currentUser,true);
+        showToast('Profile visibility could not be saved. Please check your settings and try again.');
+      } finally {
+        profileChangePending=false;
+        if(control)control.disabled=false;
+      }
+    }
+
     function handleProfileUpdate(event) {
       event.preventDefault();
       if (!currentUser || !auth.currentUser) return;
@@ -3559,8 +3653,6 @@ var bootScreenActive = false;
       const newUsername = usernameInput ? usernameInput.value.trim() : currentUser.username;
       const newBio = bioInput ? bioInput.value.trim() : currentUser.bio;
       const newNeurotypes = getSelectedCheckboxes('edit-neurotypes-container');
-      const visibilityControl=document.getElementById('profile-community-visible');
-      const newCommunityVisible=Boolean(visibilityControl&&visibilityControl.checked);
       const file = avatarFileInput && avatarFileInput.files ? avatarFileInput.files[0] : null;
       if (file && (!file.type.startsWith('image/') || file.size > 250000)) {
         showToast('Choose an image smaller than 250 KB.');
@@ -3593,7 +3685,6 @@ var bootScreenActive = false;
       currentUser.bio = newBio;
       currentUser.neurotypes = newNeurotypes;
       currentUser.links = links;
-      currentUser.communityVisible=newCommunityVisible;
 
       let avatarPromise = Promise.resolve();
       if (file) {

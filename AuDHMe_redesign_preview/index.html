@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=60">
+  <link rel="stylesheet" href="css/redesign.css?v=61">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1417,6 +1417,12 @@
         </div>
       </header>
 
+      <div id="owner-profile-visibility" class="profile-visibility-control hidden">
+        <label for="profile-community-visible">Share profile with members</label>
+        <input type="checkbox" id="profile-community-visible" role="switch" onchange="setProfileCommunityVisibility(this.checked)" aria-describedby="profile-visibility-help">
+        <p id="profile-visibility-help">Shares your profile with signed-in members. Individual gallery items can still be private. Members may save shared content.</p>
+      </div>
+
       <div class="profile-content-grid">
         <div class="profile-main-column">
           <section id="profile-bio-section" class="profile-section profile-bio-section" aria-labelledby="profile-bio-title">
@@ -1432,7 +1438,27 @@
               <div><p class="eyebrow">A space for what you love</p><h2 id="profile-interest-title">Special interests</h2></div>
             </div>
             <p id="profile-privacy-summary" class="profile-privacy-note">Your profile and gallery are private to your account.</p>
+            <div id="owner-gallery-controls" class="hidden">
+              <details class="profile-gallery-upload">
+                <summary>Add photos or videos</summary>
+                <section class="profile-upload-panel" aria-labelledby="interest-upload-title">
+                  <h3 id="interest-upload-title">Add to your special-interest gallery</h3>
+                  <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. New items follow your profile's sharing setting. Sharing an item shows your username to signed-in members, who may save shared content.</p>
+                  <label for="interest-media-files">Photos or videos</label>
+                  <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
+                  <label for="interest-media-caption">Optional caption (up to 80 characters)</label>
+                  <input type="text" id="interest-media-caption" maxlength="80" placeholder="e.g. My collection of model trains">
+                  <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
+                  <p id="interest-upload-status" role="status" aria-live="polite"></p>
+                </section>
+              </details>
+            </div>
             <div id="profile-interest-grid" class="profile-interest-grid" aria-live="polite"></div>
+            <details id="profile-gallery-archive" class="profile-gallery-archive hidden">
+              <summary>Archive <span id="profile-archive-count"></span></summary>
+              <p>Only you can see archived items. Restored items remain private until you choose to share them.</p>
+              <div id="profile-archive-grid" class="profile-interest-grid" aria-live="polite"></div>
+            </details>
           </section>
         </div>
 
@@ -1487,22 +1513,6 @@
           <label class="text-xs text-slate-400 block mb-1">Profile Picture:</label>
           <input type="file" id="edit-avatar-file" accept="image/*" class="w-full bg-[#252923] border border-slate-700 rounded-lg p-2 text-xs text-slate-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#cbb678] file:text-[#252923] hover:file:bg-amber-300">
         </div>
-
-        <section class="profile-upload-panel" aria-labelledby="interest-upload-title">
-          <h4 id="interest-upload-title">Add to your special-interest gallery</h4>
-          <p>Choose up to 12 photos or videos. Photos can be up to 12 MB; videos up to 30 MB. Your account visibility setting controls the default; each item can be changed separately. Sharing an item shows your username to signed-in members. Shared content may be saved by viewers. Avoid posting details you would not want other members to keep.</p>
-          <label for="interest-media-files">Photos or videos</label>
-          <label for="interest-media-caption">Optional caption (up to 80 characters)</label>
-          <input type="text" id="interest-media-caption" maxlength="80" placeholder="e.g. My collection of model trains">
-          <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
-          <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
-          <p id="interest-upload-status" role="status" aria-live="polite"></p>
-        </section>
-
-        <section class="profile-visibility-panel" aria-labelledby="profile-visibility-title">
-          <h4 id="profile-visibility-title">Who can see your profile?</h4>
-          <label class="visibility-choice"><input type="checkbox" id="profile-community-visible"> <span><strong>Share with signed-in Sanctuary members</strong><small>Your username, profile picture, bio, neurotypes and links will appear to signed-in members. Gallery items can still be made private one by one. This starts off. Other members may save content while it is shared; switching it off prevents future access through the site but cannot retract copies.</small></span></label>
-        </section>
 
         <div>
           <label class="text-xs text-slate-400 block mb-1">Sanctuary Bio (Max 150 chars):</label>
@@ -1908,6 +1918,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=44"></script>
+  <script src="js/app.js?v=45"></script>
 </body>
 </html>
