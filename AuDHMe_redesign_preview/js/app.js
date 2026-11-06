@@ -369,8 +369,16 @@ var bootScreenActive = false;
     function handleInitialRoute() {
       var rawHash = window.location.hash.replace('#', '');
       var hash = rawHash.toLowerCase();
-      if (rawHash.slice(0,7).toLowerCase() === 'member/') { try { openCommunityProfile(decodeURIComponent(rawHash.slice(7)), false); } catch (e) { openCommunityProfile(rawHash.slice(7), false); } return; }
-      if (hash === 'profile' || hash === 'directory') { switchView(hash, false); return; }
+      if (rawHash.slice(0,7).toLowerCase() === 'member/') {
+        authInitialized.then(function() { return userProfileReady; }).then(function() {
+          try { openCommunityProfile(decodeURIComponent(rawHash.slice(7)), false); } catch (e) { openCommunityProfile(rawHash.slice(7), false); }
+        });
+        return;
+      }
+      if (hash === 'profile' || hash === 'directory') {
+        authInitialized.then(function() { return userProfileReady; }).then(function() { switchView(hash, false); });
+        return;
+      }
       var storeRoute = hash.match(/^store\/(core-hoodie|spectrum-hoodie)$/);
       if (storeRoute) {
         switchPage('store', false);
@@ -2833,6 +2841,9 @@ var bootScreenActive = false;
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(error) {
+      console.warn('Firebase auth persistence could not be enabled:', error.code || error.message);
+    });
     const db = firebase.firestore();
     const storage = firebase.storage();
     const functions = firebase.app().functions('europe-west2');
@@ -2907,6 +2918,8 @@ var bootScreenActive = false;
     let userProfileReady = Promise.resolve();
     persistCart();
     let currentUser = null;
+    let resolveAuthInitialized;
+    const authInitialized = new Promise(function(resolve) { resolveAuthInitialized = resolve; });
 
     function finishCheckoutReturn() {
       if (checkoutReturnHandled) return;
@@ -2957,6 +2970,10 @@ var bootScreenActive = false;
 
     let authStateVersion = 0;
     auth.onAuthStateChanged(function(user) {
+      if (resolveAuthInitialized) {
+        resolveAuthInitialized();
+        resolveAuthInitialized = null;
+      }
       document.body.classList.toggle('copy-protection-enabled', !(user && user.uid === FOUNDER_AUTH_UID));
       const version = ++authStateVersion;
       if (!user) {
@@ -3080,6 +3097,14 @@ var bootScreenActive = false;
       }
     }
 
+    function safeProfileAvatarUrl(value) {
+      const valueString = String(value || '');
+      if (valueString.startsWith('data:image/')) {
+        return /^data:image\/(?:png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(valueString) ? valueString : null;
+      }
+      return safeProfileUrl(valueString);
+    }
+
     function addProfileLink(container, link) {
       const url = safeProfileUrl(link.url);
       if (!url) return;
@@ -3129,7 +3154,7 @@ var bootScreenActive = false;
       profile=profile||currentUser; isOwner=isOwner!==false; if(!profile)return;
       const usernameEl=document.getElementById('profile-display-username'); if(usernameEl) usernameEl.textContent=profile.username||'Sanctuary member';
       const avatarWrap=document.getElementById('profile-view-avatar-wrap');
-      if(avatarWrap) { const avatarUrl=safeProfileUrl(profile.avatar); if(avatarUrl) { const image=document.createElement('img'); image.src=avatarUrl; image.alt='Profile picture'; image.className='w-full h-full object-cover'; avatarWrap.replaceChildren(image); } else { const fallback=document.createElement('span'); fallback.className='text-3xl font-bold text-[#cbb678]'; fallback.textContent=(profile.username||'A').charAt(0).toUpperCase(); avatarWrap.replaceChildren(fallback); } }
+      if(avatarWrap) { const avatarUrl=safeProfileAvatarUrl(profile.avatar); if(avatarUrl) { const image=document.createElement('img'); image.src=avatarUrl; image.alt='Profile picture'; image.className='w-full h-full object-cover'; avatarWrap.replaceChildren(image); } else { const fallback=document.createElement('span'); fallback.className='text-3xl font-bold text-[#cbb678]'; fallback.textContent=(profile.username||'A').charAt(0).toUpperCase(); avatarWrap.replaceChildren(fallback); } }
       const bioEl=document.getElementById('profile-view-bio'); if(bioEl) bioEl.textContent=profile.bio||'No bio added yet.';
       const types=document.getElementById('profile-view-neurotypes'); if(types) { types.replaceChildren(); const list=Array.isArray(profile.neurotypes)?profile.neurotypes:[]; if(!list.length) { const empty=document.createElement('span'); empty.className='text-xs text-slate-400 italic'; empty.textContent='No neurotypes selected'; types.appendChild(empty); } else list.forEach(function(type){const badge=document.createElement('span');badge.className='profile-neurotype-badge';badge.textContent=String(type);types.appendChild(badge);}); }
       const founder=profile.uid===FOUNDER_AUTH_UID, badges=document.getElementById('profile-header-badges'), card=document.getElementById('profile-public-view');
@@ -3256,7 +3281,7 @@ var bootScreenActive = false;
       try{if(!directoryProfiles){if(!directoryLoadPromise)directoryLoadPromise=db.collection('communityProfiles').where('visible','==',true).limit(50).get().then(function(snapshot){directoryProfiles=snapshot.docs.map(function(doc){return Object.assign({uid:doc.id},doc.data());});}).finally(function(){directoryLoadPromise=null;});await directoryLoadPromise;}
         const query=String(searchQuery||'').trim().toLowerCase(),results=(directoryProfiles||[]).filter(function(profile){return !query||String(profile.username||'').toLowerCase().includes(query);});grid.replaceChildren();
         if(!results.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=query?'No shared profiles match that search.':'No profiles have been shared yet. You can choose whether yours is visible in Account Settings.';grid.appendChild(empty);return;}
-        results.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
+        results.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileAvatarUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
       }catch(error){directoryProfiles=null;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.textContent='The community directory could not be loaded. Check that the updated Firestore rules have been deployed.';grid.appendChild(fail);console.error('Community directory load failed:',error.code||error.message);}
     }
     async function openCommunityProfile(uid,updateHistory){
