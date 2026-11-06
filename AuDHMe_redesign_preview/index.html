@@ -508,11 +508,11 @@
           </div>
         </div>
 
-        <!-- TOOL 3: CAPACITY & SENSORY BATTERY CHECK-IN -->
+        <!-- TOOL 3: LOW-SPOONS & CAPACITY CHECK-IN -->
         <div class="card" style="background: var(--surface-card); padding: 2rem;">
-          <div class="card-top-row"><span class="organic-badge">INTEROCEPTION &amp; PACING</span><i class="ph-bold ph-battery-charging text-xl text-[#aebd9f]"></i></div>
-          <h3 class="cluster-card-title" style="margin-top: 0.5rem;">Capacity &amp; Sensory Battery Check-In</h3>
-          <p class="cluster-desc bionic-text" style="margin-bottom: 1.25rem;">Adjust the five domain sliders to detect states like the AuDHD Paradox and receive gentle, low-demand regulation ideas.</p>
+          <div class="card-top-row"><span class="organic-badge">LOW-SPOONS &amp; CAPACITY</span><i class="ph-bold ph-battery-charging text-xl text-[#aebd9f]"></i></div>
+          <h3 class="cluster-card-title" style="margin-top: 0.5rem;">Low-Spoons &amp; Capacity Check-In</h3>
+          <p class="cluster-desc bionic-text" style="margin-bottom: 1.25rem;">Check your sensory, executive, motor, and social capacity to choose a gentler next step.</p>
           
           <div class="space-y-3 text-left text-xs">
             <div>
@@ -544,6 +544,10 @@
               <strong id="readoutTitle" class="text-white block mb-1">Balanced Baseline Capacity</strong>
               <p id="readoutDesc" class="text-slate-400 text-[11px]">Your sensory load and cognitive stamina are manageable. Pace yourself with water breaks.</p>
             </div>
+
+            <button type="button" id="spoon-low-mode-toggle" data-low-spoons-toggle class="spoon-low-mode-toggle w-full" onclick="toggleLowSpoonsMode()" aria-pressed="false">
+              Low-Spoons Mode
+            </button>
           </div>
         </div>
 
@@ -1730,51 +1734,6 @@
           <input type="range" id="sanctuary-vol" min="0.02" max="0.35" step="0.01" value="0.12" oninput="updateSanctuaryVolume(this.value)" class="w-36 accent-[#cbb678]">
         </div>
       </div>
-
-      <section class="spoon-tracker" aria-labelledby="spoon-tracker-heading">
-        <div class="spoon-tracker-heading">
-          <div>
-            <span class="spoon-kicker">Spoon Theory &amp; Energy Budget</span>
-            <h2 id="spoon-tracker-heading">Capacity check</h2>
-          </div>
-          <span id="spoon-overall-value" class="spoon-overall-value">65</span>
-        </div>
-
-        <div class="spoon-slider-list">
-          <label for="spoon-sensory">
-            <span>Sensory Load <small>Noise, light, touch</small></span>
-            <output id="spoon-sensory-value" for="spoon-sensory">65%</output>
-          </label>
-          <input type="range" id="spoon-sensory" class="spoon-range" min="0" max="100" value="65" aria-label="Sensory capacity">
-
-          <label for="spoon-executive">
-            <span>Executive Spoons <small>Planning and switching</small></span>
-            <output id="spoon-executive-value" for="spoon-executive">65%</output>
-          </label>
-          <input type="range" id="spoon-executive" class="spoon-range" min="0" max="100" value="65" aria-label="Executive capacity">
-
-          <label for="spoon-motor">
-            <span>Motor &amp; Speech Stamina <small>Movement, writing, speech</small></span>
-            <output id="spoon-motor-value" for="spoon-motor">65%</output>
-          </label>
-          <input type="range" id="spoon-motor" class="spoon-range" min="0" max="100" value="65" aria-label="Motor and speech stamina">
-
-          <label for="spoon-social">
-            <span>Social &amp; Unmasking Reserve <small>Conversation and masking</small></span>
-            <output id="spoon-social-value" for="spoon-social">65%</output>
-          </label>
-          <input type="range" id="spoon-social" class="spoon-range" min="0" max="100" value="65" aria-label="Social and unmasking reserve">
-        </div>
-
-        <p id="spoon-regulation-tip" class="spoon-regulation-tip" aria-live="polite">
-          Choose one low-demand task, keep the next thirty minutes gentle, and leave some capacity unspent.
-        </p>
-        <p id="spoon-quick-summary" class="spoon-quick-summary">Capacity: steady</p>
-
-        <button type="button" id="spoon-low-mode-toggle" class="spoon-low-mode-toggle" onclick="toggleLowSpoonsMode()" aria-pressed="false">
-          Low-Spoons Mode
-        </button>
-      </section>
 
       <!-- LIVING SANCTUARY ATMOSPHERE & HOLIDAY ENGINE CONTROLS -->
       <div class="flex flex-col gap-2 pt-2 border-t border-slate-800">

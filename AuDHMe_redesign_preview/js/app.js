@@ -1771,11 +1771,10 @@ var bootScreenActive = false;
       if (!lowMode) document.body.removeAttribute('data-spoons');
       else document.body.setAttribute('data-spoons', 'low');
 
-      var toggle = document.getElementById('spoon-low-mode-toggle');
-      if (toggle) {
+      document.querySelectorAll('[data-low-spoons-toggle]').forEach(function(toggle) {
         toggle.setAttribute('aria-pressed', lowMode ? 'true' : 'false');
         toggle.textContent = lowMode ? 'Low-Spoons Mode: On' : 'Low-Spoons Mode';
-      }
+      });
       updateSpoonTracker();
     }
 
@@ -1783,11 +1782,10 @@ var bootScreenActive = false;
       var enabled = document.body.getAttribute('data-spoons') !== 'low';
       if (enabled) document.body.setAttribute('data-spoons', 'low');
       else document.body.removeAttribute('data-spoons');
-      var toggle = document.getElementById('spoon-low-mode-toggle');
-      if (toggle) {
+      document.querySelectorAll('[data-low-spoons-toggle]').forEach(function(toggle) {
         toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
         toggle.textContent = enabled ? 'Low-Spoons Mode: On' : 'Low-Spoons Mode';
-      }
+      });
       playTactileClick(enabled ? 320 : 280, 0.04);
       saveSpoonPreferences();
     };
