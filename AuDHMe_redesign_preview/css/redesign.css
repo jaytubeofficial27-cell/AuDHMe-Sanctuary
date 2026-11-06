@@ -3929,3 +3929,13 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
     padding: 14px 15px !important;
   }
 }
+/* Unified card surface: every card shares one background/opacity */
+:root { --card-surface: rgba(23,31,32,.82); }
+.orbital-card, .orbital-card:hover, .orbital-card.core-gateway-node, .flip-card-front, .flip-card:hover .flip-card-front, .flip-card-back,
+.uv-hero-card, .hud-card, .demand-card, .civic-card, .civic-card[style], .architect-card, .portal-card, .creator-profile-card, .community-profile-card,
+.profile-visibility-panel, .profile-upload-panel, .profile-interest-card, .profile-info-card, .profile-perk-card, .resource-card, .method-card,
+.grounding-card, .civic-registry-card, .cond-compact-card, .cond-modal-card, .backing-card, .creator-card, .accesscard,
+#pane-store .store-product-card, #pane-store .store-product-image {
+  background: var(--card-surface) !important;
+  background-image: none !important;
+}
