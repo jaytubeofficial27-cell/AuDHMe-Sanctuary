@@ -1,7 +1,13 @@
 [
   {
-    "origin": ["https://audhme.org", "https://www.audhme.org"],
-    "method": ["GET"],
+    "origin": [
+      "https://audhme.org",
+      "https://www.audhme.org",
+      "http://localhost:4173",
+      "http://127.0.0.1:4173"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
+    "responseHeader": ["*"],
     "maxAgeSeconds": 3600
   }
 ]
