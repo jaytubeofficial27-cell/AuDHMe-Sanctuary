@@ -3124,7 +3124,6 @@ body.low-stim-active #origin-rays, body.site-adapt-calm #origin-rays, body.atmo-
   #atmo-visual-overlay {
     width: 100%;
     height: 100%;
-    contain: strict;
     transform: translateZ(0);
   }
 
