@@ -307,6 +307,7 @@ var bootScreenActive = false;
 
     function switchPage(pageKey, updateHistory) {
       playTactileClick(310, 0.04);
+      closeGalleryViewer();
 
       var allEmbeds = ['embed03', 'embed35', 'embed-store', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04', 'embed15', 'embed16'];
       var targetEmbeds = [];
@@ -2989,6 +2990,7 @@ var bootScreenActive = false;
 
     let authStateVersion = 0;
     auth.onAuthStateChanged(function(user) {
+      closeGalleryViewer();
       if (resolveAuthInitialized) {
         resolveAuthInitialized();
         resolveAuthInitialized = null;
@@ -3137,6 +3139,7 @@ var bootScreenActive = false;
     }
 
     function switchView(viewName, updateHistory) {
+      closeGalleryViewer();
       if (viewName === 'profile' && (!currentUser || !auth.currentUser || currentUser.uid !== auth.currentUser.uid)) {
         openAuthModal('signup');
         return;
@@ -3171,6 +3174,7 @@ var bootScreenActive = false;
 
     function renderProfile(profile,isOwner) {
       profile=profile||currentUser; isOwner=isOwner!==false; if(!profile)return;
+      closeGalleryViewer();
       const usernameEl=document.getElementById('profile-display-username'); if(usernameEl) usernameEl.textContent=profile.username||'Sanctuary member';
       const avatarWrap=document.getElementById('profile-view-avatar-wrap');
       if(avatarWrap) { const avatarUrl=safeProfileAvatarUrl(profile.avatar); if(avatarUrl) { const image=document.createElement('img'); image.src=avatarUrl; image.alt='Profile picture'; image.className='w-full h-full object-cover'; avatarWrap.replaceChildren(image); } else { const fallback=document.createElement('span'); fallback.className='text-3xl font-bold text-[#cbb678]'; fallback.textContent=(profile.username||'A').charAt(0).toUpperCase(); avatarWrap.replaceChildren(fallback); } }
@@ -3187,12 +3191,13 @@ var bootScreenActive = false;
       const perk=document.getElementById('owner-perk-box'); if(perk) perk.classList.toggle('hidden',!isOwner);
       const visibility=document.getElementById('profile-community-visible'); if(visibility) visibility.checked=isOwner&&profile.communityVisible===true;
       ['owner-profile-visibility','owner-gallery-controls'].forEach(function(id){const control=document.getElementById(id);if(control)control.classList.toggle('hidden',!isOwner);});
-      if(!isOwner) document.querySelectorAll('.profile-gallery-upload[open], #profile-gallery-archive[open]').forEach(function(details){details.open=false;});
+      if(!isOwner) document.querySelectorAll('#profile-gallery-archive[open]').forEach(function(details){details.open=false;});
       const detailsVisible=isOwner||profile.communityVisible===true;
       ['profile-bio-section','profile-neurotypes-section','profile-links-section'].forEach(function(id){const section=document.getElementById(id);if(section)section.classList.toggle('hidden',!detailsVisible);});
       renderPrivateInterestGallery(profile,isOwner);
       const publicView=document.getElementById('profile-public-view'); if(publicView) publicView.classList.remove('hidden');
       const settingsView=document.getElementById('profile-settings-view'); if(settingsView) settingsView.classList.add('hidden');
+      const uploadView=document.getElementById('profile-gallery-upload-view'); if(uploadView) uploadView.classList.add('hidden');
     }
 
     const MAX_PRIVATE_INTEREST_ITEMS = 12;
@@ -3200,6 +3205,23 @@ var bootScreenActive = false;
     const MAX_INTEREST_VIDEO_BYTES = 30 * 1024 * 1024;
     let interestObjectUrls = [];
     let profileChangePending = false;
+    let galleryViewerState = null;
+    let galleryViewerUrl = null;
+    let galleryViewerRequest = 0;
+
+    function openGalleryUpload() {
+      if(!auth.currentUser||!currentUser||auth.currentUser.uid!==currentUser.uid)return;
+      document.getElementById('profile-public-view').classList.add('hidden');
+      document.getElementById('profile-gallery-upload-view').classList.remove('hidden');
+      document.getElementById('interest-upload-title').focus();
+    }
+
+    function closeGalleryUpload() {
+      if(profileChangePending){showToast('Please wait for the upload to finish.');return;}
+      document.getElementById('profile-gallery-upload-view').classList.add('hidden');
+      document.getElementById('profile-public-view').classList.remove('hidden');
+      document.querySelector('.profile-gallery-upload-link').focus();
+    }
 
     function isInterestMediaPath(path, uid) {
       if (typeof path !== 'string' || typeof uid !== 'string') return false;
@@ -3226,30 +3248,105 @@ var bootScreenActive = false;
       if(!archived.length) archive.open=false;
       document.getElementById('profile-archive-count').textContent='('+archived.length+')';
       if(!visible.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=isOwner?'Your gallery is ready when you are. Add a photo or video of something you love.':'This member has not shared any gallery items.';grid.appendChild(empty);}
-      function renderItem(item, target) {
+      function renderItem(group, target) {
+        const item=group[0];
         const card=document.createElement('figure');card.className='profile-interest-card';
-        loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){if(!card.isConnected)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.controls=true;media.preload='metadata';}else{media=document.createElement('img');media.alt=String(item.name||'Special interest photo').slice(0,100);}media.src=url;media.className='profile-interest-media';card.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('p');message.textContent='This item could not be loaded right now.';card.prepend(message);}});
+        const preview=document.createElement('button');preview.type='button';preview.className='profile-media-preview';preview.setAttribute('aria-label','Open '+String(item.name||'gallery item')+(group.length>1?' carousel':'')+' in larger view');preview.addEventListener('click',function(){openGalleryViewer(group,profile,isOwner,false);});card.appendChild(preview);
+        loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){if(!card.isConnected)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.muted=true;media.preload='metadata';}else{media=document.createElement('img');media.alt='';}media.src=url;media.className='profile-interest-media';preview.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('span');message.textContent='Preview unavailable';preview.prepend(message);}});
+        if(group.length>1){const count=document.createElement('span');count.className='profile-media-count';count.textContent='1 / '+group.length;preview.appendChild(count);}
         const caption=document.createElement('figcaption');caption.textContent=String(item.name||'A special interest').slice(0,100);card.appendChild(caption);
         if(isOwner){
           const shared=!item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));
-          const state=document.createElement('span');state.className='profile-media-state';state.textContent=item.archived?'Archived':shared?'Shared':'Private';caption.appendChild(state);
+          const state=document.createElement('span');state.className='profile-media-state';state.textContent=item.archived?'Archived':group.length>1?'Multiple items':shared?'Shared':'Private';caption.appendChild(state);
           const menu=document.createElement('details');menu.className='profile-media-menu';
           const trigger=document.createElement('summary');trigger.setAttribute('aria-label','Options for '+String(item.name||'gallery item'));trigger.textContent='⋯';menu.appendChild(trigger);
           const actions=document.createElement('div');actions.className='profile-media-actions';
           function addAction(label, action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;action();});actions.appendChild(button);}
-          if(item.archived){addAction('Restore to gallery',function(){setInterestMediaArchived(item.path,false);});}
-          else {
-            addAction(shared?'Make private':'Share with members',function(){setInterestMediaVisibility(item.path,shared?'private':'community');});
-            addAction('Archive',function(){setInterestMediaArchived(item.path,true);});
-          }
-          addAction('Delete',function(){if(window.confirm('Permanently delete this gallery item?'))deletePrivateInterestMedia(item.path);});
+          addAction('Edit',function(){openGalleryViewer(group,profile,true,true);});
           menu.appendChild(actions);card.appendChild(menu);
         }
         target.appendChild(card);
       }
-      visible.forEach(function(item){renderItem(item,grid);});
-      archived.forEach(function(item){renderItem(item,archiveGrid);});
+      const groups=[];
+      visible.forEach(function(item){
+        const existing=typeof item.groupId==='string'&&item.groupId?groups.find(function(group){return group[0].groupId===item.groupId;}):null;
+        if(existing)existing.push(item);else groups.push([item]);
+      });
+      groups.forEach(function(group){renderItem(group,grid);});
+      archived.forEach(function(item){renderItem([item],archiveGrid);});
     }
+
+    function openGalleryViewer(items,profile,isOwner,edit) {
+      if(!auth.currentUser||!items.length||(isOwner&&(!currentUser||currentUser.uid!==auth.currentUser.uid)))return;
+      const dialog=document.getElementById('profile-gallery-viewer');
+      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:edit,index:0};
+      renderGalleryViewer();
+      if(!dialog.open)dialog.showModal();
+      dialog.querySelector('.gallery-viewer-close').focus();
+    }
+
+    function renderGalleryViewer() {
+      if(!galleryViewerState)return;
+      const state=galleryViewerState,item=state.items[state.index],request=++galleryViewerRequest;
+      const media=document.getElementById('gallery-viewer-media'),edit=document.getElementById('gallery-viewer-edit');
+      if(galleryViewerUrl){URL.revokeObjectURL(galleryViewerUrl);galleryViewerUrl=null;}
+      media.replaceChildren();
+      const loading=document.createElement('p');loading.textContent='Loading media…';media.appendChild(loading);
+      document.getElementById('gallery-viewer-caption').textContent=String(item.name||'A special interest').slice(0,100);
+      document.getElementById('gallery-viewer-position').textContent=(state.index+1)+' / '+state.items.length;
+      document.getElementById('gallery-viewer-previous').disabled=state.index===0;
+      document.getElementById('gallery-viewer-next').disabled=state.index===state.items.length-1;
+      loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){
+        if(request!==galleryViewerRequest||!galleryViewerState)return;
+        galleryViewerUrl=URL.createObjectURL(blob);
+        const element=document.createElement(String(item.type||'').startsWith('video/')?'video':'img');
+        if(element.tagName==='VIDEO'){element.controls=true;element.preload='metadata';}else element.alt=String(item.name||'Special interest photo').slice(0,100);
+        element.src=galleryViewerUrl;media.replaceChildren(element);
+      }).catch(function(error){
+        console.warn('Gallery viewer item could not be loaded:',error.code||error.message);
+        if(request===galleryViewerRequest&&galleryViewerState)loading.textContent='This item could not be loaded right now.';
+      });
+      edit.replaceChildren();
+      edit.classList.toggle('hidden',!state.isOwner||!state.edit);
+      if(state.isOwner&&state.edit){
+        const shared=!item.archived&&(item.visibility==='community'||(state.profile.communityVisible===true&&item.visibility!=='private'));
+        const status=document.createElement('p');status.textContent=item.archived?'Archived':shared?'Shared with members':'Private';edit.appendChild(status);
+        function addAction(label,action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',action);edit.appendChild(button);}
+        if(item.archived)addAction('Restore to gallery',function(){closeGalleryViewer();setInterestMediaArchived(item.path,false);});
+        else {
+          addAction(shared?'Make private':'Share with members',function(){closeGalleryViewer();setInterestMediaVisibility(item.path,shared?'private':'community');});
+          addAction('Archive',function(){closeGalleryViewer();setInterestMediaArchived(item.path,true);});
+        }
+        addAction('Delete',function(){if(window.confirm('Permanently delete this gallery item?')){closeGalleryViewer();deletePrivateInterestMedia(item.path);}});
+      }
+    }
+
+    function moveGalleryViewer(direction) {
+      if(!galleryViewerState)return;
+      const next=galleryViewerState.index+direction;
+      if(next<0||next>=galleryViewerState.items.length)return;
+      galleryViewerState.index=next;
+      renderGalleryViewer();
+    }
+
+    function closeGalleryViewer() {
+      const dialog=document.getElementById('profile-gallery-viewer');
+      if(dialog&&dialog.open){dialog.close();resetGalleryViewer();}
+    }
+
+    function resetGalleryViewer(){
+      galleryViewerRequest++;
+      galleryViewerState=null;
+      if(galleryViewerUrl){URL.revokeObjectURL(galleryViewerUrl);galleryViewerUrl=null;}
+      document.getElementById('gallery-viewer-media').replaceChildren();
+    }
+
+    document.getElementById('profile-gallery-viewer').addEventListener('close',function(){
+      if(!this.open)resetGalleryViewer();
+    });
+    document.getElementById('profile-gallery-viewer').addEventListener('keydown',function(event){
+      if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeGalleryViewer();}
+    });
 
     document.addEventListener('click',function(event){
       document.querySelectorAll('.profile-media-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
@@ -3321,6 +3418,7 @@ var bootScreenActive = false;
       if (button) button.disabled = true;
       if (status) status.textContent = 'Uploading your files…';
       const uploadedRefs = [];
+      const groupId = files.length > 1 ? Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12) : null;
       try {
         const storageSdk = await loadGalleryStorageSdk();
         for (const file of files) {
@@ -3332,7 +3430,9 @@ var bootScreenActive = false;
           const defaultVisibility=currentUser.communityVisible===true?'profile':'private';
           await storageSdk.uploadBytes(ref,file,{contentType:file.type,customMetadata:{visibility:defaultVisibility}});
           uploadedRefs.push(ref);
-          existing.push({path:path,type:file.type,name:displayName,visibility:defaultVisibility});
+          const item={path:path,type:file.type,name:displayName,visibility:defaultVisibility};
+          if(groupId)item.groupId=groupId;
+          existing.push(item);
           currentUser.interestMedia=existing.slice(0,MAX_PRIVATE_INTEREST_ITEMS);
             await persistUserProfile();
         }
@@ -3340,14 +3440,21 @@ var bootScreenActive = false;
         if(captionInput) captionInput.value='';
         renderPrivateInterestGallery();
         if (status) status.textContent = 'Your files were saved. Visibility follows your profile and item settings.';
+        renderProfile(currentUser,true);
         showToast('Your profile gallery has been updated.');
       } catch (error) {
         currentUser.interestMedia = previousItems;
-        await Promise.all(uploadedRefs.map(function(ref) { return ref.delete().catch(function() {}); }));
-        await persistUserProfile().catch(function(profileError){console.error('Gallery metadata cleanup failed:',profileError.code||profileError.message);});
+        let cleanupFailed = false;
+        await Promise.all(uploadedRefs.map(function(ref) {
+          return ref.delete().catch(function(cleanupError) {
+            cleanupFailed = true;
+            console.error('Gallery file cleanup failed:',cleanupError.code||cleanupError.message);
+          });
+        }));
+        await persistUserProfile().catch(function(profileError){cleanupFailed=true;console.error('Gallery metadata cleanup failed:',profileError.code||profileError.message);});
         console.error('Private gallery upload failed:', error.code || error.message);
-        if (status) status.textContent = 'Upload failed. Your profile was not updated.';
-        showToast('The gallery upload could not be completed. Check Storage setup and try again.');
+        if (status) status.textContent = cleanupFailed?'Upload failed and cleanup could not be completed. Check your gallery before trying again.':'Upload failed. Your profile was not updated.';
+        showToast(cleanupFailed?'Upload failed and cleanup was incomplete. Check your gallery.':'The gallery upload could not be completed. Check Storage setup and try again.');
       } finally {
         profileChangePending = false;
         if (button) button.disabled = false;
@@ -3544,6 +3651,9 @@ var bootScreenActive = false;
     }
 
     function openSettingsView() {
+      if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      const uploadView=document.getElementById('profile-gallery-upload-view');
+      if(uploadView)uploadView.classList.add('hidden');
       const usernameInput = document.getElementById('edit-username');
       const emailInput = document.getElementById('edit-email');
       
@@ -3590,7 +3700,7 @@ var bootScreenActive = false;
       const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(function(item){return !item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));}).slice(0,12):[];
       const profileVisible=profile.communityVisible===true;
       if(!profileVisible&&!items.length) return ref.delete().catch(function(error){if(error.code==='not-found')return;throw error;});
-      const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){return {path:item.path,type:item.type,name:item.name,visibility:item.visibility};}),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+      const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;return result;}),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
       if(profileVisible){projection.avatar=profile.avatar||null;projection.bio=String(profile.bio||'').slice(0,150);projection.neurotypes=Array.isArray(profile.neurotypes)?profile.neurotypes.filter(function(type){return availableNeurotypes.includes(type);}):[];projection.links=Array.isArray(profile.links)?profile.links.slice(0,6):[];}
       return ref.set(projection);
     }

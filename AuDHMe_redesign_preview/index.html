@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=62">
+  <link rel="stylesheet" href="css/redesign.css?v=63">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1443,19 +1443,7 @@
             </div>
             <p id="profile-privacy-summary" class="profile-privacy-note">Your profile and gallery are private to your account.</p>
             <div id="owner-gallery-controls" class="hidden">
-              <details class="profile-gallery-upload">
-                <summary>Add photos or videos</summary>
-                <section class="profile-upload-panel" aria-labelledby="interest-upload-title">
-                  <h3 id="interest-upload-title">Add to your special-interest gallery</h3>
-                  <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. New items follow your profile's sharing setting. Sharing an item shows your username to signed-in members, who may save shared content.</p>
-                  <label for="interest-media-files">Photos or videos</label>
-                  <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
-                  <label for="interest-media-caption">Optional caption (up to 80 characters)</label>
-                  <input type="text" id="interest-media-caption" maxlength="80" placeholder="e.g. My collection of model trains">
-                  <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
-                  <p id="interest-upload-status" role="status" aria-live="polite"></p>
-                </section>
-              </details>
+              <button type="button" class="profile-gallery-upload-link" onclick="openGalleryUpload()">+ Add photos or videos</button>
             </div>
             <div id="profile-interest-grid" class="profile-interest-grid" aria-live="polite"></div>
             <details id="profile-gallery-archive" class="profile-gallery-archive hidden">
@@ -1490,6 +1478,35 @@
         </aside>
       </div>
     </article>
+
+    <section id="profile-gallery-upload-view" class="profile-gallery-upload-view hidden" aria-labelledby="interest-upload-title">
+      <button type="button" class="calm-secondary-button" onclick="closeGalleryUpload()">&larr; Back to profile</button>
+      <div class="profile-upload-panel">
+        <h2 id="interest-upload-title" tabindex="-1">Add to your special-interest gallery</h2>
+        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel. New items follow your profile's sharing setting. Members may save shared content.</p>
+        <label for="interest-media-files">Photos or videos</label>
+        <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
+        <label for="interest-media-caption">Optional caption (up to 80 characters)</label>
+        <input type="text" id="interest-media-caption" maxlength="80" placeholder="e.g. My collection of model trains">
+        <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
+        <p id="interest-upload-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <dialog id="profile-gallery-viewer" class="profile-gallery-viewer" aria-labelledby="gallery-viewer-title">
+      <div class="gallery-viewer-header">
+        <h2 id="gallery-viewer-title">Special interests</h2>
+        <button type="button" class="gallery-viewer-close" onclick="closeGalleryViewer()" aria-label="Close viewer">&times;</button>
+      </div>
+      <div id="gallery-viewer-media" class="gallery-viewer-media"></div>
+      <p id="gallery-viewer-caption"></p>
+      <div class="gallery-viewer-navigation">
+        <button type="button" id="gallery-viewer-previous" onclick="moveGalleryViewer(-1)">Previous</button>
+        <span id="gallery-viewer-position" aria-live="polite"></span>
+        <button type="button" id="gallery-viewer-next" onclick="moveGalleryViewer(1)">Next</button>
+      </div>
+      <div id="gallery-viewer-edit" class="gallery-viewer-edit hidden"></div>
+    </dialog>
 
     <!-- PRIVATE ACCOUNT SETTINGS & EDIT VIEW (Owner only) -->
     <div id="profile-settings-view" class="bg-[#292c25] border border-slate-700 rounded-2xl p-8 space-y-6 hidden">
@@ -1922,6 +1939,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=45"></script>
+  <script src="js/app.js?v=46"></script>
 </body>
 </html>
