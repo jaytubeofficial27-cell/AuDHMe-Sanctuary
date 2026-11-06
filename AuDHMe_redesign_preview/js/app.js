@@ -2966,16 +2966,6 @@ auth.onAuthStateChanged(function(user) {
     return;
   }
 
-  // Populate currentUser instantly from Auth data so UI doesn't flash logged-out state
-  currentUser = {
-    uid: user.uid,
-    email: user.email || '',
-    username: user.displayName || (user.email || '').split('@')[0],
-    avatar: user.photoURL || null,
-    bio: '', neurotypes: [], links: [], interestMedia: [], communityVisible: false, perkRedeemedAt: null
-  };
-  updateUI();
-
   const profileRef = db.collection('users').doc(user.uid);
   userProfileReady = profileRef.get().then(function(snapshot) {
     if (version !== authStateVersion || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
