@@ -2845,7 +2845,7 @@ var bootScreenActive = false;
       console.warn('Firebase auth persistence could not be enabled:', error.code || error.message);
     });
     const db = firebase.firestore();
-    const storage = firebase.app().storage('gs://audhme-sanctuary-storage');
+    const storage = firebase.storage();
     const functions = firebase.app().functions('europe-west2');
     const GOOGLE_CLIENT_ID = '986253884870-senv7guo4ukpvrbccplb9l3o29ge6u1n.apps.googleusercontent.com';
     let googleSignInInitialized = false;
