@@ -7,24 +7,28 @@ service firebase.storage {
 
     function hasGalleryCapacity(uid) {
       return firestore.exists(/databases/(default)/documents/users/$(uid))
-        && firestore.get(/databases/(default)/documents/users/$(uid)).data.keys().hasAll(['interestMedia'])
-        && firestore.get(/databases/(default)/documents/users/$(uid)).data.interestMedia is list
-        && firestore.get(/databases/(default)/documents/users/$(uid)).data.interestMedia.size() < 12;
+        && (!firestore.get(/databases/(default)/documents/users/$(uid)).data.keys().hasAny(['interestMedia'])
+          || (firestore.get(/databases/(default)/documents/users/$(uid)).data.interestMedia is list
+            && firestore.get(/databases/(default)/documents/users/$(uid)).data.interestMedia.size() < 12));
     }
 
-    match /users/{userId}/interests/{fileName} {
-      allow read: if owns(userId)
+    match /users/{userId}/{folder}/{fileName} {
+      function isGalleryFolder() {
+        return folder == 'interests' || folder == 'gallery';
+      }
+
+      allow read: if isGalleryFolder() && (owns(userId)
         || (request.auth != null
           && ((resource.metadata.visibility == 'community')
             || (firestore.get(/databases/(default)/documents/users/$(userId)).data.communityVisible == true
-              && resource.metadata.visibility != 'private')));
-      allow delete: if owns(userId);
-      allow create: if owns(userId)
+              && resource.metadata.visibility != 'private'))));
+      allow delete: if isGalleryFolder() && owns(userId);
+      allow create: if isGalleryFolder() && owns(userId)
         && hasGalleryCapacity(userId)
         && request.resource.size > 0
         && request.resource.size <= 30 * 1024 * 1024
         && request.resource.contentType.matches('^(image/(jpeg|png|webp|gif)|video/(mp4|webm|quicktime))$');
-      allow update: if owns(userId)
+      allow update: if isGalleryFolder() && owns(userId)
         && request.resource.size == resource.size
         && request.resource.contentType == resource.contentType
         && request.resource.metadata.visibility.matches('^(private|community|profile)$');

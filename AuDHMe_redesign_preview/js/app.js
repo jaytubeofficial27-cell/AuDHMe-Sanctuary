@@ -3198,6 +3198,18 @@ var bootScreenActive = false;
     const MAX_INTEREST_VIDEO_BYTES = 30 * 1024 * 1024;
     let interestObjectUrls = [];
 
+    function isInterestMediaPath(path, uid) {
+      if (typeof path !== 'string' || typeof uid !== 'string') return false;
+      return ['interests', 'gallery'].some(function(folder) {
+        const prefix = 'users/' + uid + '/' + folder + '/';
+        return path.startsWith(prefix) && path.length > prefix.length && !path.slice(prefix.length).includes('/');
+      });
+    }
+
+    function loadGalleryStorageSdk() {
+      return import('https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js');
+    }
+
     function renderPrivateInterestGallery(profile,isOwner) {
       profile=profile||currentUser; isOwner=isOwner!==false; const grid=document.getElementById('profile-interest-grid'), viewer=auth.currentUser; if(!grid)return;
       interestObjectUrls.forEach(function(url){URL.revokeObjectURL(url);}); interestObjectUrls=[]; grid.replaceChildren();
@@ -3205,9 +3217,9 @@ var bootScreenActive = false;
       if(!isOwner) items=items.filter(function(item){return item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private');});
       if(!viewer||(isOwner&&(!currentUser||currentUser.uid!==viewer.uid))||!items.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=isOwner?'Your gallery is ready when you are. Add a photo or video of something you love.':'This member has not shared any gallery items.';grid.appendChild(empty);return;}
       items.forEach(function(item){
-        if(!item||typeof item.path!=='string'||!item.path.startsWith('users/'+profile.uid+'/interests/'))return;
+        if(!item||!isInterestMediaPath(item.path,profile.uid))return;
         const card=document.createElement('figure');card.className='profile-interest-card';
-        storage.ref(item.path).getBlob().then(function(blob){if(!card.isConnected)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.controls=true;media.preload='metadata';}else{media=document.createElement('img');media.alt=String(item.name||'Special interest photo').slice(0,100);}media.src=url;media.className='profile-interest-media';card.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('p');message.textContent='This item could not be loaded right now.';card.prepend(message);}});
+        loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){if(!card.isConnected)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.controls=true;media.preload='metadata';}else{media=document.createElement('img');media.alt=String(item.name||'Special interest photo').slice(0,100);}media.src=url;media.className='profile-interest-media';card.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('p');message.textContent='This item could not be loaded right now.';card.prepend(message);}});
         const caption=document.createElement('figcaption');caption.textContent=String(item.name||'A special interest').slice(0,100);card.appendChild(caption);
         if(isOwner){const shared=item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private');const button=document.createElement('button');button.type='button';button.className='profile-media-share';button.textContent=shared?(item.visibility==='community'&&!profile.communityVisible?'Shared with members · Make private':'Shared via profile · Make private'):'Private · Share with members';button.addEventListener('click',function(){setInterestMediaVisibility(item.path,shared?'private':'community');});card.appendChild(button);const remove=document.createElement('button');remove.type='button';remove.className='profile-media-remove';remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+String(item.name||'gallery item'));remove.addEventListener('click',function(){deletePrivateInterestMedia(item.path);});card.appendChild(remove);}
         grid.appendChild(card);
@@ -3216,7 +3228,7 @@ var bootScreenActive = false;
 
     async function setInterestMediaVisibility(path,visibility){
       const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!['private','community'].includes(visibility))return;
-      const previous=Array.isArray(currentUser.interestMedia)?currentUser.interestMedia.slice():[],item=previous.find(function(entry){return entry.path===path;});if(!item||!path.startsWith('users/'+user.uid+'/interests/'))return;
+      const previous=Array.isArray(currentUser.interestMedia)?currentUser.interestMedia.slice():[],item=previous.find(function(entry){return entry.path===path;});if(!item||!isInterestMediaPath(path,user.uid))return;
       const oldVisibility=item.visibility||'profile';try{await storage.ref(path).updateMetadata({customMetadata:{visibility:visibility}});currentUser.interestMedia=previous.map(function(entry){return entry.path===path?Object.assign({},entry,{visibility:visibility}):entry;});await persistUserProfile();renderProfile(currentUser,true);showToast(visibility==='community'?'This item is shared with signed-in members.':'This item is private to you.');}
       catch(error){currentUser.interestMedia=previous;await storage.ref(path).updateMetadata({customMetadata:{visibility:oldVisibility}}).catch(function(){});renderProfile(currentUser,true);showToast('That sharing change could not be saved. Please try again.');}
     }
@@ -3247,14 +3259,15 @@ var bootScreenActive = false;
       if (status) status.textContent = 'Uploading your files…';
       const uploadedRefs = [];
       try {
+        const storageSdk = await loadGalleryStorageSdk();
         for (const file of files) {
           const extensionByType={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','video/mp4':'mp4','video/webm':'webm','video/quicktime':'mov'};
           const suffix=extensionByType[file.type];
-          const path='users/'+user.uid+'/interests/'+Date.now()+'-'+Math.random().toString(36).slice(2,12)+'.'+suffix;
+          const path='users/'+user.uid+'/gallery/'+Date.now()+'-'+Math.random().toString(36).slice(2,12)+'.'+suffix;
           const displayName=chosenCaption||(file.type.startsWith('video/')?'Video':'Photo');
           const ref = storage.ref(path);
           const defaultVisibility=currentUser.communityVisible===true?'profile':'private';
-          await ref.put(file,{contentType:file.type,customMetadata:{visibility:defaultVisibility}});
+          await storageSdk.uploadBytes(ref,file,{contentType:file.type,customMetadata:{visibility:defaultVisibility}});
           uploadedRefs.push(ref);
           existing.push({path:path,type:file.type,name:displayName,visibility:defaultVisibility});
           currentUser.interestMedia=existing.slice(0,MAX_PRIVATE_INTEREST_ITEMS);
@@ -3278,7 +3291,7 @@ var bootScreenActive = false;
     }
 
     async function deletePrivateInterestMedia(path) {
-      const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||typeof path!=='string'||!path.startsWith('users/'+user.uid+'/interests/'))return;
+      const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!isInterestMediaPath(path,user.uid))return;
       const previous=Array.isArray(currentUser.interestMedia)?currentUser.interestMedia.slice():[],item=previous.find(function(entry){return entry.path===path;});if(!item)return;
       try {
         await storage.ref(path).updateMetadata({customMetadata:{visibility:'private'}});
