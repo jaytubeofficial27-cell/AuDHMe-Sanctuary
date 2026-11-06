@@ -2852,7 +2852,7 @@ var bootScreenActive = false;
       apiKey: "AIzaSyBO3dJRsRDb011tFC37T3O6X7kUIBAJSW4",
       authDomain: "audhme-sanctuary-b73dd.firebaseapp.com",
       projectId: "audhme-sanctuary-b73dd",
-      storageBucket: "audhme-sanctuary-b73dd.appspot.com",
+      storageBucket: "audhme-sanctuary-b73dd.firebasestorage.app",
       messagingSenderId: "986253884870",
       appId: "1:986253884870:web:77935412b2171aeac746c7",
       measurementId: "G-C5Z47VWZ58"
