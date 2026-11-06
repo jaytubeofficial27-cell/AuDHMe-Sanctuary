@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://audhme.org", "https://www.audhme.org"],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]
