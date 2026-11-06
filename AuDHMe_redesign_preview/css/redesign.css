@@ -2634,8 +2634,8 @@ body.copy-protection-enabled canvas {
 #sanctuary-atmosphere-canvas {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none !important;
   z-index: 1;
   opacity: 0.72;
@@ -2856,8 +2856,8 @@ body[data-time-of-day]:not(.theme-warm-slate):not(.site-adapt-calm) .flip-card-b
 #atmo-visual-overlay {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   pointer-events: none !important;
   z-index: 1;
   opacity: 0.85;
@@ -3118,6 +3118,42 @@ body[data-holiday="founders-day"] #origin-rays { display: block; animation: orig
 @keyframes originSpin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #origin-rays { animation: none !important; } }
 body.low-stim-active #origin-rays, body.site-adapt-calm #origin-rays, body.atmo-paused #origin-rays { display: none !important; }
+
+@media (max-width: 640px) {
+  #sanctuary-atmosphere-canvas,
+  #atmo-visual-overlay {
+    width: 100%;
+    height: 100%;
+    contain: strict;
+    transform: translateZ(0);
+  }
+
+  #origin-rays {
+    top: -25%;
+    left: -25%;
+    width: 150%;
+    height: 150%;
+    animation-duration: 90s !important;
+  }
+
+  #halloween-pumpkins {
+    bottom: env(safe-area-inset-bottom, 0) !important;
+    height: 54px !important;
+  }
+
+  #halloween-pumpkins .pk-left,
+  #halloween-pumpkins .pk-right {
+    width: 44px !important;
+  }
+
+  #halloween-pumpkins .pk-center {
+    width: 58px !important;
+  }
+
+  #season-decor {
+    z-index: 999;
+  }
+}
 
 /* Sensory panel: shorter, smaller location-permission text */
 #audhme-widget-panel {

@@ -1856,6 +1856,9 @@ var bootScreenActive = false;
     var atmoParticles = [];
     var atmoSpawnQueue = 0;
     var atmoAnimFrame = null;
+    var atmoScrollPaused = false;
+    var atmoScrollResumeTimer = null;
+    var atmoResizeTimer = null;
     var atmoResolved = { time: 'night', season: 'autumn', weather: 'clear', holiday: 'none' };
 
     function loadAtmoPrefs() {
@@ -2046,6 +2049,7 @@ var bootScreenActive = false;
     function isMotionPaused() {
       return (
         !atmoState.animationsEnabled ||
+        atmoScrollPaused ||
         document.body.classList.contains('low-input-active') ||
         document.body.classList.contains('low-stim-active') ||
         document.body.classList.contains('site-adapt-calm') ||
@@ -2055,13 +2059,22 @@ var bootScreenActive = false;
       );
     }
 
+    function getAtmoViewportSize() {
+      var viewport = window.visualViewport;
+      return {
+        width: Math.round(viewport ? viewport.width : document.documentElement.clientWidth || window.innerWidth),
+        height: Math.round(viewport ? viewport.height : document.documentElement.clientHeight || window.innerHeight)
+      };
+    }
+
     function initAtmosphereCanvas() {
       var canvas = document.getElementById('sanctuary-atmosphere-canvas');
       if (!canvas) return;
       if (atmoAnimFrame) cancelAnimationFrame(atmoAnimFrame);
       atmoAnimFrame = null;
-      var width = canvas.width = window.innerWidth;
-      var height = canvas.height = window.innerHeight;
+      var viewportSize = getAtmoViewportSize();
+      var width = canvas.width = viewportSize.width;
+      var height = canvas.height = viewportSize.height;
       var mode = atmoResolved.weather;
 
       var countMap = { rain: 72, snow: 60, leaves: 36, petals: 34, embers: 44, mist: 18, clear: 40 };
@@ -2456,13 +2469,40 @@ var bootScreenActive = false;
       ctx.restore();
     }
 
-    window.addEventListener('resize', function() {
-      var canvas = document.getElementById('sanctuary-atmosphere-canvas');
-      if (canvas) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    function scheduleAtmoResize() {
+      if (atmoResizeTimer) window.clearTimeout(atmoResizeTimer);
+      atmoResizeTimer = window.setTimeout(function() {
+        var canvas = document.getElementById('sanctuary-atmosphere-canvas');
+        var viewportSize = getAtmoViewportSize();
+        if (canvas && (canvas.width !== viewportSize.width || canvas.height !== viewportSize.height)) {
+          initAtmosphereCanvas();
+        }
+      }, 180);
+    }
+
+    window.addEventListener('resize', scheduleAtmoResize, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', scheduleAtmoResize, { passive: true });
+    }
+
+    window.addEventListener('scroll', function() {
+      if (!window.matchMedia || !window.matchMedia('(max-width: 640px)').matches) return;
+      if (!atmoScrollPaused) {
+        atmoScrollPaused = true;
+        if (atmoAnimFrame) cancelAnimationFrame(atmoAnimFrame);
+        atmoAnimFrame = null;
+        var canvas = document.getElementById('sanctuary-atmosphere-canvas');
+        if (canvas) {
+          var ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
       }
-    });
+      if (atmoScrollResumeTimer) window.clearTimeout(atmoScrollResumeTimer);
+      atmoScrollResumeTimer = window.setTimeout(function() {
+        atmoScrollPaused = false;
+        initAtmosphereCanvas();
+      }, 180);
+    }, { passive: true });
 
     var xmasCountdownInterval = null;
     var xmasLastPhase = null;
