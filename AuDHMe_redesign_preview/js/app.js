@@ -3294,8 +3294,13 @@ var bootScreenActive = false;
       const loading=document.createElement('p');loading.textContent='Loading media…';media.appendChild(loading);
       document.getElementById('gallery-viewer-caption').textContent=String(item.name||'A special interest').slice(0,100);
       document.getElementById('gallery-viewer-position').textContent=(state.index+1)+' / '+state.items.length;
-      document.getElementById('gallery-viewer-previous').disabled=state.index===0;
-      document.getElementById('gallery-viewer-next').disabled=state.index===state.items.length-1;
+      document.getElementById('gallery-viewer-navigation').hidden=state.items.length<2;
+      const previous=document.getElementById('gallery-viewer-previous'),next=document.getElementById('gallery-viewer-next');
+      const focused=document.activeElement;
+      previous.disabled=state.index===0;
+      next.disabled=state.index===state.items.length-1;
+      if(focused===previous&&previous.disabled)next.focus();
+      if(focused===next&&next.disabled)previous.focus();
       loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){
         if(request!==galleryViewerRequest||!galleryViewerState)return;
         galleryViewerUrl=URL.createObjectURL(blob);
@@ -3346,7 +3351,23 @@ var bootScreenActive = false;
     });
     document.getElementById('profile-gallery-viewer').addEventListener('keydown',function(event){
       if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeGalleryViewer();}
+      else if((event.key==='ArrowLeft'||event.key==='ArrowRight')&&event.target.tagName!=='VIDEO'){
+        event.preventDefault();event.stopPropagation();moveGalleryViewer(event.key==='ArrowLeft'?-1:1);
+      }
     });
+    let galleryTouchStart=null;
+    const galleryViewerMedia=document.getElementById('gallery-viewer-media');
+    galleryViewerMedia.addEventListener('touchstart',function(event){
+      if(event.touches.length!==1||event.target.tagName==='VIDEO'){galleryTouchStart=null;return;}
+      galleryTouchStart={x:event.touches[0].clientX,y:event.touches[0].clientY};
+    },{passive:true});
+    galleryViewerMedia.addEventListener('touchend',function(event){
+      if(!galleryTouchStart||event.changedTouches.length!==1)return;
+      const dx=event.changedTouches[0].clientX-galleryTouchStart.x,dy=event.changedTouches[0].clientY-galleryTouchStart.y;
+      galleryTouchStart=null;
+      if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)moveGalleryViewer(dx<0?1:-1);
+    },{passive:true});
+    galleryViewerMedia.addEventListener('touchcancel',function(){galleryTouchStart=null;},{passive:true});
 
     document.addEventListener('click',function(event){
       document.querySelectorAll('.profile-media-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
