@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=66">
+  <link rel="stylesheet" href="css/redesign.css?v=67">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1520,22 +1520,24 @@
           <div id="gallery-viewer-edit" class="gallery-viewer-edit hidden"></div>
         </div>
         <section id="gallery-engagement" class="gallery-engagement" aria-label="Post likes and comments" hidden>
-          <div class="gallery-engagement-header">
-            <button type="button" id="gallery-like-button" aria-pressed="false">♡ Like</button>
-            <span id="gallery-like-count" aria-live="polite"></span>
-          </div>
           <h3>Comments</h3>
           <p id="gallery-comments-status" role="status"></p>
           <div id="gallery-comments-list"></div>
           <button type="button" id="gallery-comments-more" hidden>Load more comments</button>
-          <form id="gallery-comment-form">
-            <div id="gallery-reply-context" class="gallery-reply-context" hidden><span id="gallery-reply-label"></span><button type="button" id="gallery-reply-cancel" aria-label="Cancel reply">×</button></div>
-            <div class="gallery-comment-composer">
-              <label class="gallery-visually-hidden" for="gallery-comment-input">Add a comment</label>
-              <input type="text" id="gallery-comment-input" maxlength="500" placeholder="Add a comment…" required>
-              <button type="submit" aria-label="Post comment"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button>
+          <div class="gallery-engagement-controls">
+            <div class="gallery-engagement-like">
+              <button type="button" id="gallery-like-button" aria-pressed="false">♡ Like</button>
+              <span id="gallery-like-count" aria-live="polite"></span>
             </div>
-          </form>
+            <form id="gallery-comment-form">
+              <div id="gallery-reply-context" class="gallery-reply-context" hidden><span id="gallery-reply-label"></span><button type="button" id="gallery-reply-cancel" aria-label="Cancel reply">×</button></div>
+              <div class="gallery-comment-composer">
+                <label class="gallery-visually-hidden" for="gallery-comment-input">Add a comment</label>
+                <input type="text" id="gallery-comment-input" maxlength="500" placeholder="Add a comment…" required>
+                <button type="submit" aria-label="Post comment"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button>
+              </div>
+            </form>
+          </div>
         </section>
       </div>
     </dialog>

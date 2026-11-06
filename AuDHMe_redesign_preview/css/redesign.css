@@ -4237,9 +4237,11 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
 .gallery-viewer-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 320px); gap: 20px; align-items: start; }
 .gallery-viewer-layout:has(.gallery-engagement[hidden]) { grid-template-columns: minmax(0, 1fr); }
 .gallery-viewer-post { min-width: 0; }
-.gallery-engagement { min-width: 0; margin-top: 12px; padding-left: 20px; border-left: 1px solid rgba(197,170,97,.2); }
+.gallery-engagement { display: flex; flex-direction: column; align-self: stretch; min-width: 0; margin-top: 12px; padding-left: 20px; border-left: 1px solid rgba(197,170,97,.2); }
 .gallery-engagement[hidden] { display: none; }
-.gallery-engagement-header { display: flex; align-items: center; gap: 12px; }
+.gallery-engagement-controls { position: sticky; z-index: 3; bottom: 0; display: flex; align-items: end; gap: 8px; margin-top: auto; padding: 12px 0 0; background: #141d1c; }
+.gallery-engagement-like { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 3px; }
+#gallery-like-count { font-size: .72rem; color: #b6c8c0; text-align: center; }
 .gallery-engagement button {
   min-height: 44px;
   padding: 7px 12px;
@@ -4271,13 +4273,14 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
 .gallery-comment-edit { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .gallery-comment-edit input { flex: 1 1 100%; min-width: 0; padding: 8px; border: 1px solid rgba(183,190,150,.25); border-radius: 8px; background: #111a19; color: #eef1ed; }
 .gallery-comment-edit button { min-height: 36px; padding: 4px 10px; font-size: .78rem; }
-#gallery-comment-form { display: grid; gap: 8px; margin-top: 12px; }
-.gallery-comment-composer { display: flex; align-items: center; border: 1px solid rgba(183,190,150,.25); border-radius: 12px; background: #111a19; }
+#gallery-comment-form { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1 1 0; min-width: 0; gap: 8px; }
+.gallery-comment-composer { display: flex; align-items: center; min-width: 0; border: 1px solid rgba(183,190,150,.25); border-radius: 12px; background: #111a19; }
 .gallery-comment-composer:focus-within { outline: 2px solid #cbb678; outline-offset: 2px; }
-#gallery-comment-input { min-width: 0; flex: 1; padding: 10px 12px; border: 0; outline: 0; background: transparent; color: #eef1ed; }
+#gallery-comment-input { width: 0; min-width: 0; flex: 1; padding: 10px 12px; border: 0; outline: 0; background: transparent; color: #eef1ed; }
 #gallery-comment-form .gallery-comment-composer button { display: grid; min-width: 44px; min-height: 44px; padding: 0; place-items: center; border: 0; background: transparent; color: #d7c58d; }
 .gallery-reply-context { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #b6c8c0; font-size: .78rem; }
 .gallery-reply-context[hidden] { display: none; }
+.gallery-reply-context span { min-width: 0; overflow-wrap: anywhere; }
 #gallery-comment-form .gallery-reply-context button { min-width: 36px; min-height: 36px; padding: 0; border: 0; background: transparent; font-size: 1.2rem; }
 .gallery-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .gallery-comment-menu summary:focus-visible, .gallery-engagement button:focus-visible, .gallery-comment-edit input:focus-visible { outline: 2px solid #cbb678; outline-offset: 2px; }
