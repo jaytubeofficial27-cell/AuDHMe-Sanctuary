@@ -3296,6 +3296,10 @@ var bootScreenActive = false;
       return import('https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js');
     }
 
+    function fetchGalleryBlob(path) {
+      return loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(path));});
+    }
+
     function renderPrivateInterestGallery(profile,isOwner) {
       profile=profile||currentUser; isOwner=isOwner!==false;
       const grid=document.getElementById('profile-interest-grid'), archiveGrid=document.getElementById('profile-archive-grid'), archive=document.getElementById('profile-gallery-archive'), viewer=auth.currentUser;
@@ -3311,9 +3315,18 @@ var bootScreenActive = false;
       if(!visible.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=isOwner?'Your gallery is ready when you are. Add a photo or video of something you love.':'This member has not shared any gallery items.';grid.appendChild(empty);}
       function renderItem(group, target) {
         const item=group[0];
+        let previewBlobPromise=null;
+        function loadPreviewBlob(){
+          if(!previewBlobPromise)previewBlobPromise=fetchGalleryBlob(item.path).catch(function(error){previewBlobPromise=null;throw error;});
+          return previewBlobPromise;
+        }
+        function openRenderedGallery(edit){
+          if(!auth.currentUser||auth.currentUser.uid!==viewer.uid){showToast('Please reopen the profile to view this gallery.');return;}
+          openGalleryViewer(group,profile,isOwner,edit,loadPreviewBlob);
+        }
         const card=document.createElement('figure');card.className='profile-interest-card';
-        const preview=document.createElement('button');preview.type='button';preview.className='profile-media-preview';preview.setAttribute('aria-label','Open '+String(item.name||'gallery item')+(group.length>1?' carousel':'')+' in larger view');preview.addEventListener('click',function(){openGalleryViewer(group,profile,isOwner,false);});card.appendChild(preview);
-        loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){if(!card.isConnected)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.muted=true;media.preload='metadata';}else{media=document.createElement('img');media.alt='';}media.src=url;media.className='profile-interest-media';preview.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('span');message.textContent='Preview unavailable';preview.prepend(message);}});
+        const preview=document.createElement('button');preview.type='button';preview.className='profile-media-preview';preview.setAttribute('aria-label','Open '+String(item.name||'gallery item')+(group.length>1?' carousel':'')+' in larger view');preview.addEventListener('click',function(){openRenderedGallery(false);});card.appendChild(preview);
+        loadPreviewBlob().then(function(blob){if(!card.isConnected||!auth.currentUser||auth.currentUser.uid!==viewer.uid)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.muted=true;media.preload='metadata';}else{media=document.createElement('img');media.alt='';}media.src=url;media.className='profile-interest-media';preview.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('span');message.textContent='Preview unavailable';preview.prepend(message);}});
         if(group.length>1){const count=document.createElement('span');count.className='profile-media-count';count.textContent='1 / '+group.length;preview.appendChild(count);}
         const caption=document.createElement('figcaption');caption.textContent=String(item.name||'A special interest').slice(0,100);card.appendChild(caption);
         if(isOwner){
@@ -3323,7 +3336,7 @@ var bootScreenActive = false;
           const trigger=document.createElement('summary');trigger.setAttribute('aria-label','Options for '+String(item.name||'gallery item'));trigger.textContent='⋯';menu.appendChild(trigger);
           const actions=document.createElement('div');actions.className='profile-media-actions';
           function addAction(label, action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;action();});actions.appendChild(button);}
-          addAction('Edit',function(){openGalleryViewer(group,profile,true,true);});
+          addAction('Edit',function(){openRenderedGallery(true);});
           menu.appendChild(actions);card.appendChild(menu);
         }
         target.appendChild(card);
@@ -3337,10 +3350,10 @@ var bootScreenActive = false;
       archived.forEach(function(item){renderItem([item],archiveGrid);});
     }
 
-    function openGalleryViewer(items,profile,isOwner,edit) {
+    function openGalleryViewer(items,profile,isOwner,edit,loadPreviewBlob) {
       if(!auth.currentUser||!items.length||(isOwner&&(!currentUser||currentUser.uid!==auth.currentUser.uid)))return;
       const dialog=document.getElementById('profile-gallery-viewer');
-      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:edit,index:0};
+      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:edit,index:0,loadPreviewBlob:loadPreviewBlob};
       renderGalleryViewer();
       openGalleryEngagement(galleryViewerState);
       if(!dialog.open)dialog.showModal();
@@ -3353,6 +3366,7 @@ var bootScreenActive = false;
       const media=document.getElementById('gallery-viewer-media'),edit=document.getElementById('gallery-viewer-edit');
       if(galleryViewerUrl){URL.revokeObjectURL(galleryViewerUrl);galleryViewerUrl=null;}
       media.replaceChildren();
+      media.setAttribute('aria-busy','true');
       const loading=document.createElement('p');loading.textContent='Loading media…';media.appendChild(loading);
       document.getElementById('gallery-viewer-caption').textContent=String(item.name||'A special interest').slice(0,100);
       document.getElementById('gallery-viewer-description').textContent=String(item.description||'').slice(0,500);
@@ -3364,15 +3378,16 @@ var bootScreenActive = false;
       next.disabled=state.index===state.items.length-1;
       if(focused===previous&&previous.disabled)next.focus();
       if(focused===next&&next.disabled)previous.focus();
-      loadGalleryStorageSdk().then(function(sdk){return sdk.getBlob(storage.ref(item.path));}).then(function(blob){
-        if(request!==galleryViewerRequest||!galleryViewerState)return;
+      const blobPromise=state.index===0&&state.loadPreviewBlob?state.loadPreviewBlob():fetchGalleryBlob(item.path);
+      blobPromise.then(function(blob){
+        if(request!==galleryViewerRequest||galleryViewerState!==state)return;
         galleryViewerUrl=URL.createObjectURL(blob);
         const element=document.createElement(String(item.type||'').startsWith('video/')?'video':'img');
         if(element.tagName==='VIDEO'){element.controls=true;element.preload='metadata';}else element.alt=String(item.name||'Special interest photo').slice(0,100);
-        element.src=galleryViewerUrl;media.replaceChildren(element);
+        element.src=galleryViewerUrl;media.replaceChildren(element);media.removeAttribute('aria-busy');
       }).catch(function(error){
         console.warn('Gallery viewer item could not be loaded:',error.code||error.message);
-        if(request===galleryViewerRequest&&galleryViewerState)loading.textContent='This item could not be loaded right now.';
+        if(request===galleryViewerRequest&&galleryViewerState===state){loading.textContent='This item could not be loaded right now.';media.removeAttribute('aria-busy');}
       });
       edit.replaceChildren();
       edit.classList.toggle('hidden',!state.isOwner||!state.edit);
@@ -3410,6 +3425,7 @@ var bootScreenActive = false;
       galleryViewerState=null;
       if(galleryViewerUrl){URL.revokeObjectURL(galleryViewerUrl);galleryViewerUrl=null;}
       document.getElementById('gallery-viewer-media').replaceChildren();
+      document.getElementById('gallery-viewer-media').removeAttribute('aria-busy');
       document.getElementById('gallery-engagement').hidden=true;
       document.getElementById('gallery-comment-form').reset();
     }

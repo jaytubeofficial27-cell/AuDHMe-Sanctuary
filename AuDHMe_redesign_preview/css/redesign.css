@@ -4309,3 +4309,25 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
 .site-confirm-actions #site-confirm-accept { border-color: #cbb678; background: #cbb678; color: #202827; font-weight: 700; }
 .site-validation-message { margin: 6px 0; color: #ffd1c2; font-size: .85rem; overflow-wrap: anywhere; }
 .gallery-toast { position: sticky; z-index: 4; bottom: 0; width: fit-content; max-width: 100%; margin-top: 12px; padding: 12px 15px; border: 1px solid rgba(174,189,159,.38); border-radius: 12px; background: #202827; color: #eef1ed; box-shadow: 0 12px 30px rgba(0,0,0,.32); overflow-wrap: anywhere; }
+
+@keyframes sanctuaryExpand {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body:not(.low-input-active):not(.low-stim-active):not(.site-adapt-calm) :is(
+    .profile-gallery-viewer[open],
+    .site-confirm-dialog[open],
+    .site-adaptation-modal:not([hidden]) .site-adaptation-dialog,
+    #cart-modal:not(.hidden) > div,
+    #auth-modal:not(.hidden) > div,
+    #onboarding-modal:not(.hidden) > div,
+    #forgot-pass-modal:not(.hidden) > div,
+    .store-product-detail:not([hidden]),
+    .profile-gallery-upload-view:not(.hidden),
+    #profile-settings-view:not(.hidden),
+    .profile-media-menu[open] .profile-media-actions,
+    .gallery-comment-menu[open] .gallery-comment-actions,
+    .profile-gallery-archive[open] > :not(summary)
+  ) { animation: sanctuaryExpand .16s ease-out; }
+}
