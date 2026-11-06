@@ -4288,3 +4288,24 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
   .gallery-viewer-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .gallery-engagement { margin-top: 16px; padding: 14px 0 0; border-left: 0; border-top: 1px solid rgba(197,170,97,.2); }
 }
+
+.site-confirm-dialog {
+  width: min(440px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 22px;
+  overflow: auto;
+  border: 1px solid rgba(197,170,97,.35);
+  border-radius: 18px;
+  background: #1b2725;
+  color: #eef1ed;
+  box-shadow: 0 22px 70px rgba(0,0,0,.45);
+}
+.site-confirm-dialog::backdrop { background: rgba(6,12,11,.8); }
+.site-confirm-dialog h2 { margin: 0; color: #e4d5a5; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5rem; }
+.site-confirm-dialog p { margin: 12px 0 20px; line-height: 1.5; }
+.site-confirm-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.site-confirm-actions button { min-height: 44px; padding: 8px 16px; border: 1px solid rgba(156,199,189,.4); border-radius: 10px; background: #24332f; color: #eef1ed; cursor: pointer; }
+.site-confirm-actions #site-confirm-accept { border-color: #cbb678; background: #cbb678; color: #202827; font-weight: 700; }
+.site-validation-message { margin: 6px 0; color: #ffd1c2; font-size: .85rem; overflow-wrap: anywhere; }
+.gallery-toast { position: sticky; z-index: 4; bottom: 0; width: fit-content; max-width: 100%; margin-top: 12px; padding: 12px 15px; border: 1px solid rgba(174,189,159,.38); border-radius: 12px; background: #202827; color: #eef1ed; box-shadow: 0 12px 30px rgba(0,0,0,.32); overflow-wrap: anywhere; }

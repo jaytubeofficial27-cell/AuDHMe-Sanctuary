@@ -8,6 +8,15 @@ var bootScreenActive = false;
       if (!container) return;
       var toast = document.createElement('div');
       toast.textContent = message;
+      var viewer = document.getElementById('profile-gallery-viewer');
+      if (viewer && viewer.open) {
+        toast.className = 'gallery-toast';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
+        viewer.appendChild(toast);
+        window.setTimeout(function() { toast.remove(); }, 2800);
+        return;
+      }
       toast.style.pointerEvents = 'auto';
       toast.style.fontFamily = 'Atkinson Hyperlegible, sans-serif';
       container.appendChild(toast);
@@ -15,6 +24,60 @@ var bootScreenActive = false;
         toast.remove();
       }, 2800);
     }
+
+    let siteConfirmationPending=false;
+    function confirmSiteAction(title, message, acceptLabel) {
+      const dialog=document.getElementById('site-confirm-dialog');
+      if(siteConfirmationPending||dialog.open){showToast('Please finish the current confirmation first.');return Promise.resolve(false);}
+      siteConfirmationPending=true;
+      document.getElementById('site-confirm-title').textContent=title;
+      document.getElementById('site-confirm-message').textContent=message;
+      document.getElementById('site-confirm-accept').textContent=acceptLabel;
+      return new Promise(function(resolve){
+        const cancel=document.getElementById('site-confirm-cancel'),accept=document.getElementById('site-confirm-accept');
+        function finish(){dialog.removeEventListener('close',finish);siteConfirmationPending=false;resolve(dialog.returnValue==='accept');}
+        dialog.returnValue='';
+        dialog.addEventListener('close',finish);
+        cancel.onclick=function(){dialog.close('cancel');};
+        accept.onclick=function(){dialog.close('accept');};
+        dialog.onkeydown=function(event){if(event.key==='Escape'){event.preventDefault();event.stopPropagation();dialog.close('cancel');}};
+        try {dialog.showModal();cancel.focus();}
+        catch(error){dialog.removeEventListener('close',finish);siteConfirmationPending=false;console.error('Confirmation could not be opened:',error);showToast('Confirmation could not be opened. Please try again.');resolve(false);}
+      });
+    }
+
+    let validationMessageId=0;
+    document.addEventListener('invalid',function(event){
+      const field=event.target;
+      if(!field.form)return;
+      event.preventDefault();
+      let message=field._siteValidationMessage;
+      if(!message){
+        message=document.createElement('p');message.className='site-validation-message';message.id='site-validation-'+(++validationMessageId);message.setAttribute('role','alert');
+        const composer=field.closest('.gallery-comment-composer');
+        if(composer)composer.insertAdjacentElement('afterend',message);else field.insertAdjacentElement('afterend',message);
+        field._siteValidationMessage=message;
+        const describedBy=(field.getAttribute('aria-describedby')||'').trim();
+        field.setAttribute('aria-describedby',(describedBy?describedBy+' ':'')+message.id);
+      }
+      field.setAttribute('aria-invalid','true');
+      message.textContent=field.validationMessage;
+      if(field.form.querySelector(':invalid')===field)field.focus();
+    },true);
+    function clearSiteValidation(field){
+      const message=field._siteValidationMessage;
+      if(!message)return;
+      const ids=(field.getAttribute('aria-describedby')||'').split(/\s+/).filter(function(id){return id&&id!==message.id;});
+      if(ids.length)field.setAttribute('aria-describedby',ids.join(' '));else field.removeAttribute('aria-describedby');
+      field.removeAttribute('aria-invalid');message.remove();delete field._siteValidationMessage;
+    }
+    document.addEventListener('input',function(event){
+      const field=event.target;
+      if(field._siteValidationMessage&&field.validity.valid)clearSiteValidation(field);
+    });
+    document.addEventListener('reset',function(event){
+      Array.from(event.target.elements||[]).forEach(clearSiteValidation);
+    },true);
 
     function copySiteText(text, successMessage) {
       if (!text) return;
@@ -3322,7 +3385,10 @@ var bootScreenActive = false;
           addAction(shared?'Make private':'Share with members',function(){closeGalleryViewer();setInterestMediaVisibility(item.path,shared?'private':'community');});
           addAction('Archive',function(){closeGalleryViewer();setInterestMediaArchived(item.path,true);});
         }
-        addAction('Delete',function(){if(window.confirm('Permanently delete this gallery item?')){closeGalleryViewer();deletePrivateInterestMedia(item.path);}});
+        addAction('Delete',async function(){
+          const user=auth.currentUser;
+          if(await confirmSiteAction('Delete gallery item?','This item will be permanently deleted.','Delete')&&galleryViewerState===state&&auth.currentUser&&user&&auth.currentUser.uid===user.uid){closeGalleryViewer();deletePrivateInterestMedia(item.path);}
+        });
       }
     }
 
@@ -3398,7 +3464,7 @@ var bootScreenActive = false;
             function action(label,handler){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;handler();});actions.appendChild(button);}
             if(data.uid===user.uid||state.profile.uid===user.uid){
               action('Delete',async function(){
-                if(!window.confirm('Delete this comment?'))return;
+                if(!await confirmSiteAction('Delete comment?','This comment will be permanently deleted.','Delete')||!active())return;
                 try {await doc.ref.delete();if(active())await loadComments(false);}
                 catch(error){showError('Comment could not be deleted.',error);}
               });
@@ -3949,9 +4015,11 @@ var bootScreenActive = false;
       }
     }
 
-    function handleProfileUpdate(event) {
+    let profileConfirmationPending=false;
+    async function handleProfileUpdate(event) {
       event.preventDefault();
-      if (!currentUser || !auth.currentUser) return;
+      if (!currentUser || !auth.currentUser || profileConfirmationPending) return;
+      const profile=currentUser,user=auth.currentUser;
 
       const usernameInput = document.getElementById('edit-username');
       const avatarFileInput = document.getElementById('edit-avatar-file');
@@ -3982,9 +4050,13 @@ var bootScreenActive = false;
           showToast('Username is locked. You can change it again in ' + daysLeft + ' days.');
           return;
         }
-        if (!window.confirm('Are you sure? Changing your username will lock this field and prevent further changes for 30 days.')) return;
+        profileConfirmationPending=true;
+        let confirmed;
+        try {confirmed=await confirmSiteAction('Change your username?','You will not be able to change it again for 30 days.','Change username');}
+        finally {profileConfirmationPending=false;}
+        if(!confirmed||currentUser!==profile||!auth.currentUser||auth.currentUser.uid!==user.uid)return;
         currentUser.username = newUsername;
-        currentUser.lastUsernameChange = now;
+        currentUser.lastUsernameChange = Date.now();
       }
 
       currentUser.email = auth.currentUser.email || '';

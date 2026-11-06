@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=68">
+  <link rel="stylesheet" href="css/redesign.css?v=69">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1780,6 +1780,14 @@
 
   <!-- Toast Container -->
   <div id="toast-container" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none" role="status" aria-live="polite" aria-atomic="true"></div>
+  <dialog id="site-confirm-dialog" class="site-confirm-dialog" aria-labelledby="site-confirm-title" aria-describedby="site-confirm-message">
+    <h2 id="site-confirm-title"></h2>
+    <p id="site-confirm-message"></p>
+    <div class="site-confirm-actions">
+      <button type="button" id="site-confirm-cancel">Cancel</button>
+      <button type="button" id="site-confirm-accept">Confirm</button>
+    </div>
+  </dialog>
   <div id="audhme-widget-wrapper">
     <div id="audhme-widget-panel">
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -1974,6 +1982,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=49"></script>
+  <script src="js/app.js?v=50"></script>
 </body>
 </html>
