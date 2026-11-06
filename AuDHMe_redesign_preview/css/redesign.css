@@ -3939,3 +3939,11 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
   background: var(--card-surface) !important;
   background-image: none !important;
 }
+
+/* Unified card surface: remaining containers */
+#pane-toolkit .card, #pane-toolkit div.rounded-xl[class*="bg-[#252923]"]:not(input):not(select):not(textarea),
+.nh-step, .nh-step.cur, .uv-feat, .telemetry-banner, .petition-action-deck, .project-log, .project-log-promise,
+.backing-card, .hub-disclaimer-zone, .tier-container {
+  background: var(--card-surface) !important;
+  background-image: none !important;
+}
