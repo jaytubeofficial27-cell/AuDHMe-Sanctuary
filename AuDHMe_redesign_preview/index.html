@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=61">
+  <link rel="stylesheet" href="css/redesign.css?v=62">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1413,15 +1413,19 @@
         <div class="profile-identity">
           <p class="eyebrow">A little more about</p>
           <h1 id="profile-display-username" class="profile-display-name"></h1>
-          <div id="profile-header-badges" class="profile-header-badges"></div>
+          <div class="profile-header-meta">
+            <div id="profile-header-badges" class="profile-header-badges"></div>
+            <div id="owner-profile-visibility" class="profile-visibility-control hidden">
+              <label class="profile-visibility-toggle" title="Share your profile with signed-in members">
+                <input type="checkbox" id="profile-community-visible" role="switch" aria-label="Share profile with signed-in members" onchange="setProfileCommunityVisibility(this.checked)">
+                <span class="profile-visibility-track" aria-hidden="true"></span>
+                <span class="profile-visibility-private" aria-hidden="true">Private</span>
+                <span class="profile-visibility-shared" aria-hidden="true">Shared</span>
+              </label>
+            </div>
+          </div>
         </div>
       </header>
-
-      <div id="owner-profile-visibility" class="profile-visibility-control hidden">
-        <label for="profile-community-visible">Share profile with members</label>
-        <input type="checkbox" id="profile-community-visible" role="switch" onchange="setProfileCommunityVisibility(this.checked)" aria-describedby="profile-visibility-help">
-        <p id="profile-visibility-help">Shares your profile with signed-in members. Individual gallery items can still be private. Members may save shared content.</p>
-      </div>
 
       <div class="profile-content-grid">
         <div class="profile-main-column">

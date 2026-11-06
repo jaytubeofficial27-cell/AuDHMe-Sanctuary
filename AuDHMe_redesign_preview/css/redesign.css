@@ -742,7 +742,7 @@ body { background-color:var(--surface-base) !important; }
   box-shadow:0 5px 24px rgba(0,0,0,.28);
 }
 #profile-view-avatar-wrap img { width:100%; height:100%; object-fit:cover; }
-.profile-identity { min-width:0; padding-bottom:5px; }
+.profile-identity { flex:1; min-width:0; padding-bottom:5px; }
 .profile-identity .eyebrow { margin-bottom:4px; }
 #profile-display-username {
   overflow-wrap:anywhere;
@@ -759,6 +759,8 @@ body { background-color:var(--surface-base) !important; }
   border-radius:999px !important;
   font-size:.78rem !important;
 }
+.profile-header-meta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0 12px; margin-top:8px; }
+.profile-header-meta .profile-header-badges { margin-top:0; }
 .profile-content-grid {
   display:grid;
   grid-template-columns:minmax(0,1.65fr) minmax(240px,.8fr);
@@ -1133,7 +1135,7 @@ body { background-color:var(--surface-base) !important; }
   .profile-toolbar-actions { justify-content:flex-end; }
   .profile-settings-button, .profile-toolbar .calm-secondary-button { min-height:40px; padding:8px 10px; font-size:.78rem; }
   .profile-hero { align-items:center; flex-direction:column; text-align:center; }
-  .profile-identity { padding-bottom:0; }
+  .profile-identity { width:100%; padding-bottom:0; }
   .profile-header-badges { justify-content:center; }
   .profile-content-grid { padding:22px 18px; }
   .profile-sidebar { grid-template-columns:minmax(0,1fr); }
@@ -3979,39 +3981,54 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
 .profile-visibility-control {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  padding: 16px clamp(20px,4vw,48px) 0;
-  color: var(--text-primary);
 }
 .profile-visibility-control.hidden, #owner-gallery-controls.hidden, #profile-gallery-archive.hidden,
 .profile-toolbar #community-profile-back.hidden { display: none; }
-.profile-visibility-control label { font-weight: 700; font-size: .88rem; cursor: pointer; }
-.profile-visibility-control input {
-  appearance: none;
+.profile-visibility-control .profile-visibility-toggle {
   position: relative;
-  width: 44px;
-  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  color: var(--text-muted) !important;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.profile-visibility-control input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.profile-visibility-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 18px;
   border: 1px solid #87958f;
   border-radius: 999px;
   background: #39433f;
-  cursor: pointer;
 }
-.profile-visibility-control input::before {
+.profile-visibility-track::before {
   content: "";
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #f1f2ed;
 }
-.profile-visibility-control input:checked { background: #9cc7bd; border-color: #9cc7bd; }
-.profile-visibility-control input:checked::before { transform: translateX(18px); background: #14201e; }
-.profile-visibility-control input:disabled { opacity: .6; cursor: wait; }
-.profile-visibility-control p { flex-basis: 100%; margin: 0; color: var(--text-muted); font-size: .8rem; }
+.profile-visibility-control input:checked + .profile-visibility-track { background: #9cc7bd; border-color: #9cc7bd; }
+.profile-visibility-control input:checked + .profile-visibility-track::before { transform: translateX(14px); background: #14201e; }
+.profile-visibility-shared, .profile-visibility-control input:checked ~ .profile-visibility-private { display: none; }
+.profile-visibility-control input:checked ~ .profile-visibility-shared { display: inline; }
+.profile-visibility-toggle:has(input:disabled) { opacity: .6; cursor: wait; }
+.profile-visibility-control input:focus-visible + .profile-visibility-track { outline: 2px solid #cbb678; outline-offset: 3px; }
 .profile-gallery-upload { margin: 0 0 16px; }
 .profile-gallery-upload > summary, .profile-gallery-archive > summary {
   width: fit-content;
