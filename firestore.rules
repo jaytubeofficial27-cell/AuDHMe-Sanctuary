@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInAs(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function validProfile(data, userId) {
+      return data.uid == userId
+        && data.username is string && data.username.size() <= 40
+        && data.bio is string && data.bio.size() <= 150
+        && data.neurotypes is list && data.neurotypes.size() <= 15
+        && (!data.keys().hasAny(['interestMedia']) || (data.interestMedia is list && data.interestMedia.size() <= 12))
+        && (!data.keys().hasAny(['communityVisible']) || data.communityVisible is bool)
+        && data.links is list && data.links.size() <= 6
+        && (!data.keys().hasAny(['avatar']) || data.avatar == null
+          || (data.avatar is string && data.avatar.size() <= 340000));
+    }
+
+    match /users/{userId} {
+      // Owners always have access; other signed-in members can query only explicit opt-ins.
+      allow read: if signedInAs(userId);
+      allow create: if signedInAs(userId)
+        && request.resource.data.keys().hasOnly([
+          'uid', 'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible'
+        ])
+        && validProfile(request.resource.data, userId);
+      allow update: if signedInAs(userId)
+        && validProfile(request.resource.data, userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible'
+        ]);
+      allow delete: if false;
+    }
+
+    match /communityProfiles/{userId} {
+      // This projection contains only fields the member chose to share.
+      allow read: if request.auth != null && resource.data.visible == true;
+      allow create, update: if signedInAs(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.visible == true
+        && request.resource.data.profileVisible is bool
+        && request.resource.data.username is string
+        && request.resource.data.username.size() <= 40
+        && request.resource.data.interestMedia is list
+        && request.resource.data.interestMedia.size() <= 12
+        && request.resource.data.keys().hasOnly([
+          'uid', 'visible', 'profileVisible', 'username', 'avatar', 'bio',
+          'neurotypes', 'links', 'interestMedia', 'updatedAt'
+        ]);
+      allow delete: if signedInAs(userId);
+    }
+
+    match /orders/{orderId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      // Orders and payment state are written only by the verified Stripe webhook.
+      allow write: if false;
+    }
+  }
+}
