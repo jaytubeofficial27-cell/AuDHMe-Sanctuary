@@ -4221,3 +4221,38 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
 .profile-gallery-upload-link:focus-visible, .profile-media-preview:focus-visible,
 .gallery-viewer-close:focus-visible, .gallery-viewer-navigation button:focus-visible,
 .gallery-viewer-edit button:focus-visible { outline: 2px solid #cbb678; outline-offset: 3px; }
+
+.profile-media-preview, .profile-interest-media, .profile-media-preview > span:first-child:not(.profile-media-count) { aspect-ratio: 1 / 1; }
+.profile-upload-panel textarea, .profile-upload-panel select, #gallery-comment-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(183,190,150,.25);
+  border-radius: 10px;
+  color: var(--text-primary);
+  background: #111a19;
+}
+.gallery-viewer-description { margin: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gallery-viewer-description:empty { display: none; }
+.gallery-engagement { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(197,170,97,.2); }
+.gallery-engagement[hidden] { display: none; }
+.gallery-engagement-header { display: flex; align-items: center; gap: 12px; }
+.gallery-engagement button {
+  min-height: 44px;
+  padding: 7px 12px;
+  border: 1px solid rgba(156,199,189,.3);
+  border-radius: 10px;
+  background: #24332f;
+  color: #eef1ed;
+  cursor: pointer;
+}
+.gallery-engagement button:disabled { opacity: .6; cursor: wait; }
+.gallery-engagement button[aria-pressed=true] { color: #e4d5a5; border-color: rgba(197,170,97,.55); }
+.gallery-engagement h3 { margin: 14px 0 4px; font-size: 1rem; }
+#gallery-comments-status { margin: 4px 0; font-size: .85rem; }
+.gallery-comment { padding: 10px 0; border-top: 1px solid var(--line-soft); overflow-wrap: anywhere; }
+.gallery-comment strong { color: #d7c58d; font-size: .85rem; }
+.gallery-comment p { margin: 4px 0; white-space: pre-wrap; }
+.gallery-comment button { min-height: 36px; padding: 4px 9px; font-size: .78rem; }
+#gallery-comment-form { display: grid; gap: 8px; margin-top: 12px; }
+#gallery-comment-form button { justify-self: start; }

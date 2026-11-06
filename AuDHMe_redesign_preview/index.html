@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=64">
+  <link rel="stylesheet" href="css/redesign.css?v=65">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1483,11 +1483,18 @@
       <button type="button" class="calm-secondary-button" onclick="closeGalleryUpload()">&larr; Back to profile</button>
       <div class="profile-upload-panel">
         <h2 id="interest-upload-title" tabindex="-1">Add to your special-interest gallery</h2>
-        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel. New items follow your profile's sharing setting. Members may save shared content.</p>
+        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel. Shared posts are visible to signed-in members, who may save their contents.</p>
         <label for="interest-media-files">Photos or videos</label>
         <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
-        <label for="interest-media-caption">Optional caption (up to 80 characters)</label>
+        <label for="interest-media-caption">Title (optional, up to 80 characters)</label>
         <input type="text" id="interest-media-caption" maxlength="80" placeholder="e.g. My collection of model trains">
+        <label for="interest-media-description">Description (optional, up to 500 characters)</label>
+        <textarea id="interest-media-description" maxlength="500" rows="3" placeholder="Share a little about your special interest"></textarea>
+        <label for="interest-media-visibility">Who can see this post?</label>
+        <select id="interest-media-visibility">
+          <option value="community">Shared with signed-in members</option>
+          <option value="private">Private to me</option>
+        </select>
         <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
         <p id="interest-upload-status" role="status" aria-live="polite"></p>
       </div>
@@ -1507,7 +1514,23 @@
           <button type="button" id="gallery-viewer-next" onclick="moveGalleryViewer(1)" aria-label="Next item"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button>
         </div>
       </div>
+      <p id="gallery-viewer-description" class="gallery-viewer-description"></p>
       <div id="gallery-viewer-edit" class="gallery-viewer-edit hidden"></div>
+      <section id="gallery-engagement" class="gallery-engagement" aria-label="Post likes and comments" hidden>
+        <div class="gallery-engagement-header">
+          <button type="button" id="gallery-like-button" aria-pressed="false">♡ Like</button>
+          <span id="gallery-like-count" aria-live="polite"></span>
+        </div>
+        <h3>Comments</h3>
+        <p id="gallery-comments-status" role="status"></p>
+        <div id="gallery-comments-list"></div>
+        <button type="button" id="gallery-comments-more" hidden>Load more comments</button>
+        <form id="gallery-comment-form">
+          <label for="gallery-comment-input">Add a comment</label>
+          <textarea id="gallery-comment-input" maxlength="500" rows="2" required></textarea>
+          <button type="submit">Post comment</button>
+        </form>
+      </section>
     </dialog>
 
     <!-- PRIVATE ACCOUNT SETTINGS & EDIT VIEW (Owner only) -->
@@ -1520,7 +1543,7 @@
       </div>
 
       <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
-        <p class="text-xs text-slate-400">Your profile starts private. You can share your full profile with signed-in members, or share selected gallery items while keeping your bio and neurotypes private.</p>
+        <p class="text-xs text-slate-400">Choose whether to share your profile with signed-in members on your profile page. You can share selected gallery items even when your profile is private.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="text-xs text-slate-400 block mb-1">Username / Alias (30-day cooldown):</label>
@@ -1666,6 +1689,7 @@
       </div>
 
       <div class="space-y-2 flex flex-col items-center">
+        <p class="text-xs text-slate-300">New profiles are visible to signed-in members by default, including the name and picture provided by your sign-in method. You can make your profile private at any time.</p>
         <div id="google-signin-button" class="w-full flex justify-center"></div>
       </div>
 
@@ -1707,7 +1731,7 @@
       <div class="border-b border-slate-800 pb-3">
         <span class="text-[11px] font-mono text-[#cbb678] uppercase tracking-wider">STEP 2 OF 2 · SANCTUARY PROFILE</span>
         <h3 class="font-bold text-xl text-white mt-1">Set Up Your Sanctuary Identity</h3>
-        <p class="text-xs text-slate-300 mt-0.5">Choose a name and neurotypes for your private profile. You control your account details.</p>
+        <p class="text-xs text-slate-300 mt-0.5">New profiles are visible to signed-in members, including the neurotypes you choose. You can make your profile private on your profile page.</p>
       </div>
       
       <form onsubmit="handleOnboardingSubmit(event)" class="space-y-4">
@@ -1941,6 +1965,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=47"></script>
+  <script src="js/app.js?v=48"></script>
 </body>
 </html>

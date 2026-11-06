@@ -46,9 +46,43 @@ service cloud.firestore {
         && request.resource.data.interestMedia.size() <= 12
         && request.resource.data.keys().hasOnly([
           'uid', 'visible', 'profileVisible', 'username', 'avatar', 'bio',
-          'neurotypes', 'links', 'interestMedia', 'updatedAt'
+          'neurotypes', 'links', 'interestMedia', 'sharedPostIds', 'updatedAt'
         ]);
       allow delete: if signedInAs(userId);
+    }
+
+    match /galleryEngagement/{ownerId}/posts/{postId} {
+      function isSharedPost() {
+        return request.auth != null
+          && exists(/databases/$(database)/documents/communityProfiles/$(ownerId))
+          && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.keys().hasAll(['sharedPostIds'])
+          && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.sharedPostIds is map
+          && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.sharedPostIds.keys().hasAny([postId]);
+      }
+
+      match /likes/{userId} {
+        allow read: if isSharedPost() || signedInAs(ownerId);
+        allow create: if isSharedPost() && signedInAs(userId)
+          && request.resource.data.keys().hasOnly(['uid'])
+          && request.resource.data.uid == userId;
+        allow delete: if signedInAs(userId) || signedInAs(ownerId);
+        allow update: if false;
+      }
+
+      match /comments/{commentId} {
+        allow read: if isSharedPost() || signedInAs(ownerId);
+        allow create: if isSharedPost()
+          && request.resource.data.keys().hasOnly(['uid', 'authorName', 'text', 'createdAt'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.authorName is string
+          && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
+          && request.resource.data.createdAt == request.time;
+        allow delete: if request.auth != null
+          && (request.auth.uid == resource.data.uid || request.auth.uid == ownerId);
+        allow update: if false;
+      }
     }
 
     match /orders/{orderId} {

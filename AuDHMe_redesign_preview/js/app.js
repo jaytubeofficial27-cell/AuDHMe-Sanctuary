@@ -3021,25 +3021,18 @@ var bootScreenActive = false;
           neurotypes: Array.isArray(saved.neurotypes) ? saved.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
           links: Array.isArray(saved.links) ? saved.links : [],
           interestMedia: Array.isArray(saved.interestMedia) ? saved.interestMedia.slice(0, 12) : [],
-          communityVisible: saved.communityVisible === true,
+          communityVisible: !snapshot.exists || saved.communityVisible === true,
           lastUsernameChange: Number(saved.lastUsernameChange) || null,
           perkRedeemedAt: saved.perkRedeemedAt || null,
           perkReservationId: saved.perkReservationId || null
         };
         if (!snapshot.exists) {
-          return profileRef.set({
-            uid: user.uid,
-            username: currentUser.username,
-            avatar: currentUser.avatar,
-            bio: isFounderAccount ? 'Founder of AuDHMe' : '',
-            neurotypes: [],
-            links: [],
-            interestMedia: [],
-            communityVisible: false
-          }).then(function() { updateUI(); finishCheckoutReturn(); });
+          return persistUserProfile().then(function() { if(version===authStateVersion){updateUI();finishCheckoutReturn();} });
         }
-        updateUI();
-        finishCheckoutReturn();
+        return syncCommunityProfile(currentUser).catch(function(error) {
+          console.error('Community profile sync failed:',error.code||error.message);
+          showToast('Community sharing could not be refreshed. Please check your connection.');
+        }).then(function(){if(version===authStateVersion){updateUI();finishCheckoutReturn();}});
       }).catch(function(error) {
         if (version !== authStateVersion) return;
         console.error('Error loading private user profile:', error.code || error.message);
@@ -3211,6 +3204,7 @@ var bootScreenActive = false;
 
     function openGalleryUpload() {
       if(!auth.currentUser||!currentUser||auth.currentUser.uid!==currentUser.uid)return;
+      document.getElementById('interest-media-visibility').value=currentUser.communityVisible?'community':'private';
       document.getElementById('profile-public-view').classList.add('hidden');
       document.getElementById('profile-gallery-upload-view').classList.remove('hidden');
       document.getElementById('interest-upload-title').focus();
@@ -3229,6 +3223,10 @@ var bootScreenActive = false;
         const prefix = 'users/' + uid + '/' + folder + '/';
         return path.startsWith(prefix) && path.length > prefix.length && !path.slice(prefix.length).includes('/');
       });
+    }
+
+    function galleryPostId(item) {
+      return typeof item.groupId==='string' && /^[a-zA-Z0-9_-]{1,120}$/.test(item.groupId) ? 'g_'+item.groupId : 's_'+item.path.slice(item.path.lastIndexOf('/')+1);
     }
 
     function loadGalleryStorageSdk() {
@@ -3281,6 +3279,7 @@ var bootScreenActive = false;
       const dialog=document.getElementById('profile-gallery-viewer');
       galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:edit,index:0};
       renderGalleryViewer();
+      openGalleryEngagement(galleryViewerState);
       if(!dialog.open)dialog.showModal();
       dialog.querySelector('.gallery-viewer-close').focus();
     }
@@ -3293,6 +3292,7 @@ var bootScreenActive = false;
       media.replaceChildren();
       const loading=document.createElement('p');loading.textContent='Loading media…';media.appendChild(loading);
       document.getElementById('gallery-viewer-caption').textContent=String(item.name||'A special interest').slice(0,100);
+      document.getElementById('gallery-viewer-description').textContent=String(item.description||'').slice(0,500);
       document.getElementById('gallery-viewer-position').textContent=(state.index+1)+' / '+state.items.length;
       document.getElementById('gallery-viewer-navigation').hidden=state.items.length<2;
       const previous=document.getElementById('gallery-viewer-previous'),next=document.getElementById('gallery-viewer-next');
@@ -3344,6 +3344,94 @@ var bootScreenActive = false;
       galleryViewerState=null;
       if(galleryViewerUrl){URL.revokeObjectURL(galleryViewerUrl);galleryViewerUrl=null;}
       document.getElementById('gallery-viewer-media').replaceChildren();
+      document.getElementById('gallery-engagement').hidden=true;
+      document.getElementById('gallery-comment-form').reset();
+    }
+
+    function openGalleryEngagement(state) {
+      const section=document.getElementById('gallery-engagement');
+      const shared=state.items.some(function(item){return !item.archived&&(item.visibility==='community'||(state.profile.communityVisible===true&&item.visibility!=='private'));});
+      section.hidden=!shared;
+      if(!shared)return;
+      const user=auth.currentUser, postId=galleryPostId(state.items[0]);
+      const post=db.collection('galleryEngagement').doc(state.profile.uid).collection('posts').doc(postId);
+      const likes=post.collection('likes'), comments=post.collection('comments');
+      const likeButton=document.getElementById('gallery-like-button'), count=document.getElementById('gallery-like-count');
+      const list=document.getElementById('gallery-comments-list'), status=document.getElementById('gallery-comments-status');
+      const more=document.getElementById('gallery-comments-more'), form=document.getElementById('gallery-comment-form');
+      const commentButton=form.querySelector('button');
+      let liked=false, cursor=null, loading=false;
+      function active(){return galleryViewerState===state&&auth.currentUser&&auth.currentUser.uid===user.uid;}
+      function showError(message,error){console.error(message,error.code||error.message);if(active())status.textContent=message;}
+      likeButton.disabled=true;likeButton.setAttribute('aria-pressed','false');likeButton.textContent='♡ Like';
+      count.textContent='';list.replaceChildren();status.textContent='Loading comments…';more.hidden=true;form.reset();
+      async function refreshLikes(){
+        const results=await Promise.all([likes.get(),likes.doc(user.uid).get()]);
+        if(!active())return;
+        liked=results[1].exists;
+        const total=results[0].size;
+        likeButton.setAttribute('aria-pressed',String(liked));likeButton.textContent=liked?'♥ Liked':'♡ Like';
+        count.textContent=total+' '+(total===1?'like':'likes');
+        likeButton.disabled=false;
+      }
+      async function loadComments(append){
+        if(loading)return;
+        loading=true;more.disabled=true;commentButton.disabled=true;
+        try {
+          let query=comments.orderBy('createdAt','desc').limit(20);
+          if(append&&cursor)query=query.startAfter(cursor);
+          const snapshot=await query.get();
+          if(!active())return;
+          if(!append)list.replaceChildren();
+          snapshot.docs.forEach(function(doc){
+            const data=doc.data(),article=document.createElement('article');article.className='gallery-comment';
+            const name=document.createElement('strong');name.textContent=data.authorName;
+            const text=document.createElement('p');text.textContent=data.text;
+            article.append(name,text);
+            if(data.uid===user.uid||state.profile.uid===user.uid){
+              const remove=document.createElement('button');remove.type='button';remove.textContent='Delete';remove.setAttribute('aria-label','Delete comment by '+data.authorName);
+              remove.addEventListener('click',async function(){
+                if(!window.confirm('Delete this comment?'))return;
+                remove.disabled=true;
+                try {await doc.ref.delete();await loadComments(false);}
+                catch(error){showError('Comment could not be deleted.',error);remove.disabled=false;}
+              });
+              article.appendChild(remove);
+            }
+            list.appendChild(article);
+          });
+          cursor=snapshot.docs.length?snapshot.docs[snapshot.docs.length-1]:cursor;
+          more.hidden=snapshot.size<20;
+          status.textContent=list.children.length?'':'No comments yet.';
+        } catch(error){showError('Comments could not be loaded.',error);}
+        finally{loading=false;if(active()){more.disabled=false;commentButton.disabled=false;}}
+      }
+      likeButton.onclick=async function(){
+        likeButton.disabled=true;
+        try {if(liked)await likes.doc(user.uid).delete();else await likes.doc(user.uid).set({uid:user.uid});await refreshLikes();}
+        catch(error){showError('Like could not be updated.',error);if(active())likeButton.disabled=false;}
+      };
+      more.onclick=function(){loadComments(true);};
+      form.onsubmit=async function(event){
+        event.preventDefault();
+        const input=document.getElementById('gallery-comment-input'),text=input.value.trim(),button=form.querySelector('button');
+        if(!text){status.textContent='Write a comment first.';return;}
+        if(!currentUser||currentUser.uid!==user.uid){status.textContent='Sign in to comment.';return;}
+        button.disabled=true;
+        try {
+          const profileSnapshot=await db.collection('users').doc(user.uid).get();
+          if(!active())return;
+          if(!profileSnapshot.exists||typeof profileSnapshot.data().username!=='string')throw new Error('Your saved profile name is unavailable.');
+          await comments.add({uid:user.uid,authorName:profileSnapshot.data().username,text:text,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+          if(active()){input.value='';await loadComments(false);}
+        } catch(error){showError('Comment could not be posted.',error);}
+        finally{if(active())button.disabled=false;}
+      };
+      refreshLikes().catch(function(error){
+        console.error('Likes could not be loaded:',error.code||error.message);
+        if(active())count.textContent='Likes unavailable';
+      });
+      loadComments(false);
     }
 
     document.getElementById('profile-gallery-viewer').addEventListener('close',function(){
@@ -3351,7 +3439,7 @@ var bootScreenActive = false;
     });
     document.getElementById('profile-gallery-viewer').addEventListener('keydown',function(event){
       if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeGalleryViewer();}
-      else if((event.key==='ArrowLeft'||event.key==='ArrowRight')&&event.target.tagName!=='VIDEO'){
+      else if((event.key==='ArrowLeft'||event.key==='ArrowRight')&&!['VIDEO','TEXTAREA','INPUT'].includes(event.target.tagName)){
         event.preventDefault();event.stopPropagation();moveGalleryViewer(event.key==='ArrowLeft'?-1:1);
       }
     });
@@ -3416,15 +3504,20 @@ var bootScreenActive = false;
       const input = document.getElementById('interest-media-files');
       const status = document.getElementById('interest-upload-status');
       const user = auth.currentUser;
-      if (!user || !currentUser || currentUser.uid !== user.uid) { showToast('Sign in to add to your private gallery.'); return; }
+      if (!user || !currentUser || currentUser.uid !== user.uid) { showToast('Sign in to add to your gallery.'); return; }
       if (profileChangePending) { showToast('Please wait for the current profile change to finish.'); return; }
       const files = input && input.files ? Array.from(input.files) : [];
       const captionInput=document.getElementById('interest-media-caption');
       const chosenCaption=captionInput?captionInput.value.trim().slice(0,80):'';
+      const descriptionInput=document.getElementById('interest-media-description');
+      const description=descriptionInput?descriptionInput.value.trim().slice(0,500):'';
+      const visibilityInput=document.getElementById('interest-media-visibility');
+      const chosenVisibility=visibilityInput&&visibilityInput.value;
+      if(!['private','community'].includes(chosenVisibility)){showToast('Choose who can see this post.');return;}
       if (!files.length) { showToast('Choose at least one photo or video first.'); return; }
       const existing = Array.isArray(currentUser.interestMedia) ? currentUser.interestMedia.slice() : [];
       const previousItems = existing.slice();
-      if (existing.length + files.length > MAX_PRIVATE_INTEREST_ITEMS) { showToast('Your private gallery can hold up to 12 items.'); return; }
+      if (existing.length + files.length > MAX_PRIVATE_INTEREST_ITEMS) { showToast('Your gallery can hold up to 12 items.'); return; }
       const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/quicktime'];
       for (const file of files) {
         const isImage = file.type.startsWith('image/');
@@ -3448,10 +3541,10 @@ var bootScreenActive = false;
           const path='users/'+user.uid+'/gallery/'+Date.now()+'-'+Math.random().toString(36).slice(2,12)+'.'+suffix;
           const displayName=chosenCaption||(file.type.startsWith('video/')?'Video':'Photo');
           const ref = storage.ref(path);
-          const defaultVisibility=currentUser.communityVisible===true?'profile':'private';
+          const defaultVisibility=chosenVisibility;
           await storageSdk.uploadBytes(ref,file,{contentType:file.type,customMetadata:{visibility:defaultVisibility}});
           uploadedRefs.push(ref);
-          const item={path:path,type:file.type,name:displayName,visibility:defaultVisibility};
+          const item={path:path,type:file.type,name:displayName,description:description,visibility:defaultVisibility};
           if(groupId)item.groupId=groupId;
           existing.push(item);
           currentUser.interestMedia=existing.slice(0,MAX_PRIVATE_INTEREST_ITEMS);
@@ -3459,8 +3552,9 @@ var bootScreenActive = false;
         }
         input.value = '';
         if(captionInput) captionInput.value='';
+        if(descriptionInput) descriptionInput.value='';
         renderPrivateInterestGallery();
-        if (status) status.textContent = 'Your files were saved. Visibility follows your profile and item settings.';
+        if (status) status.textContent = chosenVisibility==='community'?'Your post was saved and shared with signed-in members.':'Your post was saved privately.';
         renderProfile(currentUser,true);
         showToast('Your profile gallery has been updated.');
       } catch (error) {
@@ -3482,6 +3576,22 @@ var bootScreenActive = false;
       }
     }
 
+    async function deleteGalleryEngagement(ownerId,postId) {
+      const post=db.collection('galleryEngagement').doc(ownerId).collection('posts').doc(postId);
+      for(const name of ['likes','comments']) {
+        const collection=post.collection(name);
+        let snapshot;
+        do {
+          snapshot=await collection.limit(400).get();
+          if(!snapshot.empty){
+            const batch=db.batch();
+            snapshot.docs.forEach(function(doc){batch.delete(doc.ref);});
+            await batch.commit();
+          }
+        } while(!snapshot.empty);
+      }
+    }
+
     async function deletePrivateInterestMedia(path) {
       const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!isInterestMediaPath(path,user.uid))return;
       const previous=Array.isArray(currentUser.interestMedia)?currentUser.interestMedia.slice():[],item=previous.find(function(entry){return entry.path===path;});if(!item)return;
@@ -3490,7 +3600,9 @@ var bootScreenActive = false;
       try {
         await storage.ref(path).updateMetadata({customMetadata:{visibility:'private'}});
         currentUser.interestMedia=previous.filter(function(entry){return entry.path!==path;});
-        await persistUserProfile();renderPrivateInterestGallery();
+        await persistUserProfile();
+        if(!currentUser.interestMedia.some(function(entry){return galleryPostId(entry)===galleryPostId(item);}))await deleteGalleryEngagement(user.uid,galleryPostId(item));
+        renderPrivateInterestGallery();
         await storage.ref(path).delete();
         showToast('Gallery item deleted.');
       } catch(error) {
@@ -3715,15 +3827,21 @@ var bootScreenActive = false;
       }
     }
 
-    function syncCommunityProfile(profile) {
-      const user=auth.currentUser; if(!user||!profile||profile.uid!==user.uid) return Promise.reject(new Error('Profile owner mismatch.'));
-      const ref=db.collection('communityProfiles').doc(user.uid);
+    function communityProfileProjection(profile) {
+      const user=auth.currentUser; if(!user||!profile||profile.uid!==user.uid) throw new Error('Profile owner mismatch.');
       const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(function(item){return !item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));}).slice(0,12):[];
       const profileVisible=profile.communityVisible===true;
-      if(!profileVisible&&!items.length) return ref.delete().catch(function(error){if(error.code==='not-found')return;throw error;});
-      const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;return result;}),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+      if(!profileVisible&&!items.length) return null;
+      const sharedPostIds={};
+      const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){sharedPostIds[galleryPostId(item)]=true;const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;if(typeof item.description==='string')result.description=item.description.slice(0,500);return result;}),sharedPostIds:sharedPostIds,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
       if(profileVisible){projection.avatar=profile.avatar||null;projection.bio=String(profile.bio||'').slice(0,150);projection.neurotypes=Array.isArray(profile.neurotypes)?profile.neurotypes.filter(function(type){return availableNeurotypes.includes(type);}):[];projection.links=Array.isArray(profile.links)?profile.links.slice(0,6):[];}
-      return ref.set(projection);
+      return projection;
+    }
+
+    function syncCommunityProfile(profile) {
+      const projection=communityProfileProjection(profile);
+      const ref=db.collection('communityProfiles').doc(profile.uid);
+      return projection?ref.set(projection):ref.delete();
     }
 
     function persistUserProfile() {
@@ -3743,7 +3861,12 @@ var bootScreenActive = false;
         communityVisible: currentUser.communityVisible === true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      return db.collection('users').doc(user.uid).set(profile, { merge: true }).then(function(result){directoryProfiles=null;return syncCommunityProfile(profile).then(function(){return result;});});
+      const projection=communityProfileProjection(profile);
+      const batch=db.batch();
+      batch.set(db.collection('users').doc(user.uid),profile,{merge:true});
+      const communityRef=db.collection('communityProfiles').doc(user.uid);
+      if(projection)batch.set(communityRef,projection);else batch.delete(communityRef);
+      return batch.commit().then(function(){directoryProfiles=null;});
     }
 
     async function setProfileCommunityVisibility(visible) {
@@ -4098,7 +4221,7 @@ var bootScreenActive = false;
           onboardingModal.classList.add('hidden');
         }
         updateUI();
-        showToast('Your private profile and neurotype choices have been saved.');
+        showToast('Your profile and neurotype choices have been saved.');
       }).catch(function(error) {
         console.error('Onboarding profile save failed:', error.code || error.message);
         showToast('Profile could not be saved. Please try again.');
