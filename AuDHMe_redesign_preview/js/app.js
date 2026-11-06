@@ -2955,6 +2955,17 @@ var bootScreenActive = false;
         });
     }
 
+function dismissBootSequence() {
+  const bootOverlay = document.getElementById('boot-sequence-modal') || document.querySelector('.boot-sequence') || document.getElementById('atmo-visual-overlay');
+  if (bootOverlay) {
+    bootOverlay.style.display = 'none';
+  } else {
+    // Fallback: hides any container holding the boot screen if IDs differ
+    const bootContainer = document.querySelector('[id*="boot"]') || document.querySelector('[class*="boot"]');
+    if (bootContainer) bootContainer.style.display = 'none';
+  }
+}
+
     let authStateVersion = 0;
 auth.onAuthStateChanged(function(user) {
   document.body.classList.toggle('copy-protection-enabled', !(user && user.uid === FOUNDER_AUTH_UID));
