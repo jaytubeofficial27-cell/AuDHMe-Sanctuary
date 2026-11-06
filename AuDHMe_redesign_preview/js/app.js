@@ -3359,12 +3359,15 @@ var bootScreenActive = false;
       const likeButton=document.getElementById('gallery-like-button'), count=document.getElementById('gallery-like-count');
       const list=document.getElementById('gallery-comments-list'), status=document.getElementById('gallery-comments-status');
       const more=document.getElementById('gallery-comments-more'), form=document.getElementById('gallery-comment-form');
-      const commentButton=form.querySelector('button');
-      let liked=false, cursor=null, loading=false;
+      const input=document.getElementById('gallery-comment-input'), commentButton=form.querySelector('[type="submit"]');
+      const replyContext=document.getElementById('gallery-reply-context'), replyLabel=document.getElementById('gallery-reply-label');
+      let liked=false, cursor=null, loading=false, submitting=false, replyTo=null;
       function active(){return galleryViewerState===state&&auth.currentUser&&auth.currentUser.uid===user.uid;}
       function showError(message,error){console.error(message,error.code||error.message);if(active())status.textContent=message;}
+      function clearReply(){replyTo=null;replyContext.hidden=true;replyLabel.textContent='';input.placeholder='Add a comment…';}
       likeButton.disabled=true;likeButton.setAttribute('aria-pressed','false');likeButton.textContent='♡ Like';
-      count.textContent='';list.replaceChildren();status.textContent='Loading comments…';more.hidden=true;form.reset();
+      count.textContent='';list.replaceChildren();status.textContent='Loading comments…';more.hidden=true;form.reset();clearReply();
+      document.getElementById('gallery-reply-cancel').onclick=function(){clearReply();input.focus();};
       async function refreshLikes(){
         const results=await Promise.all([likes.get(),likes.doc(user.uid).get()]);
         if(!active())return;
@@ -3384,27 +3387,68 @@ var bootScreenActive = false;
           if(!active())return;
           if(!append)list.replaceChildren();
           snapshot.docs.forEach(function(doc){
-            const data=doc.data(),article=document.createElement('article');article.className='gallery-comment';
+            const data=doc.data(),article=document.createElement('article');article.className='gallery-comment';article.dataset.commentId=doc.id;article.tabIndex=-1;
+            const header=document.createElement('div');header.className='gallery-comment-header';
             const name=document.createElement('strong');name.textContent=data.authorName;
-            const text=document.createElement('p');text.textContent=data.text;
-            article.append(name,text);
+            header.appendChild(name);
+            const menu=document.createElement('details');menu.className='gallery-comment-menu';
+            const trigger=document.createElement('summary');trigger.textContent='⋯';trigger.setAttribute('aria-label','Comment options for '+data.authorName);
+            menu.appendChild(trigger);
+            const actions=document.createElement('div');actions.className='gallery-comment-actions';
+            function action(label,handler){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;handler();});actions.appendChild(button);}
             if(data.uid===user.uid||state.profile.uid===user.uid){
-              const remove=document.createElement('button');remove.type='button';remove.textContent='Delete';remove.setAttribute('aria-label','Delete comment by '+data.authorName);
-              remove.addEventListener('click',async function(){
+              action('Delete',async function(){
                 if(!window.confirm('Delete this comment?'))return;
-                remove.disabled=true;
-                try {await doc.ref.delete();await loadComments(false);}
-                catch(error){showError('Comment could not be deleted.',error);remove.disabled=false;}
+                try {await doc.ref.delete();if(active())await loadComments(false);}
+                catch(error){showError('Comment could not be deleted.',error);}
               });
-              article.appendChild(remove);
             }
+            if(data.uid===user.uid){
+              action('Edit',function(){
+                const edit=document.createElement('form');edit.className='gallery-comment-edit';
+                const field=document.createElement('input');field.type='text';field.maxLength=500;field.required=true;field.value=data.text;field.setAttribute('aria-label','Edit comment');
+                const save=document.createElement('button');save.type='submit';save.textContent='Save';
+                const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';
+                cancel.addEventListener('click',function(){edit.replaceWith(text);});
+                edit.addEventListener('submit',async function(event){
+                  event.preventDefault();const value=field.value.trim();
+                  if(!value){status.textContent='Write a comment first.';return;}
+                  save.disabled=true;cancel.disabled=true;
+                  try {await doc.ref.update({text:value});if(active())await loadComments(false);}
+                  catch(error){showError('Comment could not be edited.',error);save.disabled=false;cancel.disabled=false;}
+                });
+                edit.append(field,save,cancel);text.replaceWith(edit);field.focus();
+              });
+            }
+            action('Copy',async function(){
+              try {
+                if(!navigator.clipboard||!navigator.clipboard.writeText)throw new Error('Clipboard access is unavailable.');
+                await navigator.clipboard.writeText(data.text);
+                if(active())status.textContent='Comment copied.';
+              } catch(error){showError('Comment could not be copied.',error);}
+            });
+            menu.appendChild(actions);header.appendChild(menu);article.appendChild(header);
+            if(typeof data.replyTo==='string'&&typeof data.replyToName==='string'){
+              const context=document.createElement('button');context.type='button';context.className='gallery-comment-reply-to';context.textContent='↳ Reply to '+data.replyToName;
+              context.addEventListener('click',function(){
+                const original=Array.from(list.children).find(function(element){return element.dataset.commentId===data.replyTo;});
+                if(original){original.scrollIntoView({block:'nearest'});original.focus();}
+                else status.textContent='The original comment is not loaded or has been deleted.';
+              });
+              article.appendChild(context);
+            }
+            const text=document.createElement('p');text.textContent=data.text;
+            article.appendChild(text);
+            const reply=document.createElement('button');reply.type='button';reply.className='gallery-comment-reply';reply.textContent='Reply';reply.setAttribute('aria-label','Reply to '+data.authorName);
+            reply.addEventListener('click',function(){replyTo={id:doc.id,name:data.authorName};replyLabel.textContent='Replying to '+data.authorName;replyContext.hidden=false;input.placeholder='Write a reply…';input.focus();});
+            article.appendChild(reply);
             list.appendChild(article);
           });
           cursor=snapshot.docs.length?snapshot.docs[snapshot.docs.length-1]:cursor;
           more.hidden=snapshot.size<20;
           status.textContent=list.children.length?'':'No comments yet.';
         } catch(error){showError('Comments could not be loaded.',error);}
-        finally{loading=false;if(active()){more.disabled=false;commentButton.disabled=false;}}
+        finally{loading=false;if(active()){more.disabled=false;commentButton.disabled=submitting;}}
       }
       likeButton.onclick=async function(){
         likeButton.disabled=true;
@@ -3414,18 +3458,21 @@ var bootScreenActive = false;
       more.onclick=function(){loadComments(true);};
       form.onsubmit=async function(event){
         event.preventDefault();
-        const input=document.getElementById('gallery-comment-input'),text=input.value.trim(),button=form.querySelector('button');
+        const text=input.value.trim(),target=replyTo;
+        if(submitting||loading)return;
         if(!text){status.textContent='Write a comment first.';return;}
         if(!currentUser||currentUser.uid!==user.uid){status.textContent='Sign in to comment.';return;}
-        button.disabled=true;
+        submitting=true;commentButton.disabled=true;
         try {
           const profileSnapshot=await db.collection('users').doc(user.uid).get();
           if(!active())return;
           if(!profileSnapshot.exists||typeof profileSnapshot.data().username!=='string')throw new Error('Your saved profile name is unavailable.');
-          await comments.add({uid:user.uid,authorName:profileSnapshot.data().username,text:text,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-          if(active()){input.value='';await loadComments(false);}
-        } catch(error){showError('Comment could not be posted.',error);}
-        finally{if(active())button.disabled=false;}
+          const comment={uid:user.uid,authorName:profileSnapshot.data().username,text:text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+          if(target){comment.replyTo=target.id;comment.replyToName=target.name;}
+          await comments.add(comment);
+          if(active()){input.value='';clearReply();await loadComments(false);}
+        } catch(error){showError(target?'Reply could not be posted. The comment may have been removed.':'Comment could not be posted.',error);}
+        finally{submitting=false;if(active())commentButton.disabled=loading;}
       };
       refreshLikes().catch(function(error){
         console.error('Likes could not be loaded:',error.code||error.message);
@@ -3438,7 +3485,11 @@ var bootScreenActive = false;
       if(!this.open)resetGalleryViewer();
     });
     document.getElementById('profile-gallery-viewer').addEventListener('keydown',function(event){
-      if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeGalleryViewer();}
+      if(event.key==='Escape'){
+        const menu=event.target.closest('.gallery-comment-menu[open]');
+        if(menu){event.preventDefault();event.stopPropagation();menu.open=false;menu.querySelector('summary').focus();return;}
+        event.preventDefault();event.stopPropagation();closeGalleryViewer();
+      }
       else if((event.key==='ArrowLeft'||event.key==='ArrowRight')&&!['VIDEO','TEXTAREA','INPUT'].includes(event.target.tagName)){
         event.preventDefault();event.stopPropagation();moveGalleryViewer(event.key==='ArrowLeft'?-1:1);
       }
@@ -3459,6 +3510,7 @@ var bootScreenActive = false;
 
     document.addEventListener('click',function(event){
       document.querySelectorAll('.profile-media-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
+      document.querySelectorAll('.gallery-comment-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
     });
     document.addEventListener('keydown',function(event){
       if(event.key!=='Escape')return;

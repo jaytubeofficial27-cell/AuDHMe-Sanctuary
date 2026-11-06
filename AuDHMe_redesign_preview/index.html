@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css">
-  <link rel="stylesheet" href="css/redesign.css?v=65">
+  <link rel="stylesheet" href="css/redesign.css?v=66">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1505,32 +1505,39 @@
         <div><p class="gallery-viewer-eyebrow">A space for what you love</p><h2 id="gallery-viewer-title">Special interests</h2></div>
         <button type="button" class="gallery-viewer-close" onclick="closeGalleryViewer()" aria-label="Close viewer">&times;</button>
       </div>
-      <div id="gallery-viewer-media" class="gallery-viewer-media"></div>
-      <div class="gallery-viewer-footer">
-        <p id="gallery-viewer-caption"></p>
-        <div id="gallery-viewer-navigation" class="gallery-viewer-navigation" aria-label="Carousel navigation">
-          <button type="button" id="gallery-viewer-previous" onclick="moveGalleryViewer(-1)" aria-label="Previous item"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></button>
-          <span id="gallery-viewer-position" aria-live="polite"></span>
-          <button type="button" id="gallery-viewer-next" onclick="moveGalleryViewer(1)" aria-label="Next item"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button>
+      <div class="gallery-viewer-layout">
+        <div class="gallery-viewer-post">
+          <div id="gallery-viewer-media" class="gallery-viewer-media"></div>
+          <div class="gallery-viewer-footer">
+            <p id="gallery-viewer-caption"></p>
+            <div id="gallery-viewer-navigation" class="gallery-viewer-navigation" aria-label="Carousel navigation">
+              <button type="button" id="gallery-viewer-previous" onclick="moveGalleryViewer(-1)" aria-label="Previous item"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></button>
+              <span id="gallery-viewer-position" aria-live="polite"></span>
+              <button type="button" id="gallery-viewer-next" onclick="moveGalleryViewer(1)" aria-label="Next item"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button>
+            </div>
+          </div>
+          <p id="gallery-viewer-description" class="gallery-viewer-description"></p>
+          <div id="gallery-viewer-edit" class="gallery-viewer-edit hidden"></div>
         </div>
+        <section id="gallery-engagement" class="gallery-engagement" aria-label="Post likes and comments" hidden>
+          <div class="gallery-engagement-header">
+            <button type="button" id="gallery-like-button" aria-pressed="false">♡ Like</button>
+            <span id="gallery-like-count" aria-live="polite"></span>
+          </div>
+          <h3>Comments</h3>
+          <p id="gallery-comments-status" role="status"></p>
+          <div id="gallery-comments-list"></div>
+          <button type="button" id="gallery-comments-more" hidden>Load more comments</button>
+          <form id="gallery-comment-form">
+            <div id="gallery-reply-context" class="gallery-reply-context" hidden><span id="gallery-reply-label"></span><button type="button" id="gallery-reply-cancel" aria-label="Cancel reply">×</button></div>
+            <div class="gallery-comment-composer">
+              <label class="gallery-visually-hidden" for="gallery-comment-input">Add a comment</label>
+              <input type="text" id="gallery-comment-input" maxlength="500" placeholder="Add a comment…" required>
+              <button type="submit" aria-label="Post comment"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button>
+            </div>
+          </form>
+        </section>
       </div>
-      <p id="gallery-viewer-description" class="gallery-viewer-description"></p>
-      <div id="gallery-viewer-edit" class="gallery-viewer-edit hidden"></div>
-      <section id="gallery-engagement" class="gallery-engagement" aria-label="Post likes and comments" hidden>
-        <div class="gallery-engagement-header">
-          <button type="button" id="gallery-like-button" aria-pressed="false">♡ Like</button>
-          <span id="gallery-like-count" aria-live="polite"></span>
-        </div>
-        <h3>Comments</h3>
-        <p id="gallery-comments-status" role="status"></p>
-        <div id="gallery-comments-list"></div>
-        <button type="button" id="gallery-comments-more" hidden>Load more comments</button>
-        <form id="gallery-comment-form">
-          <label for="gallery-comment-input">Add a comment</label>
-          <textarea id="gallery-comment-input" maxlength="500" rows="2" required></textarea>
-          <button type="submit">Post comment</button>
-        </form>
-      </section>
     </dialog>
 
     <!-- PRIVATE ACCOUNT SETTINGS & EDIT VIEW (Owner only) -->
@@ -1965,6 +1972,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=48"></script>
+  <script src="js/app.js?v=49"></script>
 </body>
 </html>
