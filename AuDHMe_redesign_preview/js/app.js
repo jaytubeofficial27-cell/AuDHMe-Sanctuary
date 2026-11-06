@@ -2956,15 +2956,29 @@ var bootScreenActive = false;
     }
 
     let authStateVersion = 0;
-    auth.onAuthStateChanged(function(user) {
-      document.body.classList.toggle('copy-protection-enabled', !(user && user.uid === FOUNDER_AUTH_UID));
-      const version = ++authStateVersion;
-      if (!user) {
-        currentUser = null;
-        updateUI();
-        finishCheckoutReturn();
-        return;
-      }
+auth.onAuthStateChanged(function(user) {
+  document.body.classList.toggle('copy-protection-enabled', !(user && user.uid === FOUNDER_AUTH_UID));
+  const version = ++authStateVersion;
+  if (!user) {
+    currentUser = null;
+    updateUI();
+    finishCheckoutReturn();
+    return;
+  }
+
+  // Populate currentUser instantly from Auth data so UI doesn't flash logged-out state
+  currentUser = {
+    uid: user.uid,
+    email: user.email || '',
+    username: user.displayName || (user.email || '').split('@')[0],
+    avatar: user.photoURL || null,
+    bio: '', neurotypes: [], links: [], interestMedia: [], communityVisible: false, perkRedeemedAt: null
+  };
+  updateUI();
+
+  const profileRef = db.collection('users').doc(user.uid);
+  userProfileReady = profileRef.get().then(function(snapshot) {
+    if (version !== authStateVersion || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
 
       currentUser = null;
       updateUI();
