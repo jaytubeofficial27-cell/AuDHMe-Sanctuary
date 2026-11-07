@@ -1004,7 +1004,7 @@ var bootScreenActive = false;
 
       if (mode === 'conditions') {
         codesView.style.display = 'none';
-        codesControls.style.display = 'none';
+        codesControls.hidden = true;
         condView.style.display = 'block';
         embed41.classList.remove('active-embed');
         embed07.classList.remove('active-embed');
@@ -1013,7 +1013,7 @@ var bootScreenActive = false;
         renderConditionGuide();
       } else {
         codesView.style.display = 'block';
-        codesControls.style.display = 'flex';
+        codesControls.hidden = false;
         condView.style.display = 'none';
         embed41.classList.add('active-embed');
         embed07.classList.add('active-embed');

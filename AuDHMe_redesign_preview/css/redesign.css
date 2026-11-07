@@ -2568,18 +2568,22 @@ body.copy-protection-enabled canvas {
 #embed09 .neuroverse-header-container .system-gold-divider { display: none !important; }
 #embed09 .neuroverse-main-heading { margin: 8px 0 12px !important; }
 #embed09 .neuroverse-header-container > p { margin-bottom: 16px !important; }
+#embed09 :is(#neuropedia-codes-controls, #neuropedia-conditions-controls) {
+  margin: 0 0 30px !important;
+  padding: 20px 16px !important;
+  border: 1px solid rgba(212,175,55,.32) !important;
+  border-bottom: 3px solid var(--brass) !important;
+  border-radius: 12px !important;
+  background: var(--card-surface) !important;
+}
 #embed09 #neuropedia-codes-controls {
   display: grid !important;
   grid-template-columns: minmax(260px, .9fr) minmax(0, 1.1fr);
   align-items: center;
   gap: 14px 20px !important;
-  margin: 0 0 30px !important;
-  padding: 16px !important;
-  border: 1px solid rgba(173,196,185,.18) !important;
-  border-radius: 16px !important;
-  background: rgba(25,33,31,.68) !important;
 }
-#embed09 #nc-search-input {
+#embed09 #neuropedia-codes-controls[hidden] { display: none !important; }
+#embed09 :is(#nc-search-input, #cond-search-input) {
   display: block;
   width: 100%;
   min-width: 0;
@@ -2598,7 +2602,7 @@ body.copy-protection-enabled canvas {
   min-height: 44px;
   padding: 10px 15px !important;
   border-radius: 11px !important;
-  white-space: nowrap;
+  white-space: normal;
   font-size: .72rem !important;
   line-height: 1.2;
 }
@@ -2622,6 +2626,8 @@ body.copy-protection-enabled canvas {
   #embed09 #neuropedia-codes-controls {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px !important;
+  }
+  #embed09 :is(#neuropedia-codes-controls, #neuropedia-conditions-controls) {
     padding: 13px !important;
   }
   #embed09 #neuropedia-codes-controls > div:not(.code-topic-filters) { justify-content: flex-start; }
@@ -2857,6 +2863,13 @@ body[data-time-of-day]:not(.theme-warm-slate):not(.site-adapt-calm) .cond-compac
 body[data-time-of-day]:not(.theme-warm-slate):not(.site-adapt-calm) .flip-card-front {
   background: var(--surface-card) !important;
   border-color: var(--field-line) !important;
+}
+body[data-time-of-day]:not(.theme-warm-slate):not(.site-adapt-calm) #embed09 :is(#neuropedia-codes-controls, #neuropedia-conditions-controls) {
+  background: var(--surface-card) !important;
+  border-color: var(--field-line) !important;
+}
+body.site-adapt-calm #embed09 :is(#neuropedia-codes-controls, #neuropedia-conditions-controls) {
+  background: var(--surface-card) !important;
 }
 
 body[data-time-of-day]:not(.theme-warm-slate):not(.site-adapt-calm) .flip-card-back {

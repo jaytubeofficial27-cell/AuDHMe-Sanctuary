@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css?v=3">
-  <link rel="stylesheet" href="css/redesign.css?v=71">
+  <link rel="stylesheet" href="css/redesign.css?v=73">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -616,7 +616,7 @@
             01 · Neuro-Code™ Encyclopedia
           </button>
           <button id="tab-btn-conditions" onclick="switchNeuropediaMode('conditions')" class="px-5 py-2.5 rounded-lg font-mono text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-white transition">
-            02 · 24 Condition &amp; Symptom Cards (Tap to Open)
+            02 · 24 Condition &amp; Symptom Cards
           </button>
         </div>
         <div class="system-gold-divider"></div>
@@ -717,8 +717,8 @@
 
       <!-- NEUROPEDIA SUB-VIEW B: 24 COMPACT CONDITION CARDS -->
       <div id="neuropedia-conditions-view" style="display: none;">
-        <div class="bg-[#292c25] border border-slate-700 rounded-xl p-5 mb-6">
-          <div class="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center mb-3">
+        <div id="neuropedia-conditions-controls" class="bg-[#292c25] border border-slate-700 rounded-xl p-5 mb-6">
+          <div class="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
             <input 
               type="text" 
               id="cond-search-input" 
@@ -734,9 +734,6 @@
               <button onclick="setCondCategory('Sensory')" data-cat="Sensory" class="cond-pill px-3 py-1.5 rounded-lg font-mono text-xs font-bold bg-[#252923] text-slate-300 border border-slate-700">SENSORY &amp; NERVOUS SYSTEM</button>
             </div>
           </div>
-          <p class="text-xs font-mono text-[#cbb678] m-0">
-            COMPACT DECK VIEW · Tap any small condition card below to open its full breakdown, symptoms, and linked Neuro-Codes.
-          </p>
         </div>
 
         <div id="condition-cards-mount" class="cards-grid mb-8"></div>
@@ -1998,6 +1995,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=58"></script>
+  <script src="js/app.js?v=59"></script>
 </body>
 </html>
