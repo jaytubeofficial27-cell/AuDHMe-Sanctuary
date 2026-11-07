@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css?v=3">
-  <link rel="stylesheet" href="css/redesign.css?v=75">
+  <link rel="stylesheet" href="css/redesign.css?v=76">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1420,13 +1420,6 @@
           <h1 id="profile-display-username" class="profile-display-name"></h1>
           <div class="profile-header-meta">
             <div id="profile-header-badges" class="profile-header-badges"></div>
-            <div id="profile-live-status" class="profile-live-status"></div>
-            <details id="owner-status-editor" class="profile-status-editor hidden">
-              <summary>Set live Neuro-Code status</summary>
-              <p>These codes stay until you change them. They are visible to signed-in members only while your profile is shared.</p>
-              <div id="profile-status-options" class="profile-status-options"></div>
-              <button type="button" class="calm-primary-button" onclick="saveProfileStatuses()">Save status</button>
-            </details>
             <div id="owner-profile-visibility" class="profile-visibility-control hidden">
               <label class="profile-visibility-toggle" title="Share your profile with signed-in members">
                 <input type="checkbox" id="profile-community-visible" role="switch" aria-label="Share profile with signed-in members" onchange="setProfileCommunityVisibility(this.checked)">
@@ -1441,6 +1434,13 @@
 
       <div class="profile-content-grid">
         <div class="profile-main-column">
+          <section id="profile-status-section" class="profile-status-section" aria-labelledby="profile-status-title" hidden>
+            <div class="profile-status-heading">
+              <div><p class="eyebrow">Right now</p><h2 id="profile-status-title">Neuro-Code status</h2></div>
+              <button type="button" id="owner-status-editor" class="profile-status-trigger hidden" onclick="openProfileStatusEditor()">Edit status</button>
+            </div>
+            <div id="profile-live-status" class="profile-live-status"></div>
+          </section>
           <section id="profile-bio-section" class="profile-section profile-bio-section" aria-labelledby="profile-bio-title">
             <div class="profile-section-heading">
               <p class="eyebrow">Introduction</p>
@@ -1491,6 +1491,27 @@
         </aside>
       </div>
     </article>
+
+    <dialog id="profile-status-dialog" class="profile-status-dialog" aria-labelledby="profile-status-dialog-title" aria-describedby="profile-status-help">
+      <div class="profile-status-dialog-header">
+        <div><p class="eyebrow">Your profile</p><h2 id="profile-status-dialog-title">Choose your Neuro-Codes</h2></div>
+        <button type="button" class="profile-status-close" onclick="closeProfileStatusEditor()" aria-label="Close status editor">&times;</button>
+      </div>
+      <p id="profile-status-help">Choose the codes that feel useful. They stay until you change them and are visible to signed-in members only while your profile is shared.</p>
+      <label class="profile-status-search-label" for="profile-status-search">Search by code or name</label>
+      <input id="profile-status-search" type="search" placeholder="e.g. NC-10 or sensory" oninput="filterProfileStatusOptions()">
+      <div class="profile-status-selection-bar">
+        <span id="profile-status-selection-count" aria-live="polite"></span>
+        <button type="button" id="profile-status-clear" onclick="clearProfileStatusSelection()">Clear selection</button>
+      </div>
+      <div id="profile-status-options" class="profile-status-options"></div>
+      <p id="profile-status-empty" class="profile-status-empty" hidden>No matching codes. Try a different search.</p>
+      <p id="profile-status-error" class="profile-status-error" role="alert"></p>
+      <div class="profile-status-dialog-actions">
+        <button type="button" class="profile-status-cancel" onclick="closeProfileStatusEditor()">Cancel</button>
+        <button type="button" id="profile-status-save" class="calm-primary-button" onclick="saveProfileStatuses()">Save status</button>
+      </div>
+    </dialog>
 
     <section id="profile-gallery-upload-view" class="profile-gallery-upload-view hidden" aria-labelledby="interest-upload-title">
       <button type="button" class="calm-secondary-button" onclick="closeGalleryUpload()">&larr; Back to profile</button>
@@ -2003,6 +2024,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=61"></script>
+  <script src="js/app.js?v=62"></script>
 </body>
 </html>

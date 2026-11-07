@@ -402,6 +402,7 @@ var bootScreenActive = false;
     function switchPage(pageKey, updateHistory) {
       playTactileClick(310, 0.04);
       closeGalleryViewer();
+      closeProfileStatusForNavigation();
       routeVersion++;
       hideRouteLoading();
 
@@ -3156,6 +3157,7 @@ var bootScreenActive = false;
     let authStateVersion = 0;
     auth.onAuthStateChanged(function(user) {
       closeGalleryViewer();
+      closeProfileStatusForNavigation();
       directoryProfiles = null;
       directoryLoadError = null;
       directoryRenderVersion++;
@@ -3302,6 +3304,7 @@ var bootScreenActive = false;
 
     function switchView(viewName, updateHistory) {
       closeGalleryViewer();
+      closeProfileStatusForNavigation();
       if (viewName === 'profile' && (!currentUser || !auth.currentUser || currentUser.uid !== auth.currentUser.uid)) {
         openAuthModal('signup');
         return;
@@ -3341,6 +3344,7 @@ var bootScreenActive = false;
     function renderProfile(profile,isOwner) {
       profile=profile||currentUser; isOwner=isOwner!==false; if(!profile)return;
       closeGalleryViewer();
+      const statusDialog=document.getElementById('profile-status-dialog');if(statusDialog.open)statusDialog.close();
       const usernameEl=document.getElementById('profile-display-username'); if(usernameEl) usernameEl.textContent=profile.username||'Sanctuary member';
       const avatarWrap=document.getElementById('profile-view-avatar-wrap');
       if(avatarWrap) { const avatarUrl=safeProfileAvatarUrl(profile.avatar); if(avatarUrl) { const image=document.createElement('img'); image.src=avatarUrl; image.alt='Profile picture'; image.className='w-full h-full object-cover'; avatarWrap.replaceChildren(image); } else { const fallback=document.createElement('span'); fallback.className='text-3xl font-bold text-[#cbb678]'; fallback.textContent=(profile.username||'A').charAt(0).toUpperCase(); avatarWrap.replaceChildren(fallback); } }
@@ -3370,7 +3374,8 @@ var bootScreenActive = false;
     function profileStatusCatalog() {
       return Array.from(document.querySelectorAll('.flip-card')).map(function(card) {
         const code=card.querySelector('.card-code-mini'), title=card.querySelector('.card-title-mini');
-        return code ? {code:code.textContent.trim(),title:title ? title.textContent.trim() : 'Neuro-Code'} : null;
+        const series=card.closest('.series-block-container'),heading=series&&series.querySelector('.series-node-title');
+        return code ? {code:code.textContent.trim(),title:title ? title.textContent.trim() : 'Neuro-Code',category:heading ? heading.textContent.trim() : 'Other codes'} : null;
       }).filter(Boolean);
     }
 
@@ -3381,32 +3386,96 @@ var bootScreenActive = false;
 
     function renderProfileStatuses(profile,isOwner) {
       const selected=validProfileStatuses(profile.liveStatuses), catalog=profileStatusCatalog();
-      const display=document.getElementById('profile-live-status'), editor=document.getElementById('owner-status-editor'), options=document.getElementById('profile-status-options');
-      display.replaceChildren();
-      selected.forEach(function(code){const item=catalog.find(function(entry){return entry.code===code;});const badge=document.createElement('span');badge.className='profile-status-badge';badge.textContent=code+' · '+item.title;display.appendChild(badge);});
+      const display=document.getElementById('profile-live-status'), editor=document.getElementById('owner-status-editor'),section=document.getElementById('profile-status-section');
+      section.hidden=!isOwner&&!selected.length;
       editor.classList.toggle('hidden',!isOwner);
-      editor.open=false;
+      display.replaceChildren();
+      if(!selected.length&&isOwner){const empty=document.createElement('p');empty.className='profile-status-placeholder';empty.textContent='No codes selected yet.';display.appendChild(empty);return;}
+      function addBadge(code,target){const item=catalog.find(function(entry){return entry.code===code;});const badge=document.createElement('span');badge.className='profile-status-badge';badge.textContent=code+' · '+item.title;target.appendChild(badge);}
+      selected.slice(0,3).forEach(function(code){addBadge(code,display);});
+      if(selected.length>3){
+        const more=document.createElement('details');more.className='profile-status-more';
+        const summary=document.createElement('summary');summary.textContent='Show '+(selected.length-3)+' more';more.appendChild(summary);
+        const extra=document.createElement('div');extra.className='profile-status-extra';selected.slice(3).forEach(function(code){addBadge(code,extra);});more.appendChild(extra);display.appendChild(more);
+      }
+    }
+
+    function openProfileStatusEditor() {
+      if(!auth.currentUser||!currentUser||auth.currentUser.uid!==currentUser.uid){showToast('Sign in to edit your status.');return;}
+      if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      const dialog=document.getElementById('profile-status-dialog'),options=document.getElementById('profile-status-options');
+      if(dialog.open)return;
+      const selected=new Set(validProfileStatuses(currentUser.liveStatuses)),groups=new Map();
       options.replaceChildren();
-      if(isOwner)catalog.forEach(function(item){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.value=item.code;input.checked=selected.includes(item.code);label.append(input,document.createTextNode(' '+item.code+' · '+item.title));options.appendChild(label);});
+      profileStatusCatalog().forEach(function(item){
+        if(!groups.has(item.category)){const group=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent=item.category;group.appendChild(legend);groups.set(item.category,group);options.appendChild(group);}
+        const label=document.createElement('label'),input=document.createElement('input'),text=document.createElement('span'),code=document.createElement('strong');
+        label.className='profile-status-option';label.dataset.search=(item.code+' '+item.title+' '+item.category).toLowerCase();
+        input.type='checkbox';input.value=item.code;input.checked=selected.has(item.code);input.addEventListener('change',updateProfileStatusSelectionCount);
+        code.textContent=item.code;text.append(code,document.createTextNode(' '+item.title));label.append(input,text);groups.get(item.category).appendChild(label);
+      });
+      document.getElementById('profile-status-search').value='';
+      document.getElementById('profile-status-error').textContent='';
+      filterProfileStatusOptions();updateProfileStatusSelectionCount();
+      try {dialog.showModal();document.getElementById('profile-status-search').focus();}
+      catch(error){console.error('Status editor could not be opened:',error);showToast('The status editor could not be opened. Please try again.');}
+    }
+
+    function filterProfileStatusOptions() {
+      const query=document.getElementById('profile-status-search').value.trim().toLowerCase();
+      let total=0;
+      document.querySelectorAll('#profile-status-options fieldset').forEach(function(group){
+        let visible=0;group.querySelectorAll('.profile-status-option').forEach(function(option){const matches=option.dataset.search.includes(query);option.hidden=!matches;if(matches)visible++;});
+        group.hidden=visible===0;total+=visible;
+      });
+      document.getElementById('profile-status-empty').hidden=total>0;
+    }
+
+    function updateProfileStatusSelectionCount() {
+      const count=document.querySelectorAll('#profile-status-options input:checked').length;
+      document.getElementById('profile-status-selection-count').textContent=count+' '+(count===1?'code selected':'codes selected');
+      document.getElementById('profile-status-clear').disabled=count===0;
+    }
+
+    function clearProfileStatusSelection() {
+      document.querySelectorAll('#profile-status-options input:checked').forEach(function(input){input.checked=false;});
+      updateProfileStatusSelectionCount();
+    }
+
+    function closeProfileStatusEditor() {
+      if(profileChangePending){document.getElementById('profile-status-error').textContent='Please wait for your status to finish saving.';return;}
+      closeProfileStatusForNavigation();
+    }
+
+    function closeProfileStatusForNavigation() {
+      const dialog=document.getElementById('profile-status-dialog');if(dialog&&dialog.open)dialog.close();
     }
 
     async function saveProfileStatuses() {
       const user=auth.currentUser, profile=currentUser;
-      if(!user||!profile||profile.uid!==user.uid||profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      const errorMessage=document.getElementById('profile-status-error');
+      if(!user||!profile||profile.uid!==user.uid){errorMessage.textContent='Sign in to save your status.';return;}
+      if(profileChangePending){errorMessage.textContent='Please wait for the current profile change to finish.';return;}
       const previous=profile.liveStatuses;
       profile.liveStatuses=validProfileStatuses(Array.from(document.querySelectorAll('#profile-status-options input:checked')).map(function(input){return input.value;}));
       profileChangePending=true;
-      const button=document.querySelector('#owner-status-editor button');
-      button.disabled=true;
+      const dialog=document.getElementById('profile-status-dialog'),button=document.getElementById('profile-status-save');
+      const inputs=Array.from(document.querySelectorAll('#profile-status-options input'));
+      const search=document.getElementById('profile-status-search'),clear=document.getElementById('profile-status-clear');
+      button.disabled=true;search.disabled=true;clear.disabled=true;inputs.forEach(function(input){input.disabled=true;});errorMessage.textContent='';
       try {
         await persistUserProfile();
-        if(currentUser===profile){renderProfileStatuses(profile,true);showToast('Live status saved.');}
+        if(currentUser===profile&&auth.currentUser&&auth.currentUser.uid===user.uid){renderProfileStatuses(profile,true);if(dialog.open)dialog.close();showToast('Live status saved.');}
       } catch(error) {
         console.error('Live status save failed:',error.code||error.message);
-        if(currentUser===profile){profile.liveStatuses=previous;renderProfileStatuses(profile,true);showToast('Live status could not be saved. Please try again.');}
-      } finally {profileChangePending=false;button.disabled=false;}
+        profile.liveStatuses=previous;
+        if(currentUser===profile&&dialog.open)errorMessage.textContent='Status could not be saved. Please try again.';
+      } finally {profileChangePending=false;button.disabled=false;search.disabled=false;inputs.forEach(function(input){input.disabled=false;});updateProfileStatusSelectionCount();}
     }
 
+    document.getElementById('profile-status-dialog').addEventListener('cancel',function(event){
+      if(profileChangePending){event.preventDefault();document.getElementById('profile-status-error').textContent='Please wait for your status to finish saving.';}
+    });
     const MAX_PRIVATE_INTEREST_ITEMS = 12;
     const MAX_INTEREST_IMAGE_BYTES = 12 * 1024 * 1024;
     const MAX_INTEREST_VIDEO_BYTES = 30 * 1024 * 1024;
