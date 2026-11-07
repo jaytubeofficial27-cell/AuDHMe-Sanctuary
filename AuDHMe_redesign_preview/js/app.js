@@ -967,7 +967,6 @@ var bootScreenActive = false;
           return;
         }
         closeCrisisHud();
-        closeConditionModal();
         return;
       }
       var modal = document.getElementById('site-adaptation-modal');
@@ -1681,8 +1680,8 @@ var bootScreenActive = false;
       content.innerHTML =
         '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">' +
           '<span class="organic-badge">' + c.code + ' · ' + c.category.toUpperCase() + ' PROFILE</span>' +
-          '<button onclick="closeConditionModal()" class="px-3.5 py-1.5 rounded-lg bg-[#252923] border border-slate-700 text-slate-300 hover:text-white hover:border-[#cbb678] font-mono text-xs font-extrabold transition">' +
-            '✕ CLOSE PROFILE [ESC]' +
+          '<button type="button" aria-label="Close profile" title="Close profile" onclick="closeConditionModal()" class="w-10 h-10 rounded-lg bg-[#252923] border border-slate-700 text-slate-300 hover:text-white hover:border-[#cbb678] text-lg font-bold transition">' +
+            '<span aria-hidden="true">✕</span>' +
           '</button>' +
         '</div>' +
         '<h2 class="text-2xl sm:text-3xl font-black text-white mb-2">' + c.name + '</h2>' +
