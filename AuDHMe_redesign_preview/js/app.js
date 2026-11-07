@@ -3474,6 +3474,7 @@ var bootScreenActive = false;
       const items=validViewer&&profile&&Array.isArray(profile.interestMedia)?profile.interestMedia.slice(0,MAX_PRIVATE_INTEREST_ITEMS).filter(function(item){return item&&isInterestMediaPath(item.path,profile.uid);}):[];
       const visible=items.filter(function(item){return !item.archived&&(isOwner||isGalleryItemShared(profile,item));});
       const archived=isOwner?items.filter(function(item){return item.archived===true;}):[];
+      const viewLabels=new Map();
       archive.classList.toggle('hidden',!isOwner||!archived.length);
       if(!archived.length) archive.open=false;
       document.getElementById('profile-archive-count').textContent='('+archived.length+')';
@@ -3485,24 +3486,22 @@ var bootScreenActive = false;
           if(!previewBlobPromise)previewBlobPromise=fetchGalleryBlob(item.path).catch(function(error){previewBlobPromise=null;throw error;});
           return previewBlobPromise;
         }
-        function openRenderedGallery(edit){
+        function openRenderedGallery(){
           if(!auth.currentUser||auth.currentUser.uid!==viewer.uid){showToast('Please reopen the profile to view this gallery.');return;}
-          openGalleryViewer(group,profile,isOwner,edit,loadPreviewBlob);
+          openGalleryViewer(group,profile,isOwner,loadPreviewBlob);
         }
         const card=document.createElement('figure');card.className='profile-interest-card';
-        const preview=document.createElement('button');preview.type='button';preview.className='profile-media-preview';preview.setAttribute('aria-label','Open '+String(item.name||'gallery item')+(group.length>1?' carousel':'')+' in larger view');preview.addEventListener('click',function(){openRenderedGallery(false);});card.appendChild(preview);
+        const preview=document.createElement('button');preview.type='button';preview.className='profile-media-preview';preview.setAttribute('aria-label','Open '+String(item.name||'gallery item')+(group.length>1?' carousel':'')+' in larger view');preview.addEventListener('click',openRenderedGallery);card.appendChild(preview);
         loadPreviewBlob().then(function(blob){if(!card.isConnected||!auth.currentUser||auth.currentUser.uid!==viewer.uid)return;const url=URL.createObjectURL(blob);interestObjectUrls.push(url);let media;if(String(item.type||'').startsWith('video/')){media=document.createElement('video');media.muted=true;media.preload='metadata';}else{media=document.createElement('img');media.alt='';}media.src=url;media.className='profile-interest-media';preview.prepend(media);}).catch(function(error){console.warn('Gallery item could not be loaded:',error.code||error.message);if(card.isConnected){const message=document.createElement('span');message.textContent='Preview unavailable';preview.prepend(message);}});
         if(group.length>1){const count=document.createElement('span');count.className='profile-media-count';count.textContent='1 / '+group.length;preview.appendChild(count);}
         const caption=document.createElement('figcaption');caption.textContent=String(item.name||'A special interest').slice(0,100);card.appendChild(caption);
         if(isOwner){
           const shared=isGalleryItemShared(profile,item);
-          const state=document.createElement('span');state.className='profile-media-state';state.textContent=item.archived?'Archived':group.length>1?'Multiple items':shared?'Shared':'Private';caption.appendChild(state);
-          const menu=document.createElement('details');menu.className='profile-media-menu';
-          const trigger=document.createElement('summary');trigger.setAttribute('aria-label','Options for '+String(item.name||'gallery item'));trigger.textContent='⋯';menu.appendChild(trigger);
-          const actions=document.createElement('div');actions.className='profile-media-actions';
-          function addAction(label, action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;action();});actions.appendChild(button);}
-          addAction('Edit',function(){openRenderedGallery(true);});
-          menu.appendChild(actions);card.appendChild(menu);
+          const state=document.createElement('span');state.className='profile-media-state';state.textContent=item.archived?'Archived':shared?'Shared':'Private';caption.appendChild(state);
+          const views=document.createElement('span');views.className='profile-media-views';views.textContent='Loading views…';caption.appendChild(views);
+          const postId=galleryPostId(item);
+          if(!viewLabels.has(postId))viewLabels.set(postId,[]);
+          viewLabels.get(postId).push(views);
         }
         target.appendChild(card);
       }
@@ -3513,22 +3512,49 @@ var bootScreenActive = false;
       });
       groups.forEach(function(group){renderItem(group,grid);});
       archived.forEach(function(item){renderItem([item],archiveGrid);});
+      if(isOwner&&viewLabels.size) {
+        functions.httpsCallable('getGalleryViewCounts')({postIds:Array.from(viewLabels.keys())}).then(function(result){
+          if(!auth.currentUser||auth.currentUser.uid!==viewer.uid)return;
+          viewLabels.forEach(function(labels,postId){
+            const count=result.data && result.data[postId];
+            if(!Number.isSafeInteger(count)||count<0)throw new Error('Invalid gallery view count.');
+            labels.forEach(function(label){if(label.isConnected)label.textContent=count+' '+(count===1?'view':'views');});
+          });
+        }).catch(function(error){
+          console.error('Gallery view counts could not be loaded:',error.code||error.message);
+          viewLabels.forEach(function(labels){labels.forEach(function(label){if(label.isConnected)label.textContent='Views unavailable';});});
+        });
+      }
     }
 
-    function openGalleryViewer(items,profile,isOwner,edit,loadPreviewBlob) {
+    function openGalleryViewer(items,profile,isOwner,loadPreviewBlob) {
       if(!auth.currentUser||!items.length||(isOwner&&(!currentUser||currentUser.uid!==auth.currentUser.uid)))return;
       const dialog=document.getElementById('profile-gallery-viewer');
-      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:edit,index:0,loadPreviewBlob:loadPreviewBlob};
+      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:false,index:0,loadPreviewBlob:loadPreviewBlob};
+      const state=galleryViewerState;
+      document.getElementById('gallery-viewer-view-status').textContent='';
       renderGalleryViewer();
-      openGalleryEngagement(galleryViewerState);
+      openGalleryEngagement(state);
       if(!dialog.open)dialog.showModal();
       dialog.querySelector('.gallery-viewer-close').focus();
+      if(!isOwner&&items.some(function(item){return isGalleryItemShared(profile,item);})) {
+        functions.httpsCallable('recordGalleryView')({ownerId:profile.uid,postId:galleryPostId(items[0])}).catch(function(error){
+          console.error('Gallery view could not be recorded:',error.code||error.message);
+          if(galleryViewerState===state)document.getElementById('gallery-viewer-view-status').textContent='This view could not be counted.';
+        });
+      }
+    }
+
+    function toggleGalleryViewerOptions() {
+      if(!galleryViewerState||!galleryViewerState.isOwner)return;
+      galleryViewerState.edit=!galleryViewerState.edit;
+      renderGalleryViewerOptions();
     }
 
     function renderGalleryViewer() {
       if(!galleryViewerState)return;
       const state=galleryViewerState,item=state.items[state.index],request=++galleryViewerRequest;
-      const media=document.getElementById('gallery-viewer-media'),edit=document.getElementById('gallery-viewer-edit');
+      const media=document.getElementById('gallery-viewer-media');
       if(galleryViewerUrl){URL.revokeObjectURL(galleryViewerUrl);galleryViewerUrl=null;}
       media.replaceChildren();
       media.setAttribute('aria-busy','true');
@@ -3554,11 +3580,58 @@ var bootScreenActive = false;
         console.warn('Gallery viewer item could not be loaded:',error.code||error.message);
         if(request===galleryViewerRequest&&galleryViewerState===state){loading.textContent='This item could not be loaded right now.';media.removeAttribute('aria-busy');}
       });
+      renderGalleryViewerOptions();
+    }
+
+    function renderGalleryViewerOptions() {
+      if(!galleryViewerState)return;
+      const state=galleryViewerState,item=state.items[state.index];
+      const edit=document.getElementById('gallery-viewer-edit'),options=document.getElementById('gallery-viewer-options');
+      options.hidden=!state.isOwner;
+      options.setAttribute('aria-expanded',String(state.isOwner&&state.edit));
       edit.replaceChildren();
       edit.classList.toggle('hidden',!state.isOwner||!state.edit);
       if(state.isOwner&&state.edit){
         const selected=isGalleryItemSelectedForSharing(item),shared=isGalleryItemShared(state.profile,item);
         const status=document.createElement('p');status.textContent=item.archived?'Archived':shared?'Shared with members':selected?'Private while your profile is private; shared when your profile is shared':'Private';edit.appendChild(status);
+        if(state.items.length>1){const note=document.createElement('p');note.textContent='Title and description apply to the whole post. Sharing, archive and delete apply to the selected item.';edit.appendChild(note);}
+        const form=document.createElement('form');form.className='gallery-edit-form';
+        const titleLabel=document.createElement('label');titleLabel.textContent='Post title';
+        const title=document.createElement('input');title.type='text';title.maxLength=80;title.value=String(item.name||'').slice(0,80);titleLabel.appendChild(title);
+        const descriptionLabel=document.createElement('label');descriptionLabel.textContent='Description';
+        const description=document.createElement('textarea');description.maxLength=500;description.rows=3;description.value=String(item.description||'').slice(0,500);descriptionLabel.appendChild(description);
+        const save=document.createElement('button');save.type='submit';save.textContent='Save post';
+        form.append(titleLabel,descriptionLabel,save);edit.appendChild(form);
+        form.addEventListener('submit',async function(event){
+          event.preventDefault();
+          const user=auth.currentUser;
+          if(!user||!currentUser||currentUser.uid!==user.uid||galleryViewerState!==state)return;
+          if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+          const ownerProfile=currentUser,previous=ownerProfile.interestMedia.slice(),postId=galleryPostId(item);
+          const name=title.value.trim()||'A special interest',text=description.value.trim();
+          profileChangePending=true;save.disabled=true;
+          try {
+            ownerProfile.interestMedia=previous.map(function(entry){return entry&&isInterestMediaPath(entry.path,user.uid)&&galleryPostId(entry)===postId?Object.assign({},entry,{name:name,description:text}):entry;});
+            await persistUserProfile();
+            if(auth.currentUser&&auth.currentUser.uid===user.uid&&currentUser===ownerProfile){
+              if(galleryViewerState===state){
+                state.items=state.items.map(function(entry){return ownerProfile.interestMedia.find(function(updated){return updated&&updated.path===entry.path;})||entry;});
+                state.edit=false;
+                document.getElementById('gallery-viewer-caption').textContent=name;
+                document.getElementById('gallery-viewer-description').textContent=text;
+                const image=document.querySelector('#gallery-viewer-media img');if(image)image.alt=name;
+                renderGalleryViewerOptions();
+                document.getElementById('gallery-viewer-options').focus();
+              }
+              if(!document.getElementById('owner-gallery-controls').classList.contains('hidden'))renderPrivateInterestGallery(ownerProfile,true);
+              showToast('Post updated.');
+            }
+          } catch(error) {
+            ownerProfile.interestMedia=previous;
+            console.error('Post could not be updated:',error.code||error.message);
+            if(auth.currentUser&&auth.currentUser.uid===user.uid)showToast('Post could not be updated. Please try again.');
+          } finally {profileChangePending=false;save.disabled=false;}
+        });
         function addAction(label,action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',action);edit.appendChild(button);}
         if(item.archived)addAction('Restore to gallery',function(){closeGalleryViewer();setInterestMediaArchived(item.path,false);});
         else {
@@ -3756,13 +3829,7 @@ var bootScreenActive = false;
     galleryViewerMedia.addEventListener('touchcancel',function(){galleryTouchStart=null;},{passive:true});
 
     document.addEventListener('click',function(event){
-      document.querySelectorAll('.profile-media-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
       document.querySelectorAll('.gallery-comment-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
-    });
-    document.addEventListener('keydown',function(event){
-      if(event.key!=='Escape')return;
-      const menu=document.querySelector('.profile-media-menu[open]');
-      if(menu){menu.open=false;menu.querySelector('summary').focus();event.stopPropagation();}
     });
 
     async function setInterestMediaVisibility(path,visibility){
@@ -3888,6 +3955,7 @@ var bootScreenActive = false;
             snapshot.docs.forEach(function(doc){batch.delete(doc.ref);});
             await batch.commit();
           }
+          await functions.httpsCallable('deleteGalleryViews')({postId:postId});
         } while(!snapshot.empty);
       }
     }

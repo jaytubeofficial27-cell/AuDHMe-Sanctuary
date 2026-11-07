@@ -59,6 +59,64 @@ exports.listCommunityProfiles = onCall({
   }, { readOnly: true });
 });
 
+function validGalleryPostId(postId) {
+  return typeof postId === 'string' && postId.length <= 250 && /^(g_[a-zA-Z0-9_-]{1,120}|s_[^/]+)$/.test(postId);
+}
+
+function galleryViews(ownerId, postId) {
+  return db.collection('galleryEngagement').doc(ownerId).collection('posts').doc(postId).collection('views');
+}
+
+exports.recordGalleryView = onCall({ region: 'europe-west2', maxInstances: 5 }, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to view this post.');
+  const { ownerId, postId } = request.data || {};
+  if (typeof ownerId !== 'string' || !ownerId || ownerId.length > 128 || ownerId.includes('/') || ownerId === '.' || ownerId === '..' || !validGalleryPostId(postId)) {
+    throw new HttpsError('invalid-argument', 'Invalid post.');
+  }
+  if (ownerId === request.auth.uid) return { recorded: false };
+  const owner = db.collection('users').doc(ownerId);
+  const projection = db.collection('communityProfiles').doc(ownerId);
+  const view = galleryViews(ownerId, postId).doc(request.auth.uid);
+  await db.runTransaction(async (transaction) => {
+    const [profile, shared, existing] = await transaction.getAll(owner, projection, view);
+    if (!profile.exists || profile.data().communityVisible !== true || !shared.exists ||
+        shared.data().profileVisible !== true || !shared.data().sharedPostIds ||
+        shared.data().sharedPostIds[postId] !== true) {
+      throw new HttpsError('permission-denied', 'This post is no longer shared.');
+    }
+    if (!existing.exists) transaction.create(view, { recordedAt: admin.firestore.FieldValue.serverTimestamp() });
+  });
+  return { recorded: true };
+});
+
+exports.getGalleryViewCounts = onCall({ region: 'europe-west2', maxInstances: 5 }, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see post views.');
+  const postIds = request.data && request.data.postIds;
+  if (!Array.isArray(postIds) || postIds.length > 12 || !postIds.every(validGalleryPostId)) {
+    throw new HttpsError('invalid-argument', 'Invalid posts.');
+  }
+  const ids = [...new Set(postIds)];
+  const results = await Promise.all(ids.map((postId) => galleryViews(request.auth.uid, postId).count().get()));
+  return Object.fromEntries(ids.map((postId, index) => [postId, results[index].data().count]));
+});
+
+exports.deleteGalleryViews = onCall({ region: 'europe-west2', maxInstances: 5 }, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to manage posts.');
+  const postId = request.data && request.data.postId;
+  if (!validGalleryPostId(postId)) throw new HttpsError('invalid-argument', 'Invalid post.');
+  const views = galleryViews(request.auth.uid, postId);
+  let snapshot;
+  do {
+    snapshot = await views.limit(400).get();
+    if (!snapshot.empty) {
+      const batch = db.batch();
+      snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+    }
+  } while (!snapshot.empty);
+  return { deleted: true };
+});
+
 function getSiteUrl() {
   let parsed;
   try {

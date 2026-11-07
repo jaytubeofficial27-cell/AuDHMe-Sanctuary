@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css?v=3">
-  <link rel="stylesheet" href="css/redesign.css?v=73">
+  <link rel="stylesheet" href="css/redesign.css?v=74">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1454,6 +1454,7 @@
               <div><p class="eyebrow">A space for what you love</p><h2 id="profile-interest-title">Special interests</h2></div>
             </div>
             <p id="profile-privacy-summary" class="profile-privacy-note">Your profile and gallery are private to your account.</p>
+            <p class="profile-privacy-note">Each other member who opens a shared post counts once. Only its owner can see the count.</p>
             <div id="owner-gallery-controls" class="hidden">
               <button type="button" class="profile-gallery-upload-link" onclick="openGalleryUpload()">+ Add photos or videos</button>
             </div>
@@ -1516,7 +1517,10 @@
     <dialog id="profile-gallery-viewer" class="profile-gallery-viewer" aria-labelledby="gallery-viewer-title">
       <div class="gallery-viewer-header">
         <div><p class="gallery-viewer-eyebrow">A space for what you love</p><h2 id="gallery-viewer-title">Special interests</h2></div>
-        <button type="button" class="gallery-viewer-close" onclick="closeGalleryViewer()" aria-label="Close viewer">&times;</button>
+        <div class="gallery-viewer-header-actions">
+          <button type="button" id="gallery-viewer-options" class="gallery-viewer-options" onclick="toggleGalleryViewerOptions()" aria-expanded="false" aria-controls="gallery-viewer-edit" hidden>Post options</button>
+          <button type="button" class="gallery-viewer-close" onclick="closeGalleryViewer()" aria-label="Close viewer">&times;</button>
+        </div>
       </div>
       <div class="gallery-viewer-layout">
         <div class="gallery-viewer-post">
@@ -1530,6 +1534,7 @@
             </div>
           </div>
           <p id="gallery-viewer-description" class="gallery-viewer-description"></p>
+          <p id="gallery-viewer-view-status" class="gallery-viewer-view-status" role="status"></p>
           <div id="gallery-viewer-edit" class="gallery-viewer-edit hidden"></div>
         </div>
         <section id="gallery-engagement" class="gallery-engagement" aria-label="Post likes and comments" hidden>
@@ -1995,6 +2000,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=59"></script>
+  <script src="js/app.js?v=60"></script>
 </body>
 </html>

@@ -78,6 +78,11 @@ service cloud.firestore {
           && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.sharedPostIds.keys().hasAny([postId]);
       }
 
+      // View records are accessed only by the authenticated callable functions.
+      match /views/{viewerId} {
+        allow read, write: if false;
+      }
+
       match /likes/{userId} {
         allow read: if isSharedPost() || signedInAs(ownerId);
         allow create: if isSharedPost() && signedInAs(userId)

@@ -18,7 +18,7 @@ The page uses Firebase Authentication and private Firestore profile documents. S
 
    ```powershell
    firebase deploy --only firestore:rules,storage --project audhme-sanctuary-b73dd
-   firebase deploy --only functions:createCheckoutSession,functions:verifyCheckoutSession,functions:listCommunityProfiles --project audhme-sanctuary-b73dd
+   firebase deploy --only functions:createCheckoutSession,functions:verifyCheckoutSession,functions:listCommunityProfiles,functions:recordGalleryView,functions:getGalleryViewCounts,functions:deleteGalleryViews --project audhme-sanctuary-b73dd
    ```
 
    Set `SITE_URL` to the canonical HTTPS URL serving this HTML file when prompted. The default is the root of the Firebase Hosting origin. If the file is served at a named path, include that path.
@@ -60,6 +60,8 @@ Files selected in a single upload are grouped into a carousel; each file still c
 The expanded viewer reuses the authenticated blob already loaded or loading for the first thumbnail, avoiding a second download. Other carousel items load on demand; object URLs are released when the viewer closes or the gallery is refreshed. No public download URLs or persistent media cache are used.
 
 Likes and comments belong to a whole post, including a carousel, and are readable by signed-in members only while the profile is shared and at least one of its items is shared. Each member can like once; comment authors and post owners can delete comments. The owner's `communityProfiles` projection contains shared post IDs for rules to check; existing projections acquire them when the owner next signs in or saves a profile change. When a profile or post becomes private its engagement remains stored for a future reshare and can only be read by its owner; members can still delete their own likes or comments. Deleting the final item of a post removes its likes and comments before deleting the file; deletion errors are reported. Deploy both updated Storage and Firestore rules before the updated page.
+
+Opening a shared post records one view per signed-in member, excluding the owner; carousel slides and repeat opens do not add more views. Counts start when this feature is deployed and are shown only to the owner, including after a post becomes private or archived. The callable functions keep viewer records inaccessible to clients and return counts only, not viewer identities. Deleting the final item removes the post's view records. Post options are available in the expanded viewer; title and description changes apply to the whole carousel, while sharing, archiving and deletion apply to the selected item. Deploy the three gallery view functions and Firestore rules before publishing the updated page.
 
 Members can reply to comments, copy their text, and edit their own comments. Replies are shown in the same newest-first, paginated feed with the original author's name; selecting it goes to the original if it is loaded. Replies remain if the original is deleted. Comment authors and post owners can delete comments, but only authors can edit them, and only while the post is shared. Reply creation verifies that the referenced comment exists on the same post. Deploy the updated Firestore rules before the page for replies and edits to work.
 
