@@ -366,6 +366,16 @@ var bootScreenActive = false;
       skipLink.href = '#' + targetId;
     }
 
+    function updateActiveNavigation(pageKey) {
+      document.querySelectorAll('.nav-item').forEach(function(item) {
+        item.classList.toggle('active', item.getAttribute('data-target') === pageKey);
+      });
+      document.querySelectorAll('.audh-links .group').forEach(function(group) {
+        var trigger = group.querySelector(':scope > button');
+        if (trigger) trigger.classList.toggle('active', Boolean(group.querySelector('[data-target="' + pageKey + '"]')));
+      });
+    }
+
     function switchPage(pageKey, updateHistory) {
       playTactileClick(310, 0.04);
       closeGalleryViewer();
@@ -393,13 +403,7 @@ var bootScreenActive = false;
       if (profilePage) { profilePage.classList.add('hidden'); profilePage.classList.remove('active-embed'); profilePage.style.display = 'none'; }
       if (directoryView) { directoryView.classList.add('hidden'); directoryView.classList.remove('active-embed'); directoryView.style.display = 'none'; }
 
-      document.querySelectorAll('.nav-item').forEach(function(item) {
-        item.classList.toggle('active', item.getAttribute('data-target') === pageKey);
-      });
-      document.querySelectorAll('.audh-links .group').forEach(function(group) {
-        var trigger = group.querySelector(':scope > button');
-        if (trigger) trigger.classList.toggle('active', Boolean(group.querySelector('[data-target="' + pageKey + '"]')));
-      });
+      updateActiveNavigation(pageKey);
 
       var links = document.querySelector('.audh-links');
       if (links) links.classList.remove('active');
@@ -3226,6 +3230,7 @@ var bootScreenActive = false;
         const search=document.getElementById('member-search-input');
         renderCommunityDirectory(search ? search.value : '');
       } else { switchPage('home',true); return; }
+      updateActiveNavigation(viewName);
       document.querySelectorAll('.audh-links').forEach(function(menu){menu.classList.remove('active');});
       var menuButton=document.querySelector('.audh-hamburger'); if(menuButton)menuButton.setAttribute('aria-expanded','false');
       document.querySelectorAll('.audh-links .group.open').forEach(function(group){group.classList.remove('open');var trigger=group.querySelector('[aria-haspopup="true"]');if(trigger)trigger.setAttribute('aria-expanded','false');});

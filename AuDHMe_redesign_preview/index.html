@@ -185,7 +185,7 @@
           <button class="nav-item flex items-center gap-1 cursor-pointer px-3 py-2 rounded-lg text-slate-300 hover:text-white" aria-haspopup="true" aria-expanded="false" onclick="toggleNavGroup(this)">Community ▾</button>
           <ul class="absolute top-full left-0 bg-[#292c25] border border-[#cbb678]/30 rounded-xl py-2 w-44 shadow-2xl flex-col z-50">
             <li><a href="#neuroverse" data-target="neuroverse" onclick="closeNavGroup(this); switchPage('neuroverse', true); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">The Neuroverse</a></li>
-            <li><a href="#directory" onclick="closeNavGroup(this); switchView('directory'); return false;" class="block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">Community Directory</a></li>
+            <li><a href="#directory" data-target="directory" onclick="closeNavGroup(this); switchView('directory'); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">Community Directory</a></li>
             <li><a href="#petition" data-target="petition" onclick="closeNavGroup(this); switchPage('petition', true); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">The Petition</a></li>
             <li><a href="#civic" data-target="civic" onclick="closeNavGroup(this); switchPage('civic', true); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">Civic &amp; Passes</a></li>
           </ul>
@@ -1994,6 +1994,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=52"></script>
+  <script src="js/app.js?v=53"></script>
 </body>
 </html>
