@@ -1209,20 +1209,20 @@ var bootScreenActive = false;
     var fullSpectrumConditions = [
       {
         code: 'ND-01',
-        name: 'Executive Age (The 30% Rule)',
-        shortTag: 'Chronological vs Executive Battery',
+        name: 'Executive Age (The Fluid Spectrum)',
+        shortTag: 'Chronological Age vs. Fluid Executive Battery',
         category: 'Executive',
-        summary: 'Why an intellectually sharp 26-year-old neurodivergent adult can have the working memory, impulse pacing, or task-initiation battery of an 18-year-old when tired.',
+        summary: 'Why an intellectually sharp adult can design complex systems or run a university-level project, yet find their executive regulation age fluctuating anywhere from 3 years old to past their actual age depending on safety, sensory load, and emotional triggers.',
         symptoms: [
-          'Your intellectual intelligence matches or exceeds your birth certificate, but your executive regulation age lags roughly 30% behind',
-          'Being able to design complex systems or university-level projects, yet feeling completely overwhelmed by tidying your room or booking a dentist appointment',
-          'Emotional floodgates and frustration tolerance dropping rapidly once your daily executive battery hits zero'
+          'Your intellectual capacity matches or exceeds your birth certificate, but your executive regulation age shifts dynamically rather than sitting at a fixed percentage behind.',
+          'Experiencing moments of deep, intuitive mastery where your strategic foresight feels decades ahead, crashing instantly into a state of total overwhelm where basic self-care feels impossibly out of reach.',
+          'Emotional triggers like Rejection Sensitive Dysphoria (ND-08) or sudden sensory assaults causing your nervous system to executively revert to a young child\'s state (e.g., ages 3–5) seeking safety and co-regulation.'
         ],
-        internalReality: 'Having a Formula 1 engine for deep thinking bolted onto the fuel tank and brakes of a much younger nervous system.',
-        externalView: 'People say "You\'re so smart, how can you struggle with something so basic?"',
-        maskingTax: 'Hiding your executive exhaustion and feeling like an impostor adult every time daily life admin piles up.',
-        sanctuaryAdjustment: 'Respecting the 30% rule without shame: externalise reminders, use body-doubling (NC-02), and separate intellectual respect from executive support.',
-        relatedCodes: ['NC-24', 'NC-41', 'NC-64']
+        internalReality: 'A dynamic, high-horsepower engine whose operational age shifts wildly based on the weather of your nervous system—not a broken gauge, but a highly sensitive barometer.',
+        externalView: 'People look at your achievements or intelligence and say, "How can someone so capable struggle with something this simple?" completely misunderstanding how fast your internal battery drains.',
+        maskingTax: 'Exhausting yourself trying to hold an "adult" facade all day, hiding the sudden drops in executive age behind frantic coping mechanisms until you crash.',
+        sanctuaryAdjustment: 'Abandoning shame around executive fluctuation. Recognising when you have dropped into a younger, low-demand state (NC-52, NC-53), building in immediate co-regulation or rest, and allowing yourself the grace to operate from whatever age your nervous system actually is in that moment.',
+        relatedCodes: ['NC-52', 'NC-53']
       },
       {
         code: 'ND-02',
