@@ -947,9 +947,9 @@
   <div id="embed-store">
     <main id="pane-store" class="neuro-pane store-page-shell">
       <header class="store-intro">
-        <p class="eyebrow">AuDHMe Sanctuary shop</p>
-        <h1>Comfortable gear, chosen by you</h1>
-        <p>Explore the current hoodie collection at your own pace.</p>
+        <p class="eyebrow">AuDHMe Sanctuary shop · Wear your difference</p>
+        <h1>Neurodivergent.<br>Proudly, unapologetically you.</h1>
+        <p>Made for the many ways minds move through the world. Find your statement, your comfort, your AuDHMe.</p>
       </header>
 
       <div id="store-catalog" class="store-product-grid">
@@ -1038,7 +1038,7 @@
           <div class="initiative-badge">CIVIC LEGISLATION &amp; INFRASTRUCTURE DIRECTIVE</div>
           <h1 class="neuroverse-main-heading">The Sanctuary Standard</h1>
           <p class="text-slate-300 max-w-2xl mx-auto text-base leading-relaxed mb-4 bionic-text">
-            A campaign to establish legally recognised, low-demand, sensory-safe rooms and protocols in public and civic buildings, so neurodivergent people aren't forced to pay the Masking Tax just to access everyday life.
+            A campaign for mandatory low-demand sensory rooms in appropriately sized businesses and institutions, alongside sensory-safe protocols in public and civic buildings. Access to everyday life should not come at the cost of sensory safety.
           </p>
           <div class="system-gold-divider"></div>
         </div>
@@ -1050,7 +1050,7 @@
           </div>
           <div class="telemetry-node">
             <span class="telemetry-label">TARGET</span>
-            <span class="telemetry-value">PUBLIC &amp; CIVIC SPACES</span>
+            <span class="telemetry-value">BUSINESSES &amp; INSTITUTIONS</span>
           </div>
           <div class="telemetry-node">
             <span class="telemetry-label">CORE GOAL</span>
@@ -1063,7 +1063,7 @@
             <div class="card-num">PILLAR 01</div>
             <h3 class="demand-card-title">Acoustic &amp; Visual Regulation</h3>
             <p class="demand-card-body bionic-text">
-              Mandatory low-sensory rooms and quiet zones inside public buildings, flicker-free lighting, and cutting out relentless background music and announcements in essential services.
+              Mandatory low-sensory rooms in appropriately sized businesses and institutions, alongside quiet zones, flicker-free lighting, and less relentless background music and announcements in essential services.
             </p>
           </div>
 
@@ -1230,8 +1230,8 @@
   <div id="embed11">
     <div id="pane-build" class="neuro-pane">
       <div class="launch-portal-header-container">
-        <div class="initiative-badge">WORKBENCH HARDWARE &amp; PRODUCTION PIPELINE</div>
-        <h1 class="portal-main-heading">Material Launch Portal</h1>
+        <div class="initiative-badge">AuDHMe · THE BUILD BLUEPRINT</div>
+        <h1 class="portal-main-heading">Build the future.<br>Back the sanctuary.</h1>
         <div class="system-gold-divider"></div>
       </div>
 
@@ -1310,7 +1310,7 @@
                 <div class="tier-model-badge">FIRST WORKBENCH BATCH</div>
                 <div class="text-xl font-black text-white">£25</div>
               </div>
-              <p class="text-sm text-slate-300">Reserves your physical 310gsm linen Neuro-Code™ V1.4 Core Deck plus physical QR Bridge Passes from the first production run.</p>
+              <p class="text-sm text-slate-300">Reserves your physical 310gsm linen Neuro-Code™ V1.4 Core Deck plus physical QR Bridge Passes from the first production run. The Neuro-Pass is in development.</p>
             </div>
             <a href="https://buy.stripe.com/00wbJ12gDeIgazGaQ9frW01" class="action-trigger w-full text-center" target="_blank" rel="noopener noreferrer">Pre-Order Physical Deck &nearr;</a>
           </div>
@@ -1415,6 +1415,13 @@
           <h1 id="profile-display-username" class="profile-display-name"></h1>
           <div class="profile-header-meta">
             <div id="profile-header-badges" class="profile-header-badges"></div>
+            <div id="profile-live-status" class="profile-live-status"></div>
+            <details id="owner-status-editor" class="profile-status-editor hidden">
+              <summary>Set live Neuro-Code status</summary>
+              <p>These codes stay until you change them. They are visible to signed-in members only while your profile is shared.</p>
+              <div id="profile-status-options" class="profile-status-options"></div>
+              <button type="button" class="calm-primary-button" onclick="saveProfileStatuses()">Save status</button>
+            </details>
             <div id="owner-profile-visibility" class="profile-visibility-control hidden">
               <label class="profile-visibility-toggle" title="Share your profile with signed-in members">
                 <input type="checkbox" id="profile-community-visible" role="switch" aria-label="Share profile with signed-in members" onchange="setProfileCommunityVisibility(this.checked)">
@@ -1483,7 +1490,7 @@
       <button type="button" class="calm-secondary-button" onclick="closeGalleryUpload()">&larr; Back to profile</button>
       <div class="profile-upload-panel">
         <h2 id="interest-upload-title" tabindex="-1">Add to your special-interest gallery</h2>
-        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel. Shared posts are visible to signed-in members only while your profile is shared. Members may save shared content.</p>
+        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel.</p>
         <label for="interest-media-files">Photos or videos</label>
         <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
         <label for="interest-media-caption">Title (optional, up to 80 characters)</label>
@@ -1495,6 +1502,7 @@
           <option value="community">Shared when my profile is shared</option>
           <option value="private">Private to me</option>
         </select>
+        <p id="interest-visibility-notice" role="status"></p>
         <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
         <p id="interest-upload-status" role="status" aria-live="polite"></p>
       </div>
@@ -1925,22 +1933,22 @@
       </header>
 
       <div class="legal-notice-grid">
-        <section>
-          <h2>Framework ownership</h2>
+        <details>
+          <summary>Framework ownership</summary>
           <p>All original frameworks displayed here, including the Neuro-Code Protocol, Endocrine Code Protocol, Neuro-Pass credentialing, and the AuDHMe ecosystem, are the exclusive intellectual property of Jason Parish &copy; 2026.</p>
-        </section>
-        <section>
-          <h2>Use and licensing</h2>
+        </details>
+        <details>
+          <summary>Use and licensing</summary>
           <p>Real-time access remains freely available for individual self-advocacy and grassroots community use. Commercial use or corporate training integration requires an active licensing agreement.</p>
-        </section>
-        <section>
-          <h2>Professional advice</h2>
+        </details>
+        <details>
+          <summary>Professional advice</summary>
           <p>AuDHMe provides lived-experience environmental and communication frameworks. These resources do not constitute or replace medical, clinical, therapeutic, legal, or other professional advice. Use appropriate local services for advice specific to your circumstances.</p>
-        </section>
-        <section>
-          <h2>Community services</h2>
+        </details>
+        <details>
+          <summary>Community services</summary>
           <p>Independent organisations linked from AuDHMe are separate services. References and links are signposting information and do not imply affiliation, endorsement, or guaranteed eligibility.</p>
-        </section>
+        </details>
       </div>
     </main>
   </div>

@@ -14,11 +14,11 @@ The page uses Firebase Authentication and private Firestore profile documents. S
    firebase functions:secrets:set STRIPE_SECRET_KEY --project audhme-sanctuary-b73dd
    ```
 
-4. Deploy Firestore rules and the two callable functions:
+4. Deploy Firestore and Storage rules and the callable functions:
 
    ```powershell
    firebase deploy --only firestore:rules,storage --project audhme-sanctuary-b73dd
-   firebase deploy --only functions:createCheckoutSession,functions:verifyCheckoutSession --project audhme-sanctuary-b73dd
+   firebase deploy --only functions:createCheckoutSession,functions:verifyCheckoutSession,functions:listCommunityProfiles --project audhme-sanctuary-b73dd
    ```
 
    Set `SITE_URL` to the canonical HTTPS URL serving this HTML file when prompted. The default is the root of the Firebase Hosting origin. If the file is served at a named path, include that path.
@@ -37,6 +37,8 @@ The page uses Firebase Authentication and private Firestore profile documents. S
 6. Deploy the updated HTML to the same origin configured as `SITE_URL`.
 
 The Stripe webhook records paid orders and consumes the 15% first-order perk only after payment succeeds. Expired checkout sessions release an unused perk reservation. Order fulfillment and shipping notices remain a manual business process; the payment backend does not connect to a courier or inventory system.
+
+If checkout or the directory is unavailable, inspect the callable function logs in the Firebase console for the configured project and `europe-west2` region. Confirm that the functions were deployed, that the project has billing enabled, and that `STRIPE_SECRET_KEY` and `SITE_URL` are configured for checkout. A local preview cannot verify production Stripe configuration.
 
 ## Privacy rules
 
@@ -64,5 +66,7 @@ Members can reply to comments, copy their text, and edit their own comments. Rep
 The Storage Rules also check the private Firestore profile before each new upload and reject uploads once 12 items are registered. Since the page uploads sequentially and saves each file path before starting the next upload, that limit is checked server-side. Storage Rules will ask Firebase to connect to Cloud Firestore on first deployment; approve that connection for the project.
 
 The directory uses the authenticated `listCommunityProfiles` callable in `europe-west2` to check the private profile setting before returning directory details. This also filters older stale public projections belonging to private profiles. The directory checks at most 50 shared-profile projections; pagination is not implemented yet, so stale projections may reduce the number shown until their owners sign in. Deploy this function and both updated rules files before the page; older page versions that query the directory directly will no longer work with the tightened Firestore rules.
+
+Members may choose multiple live Neuro-Code statuses on their profile. These persist until changed or cleared and are included in the community projection only while the profile is shared. Deploy the updated Firestore rules before publishing this frontend; older rules reject the new field.
 
 The site source is split into `index.html`, `css/site.css`, `css/redesign.css`, and `js/app.js`. Keep `js/app.js` as a classic script while the HTML uses inline handlers. The shop has its own `#store` route and navigation entry.

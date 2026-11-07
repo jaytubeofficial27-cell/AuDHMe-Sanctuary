@@ -358,8 +358,6 @@ var bootScreenActive = false;
       });
     });
 
-    var currentPageKey = 'home';
-
     function updateSkipTarget(targetId) {
       var skipLink = document.querySelector('.skip-link');
       var target = document.getElementById(targetId);
@@ -398,6 +396,10 @@ var bootScreenActive = false;
       document.querySelectorAll('.nav-item').forEach(function(item) {
         item.classList.toggle('active', item.getAttribute('data-target') === pageKey);
       });
+      document.querySelectorAll('.audh-links .group').forEach(function(group) {
+        var trigger = group.querySelector(':scope > button');
+        if (trigger) trigger.classList.toggle('active', Boolean(group.querySelector('[data-target="' + pageKey + '"]')));
+      });
 
       var links = document.querySelector('.audh-links');
       if (links) links.classList.remove('active');
@@ -414,13 +416,11 @@ var bootScreenActive = false;
         if (el) el.classList.remove('active-embed');
       });
 
-      setTimeout(function() {
-        targetEmbeds.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.classList.add('active-embed');
-        });
-        initChristmasCardSnow();
-      }, 10);
+      targetEmbeds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('active-embed');
+      });
+      initChristmasCardSnow();
 
       if (updateHistory) {
         try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
@@ -3054,6 +3054,9 @@ var bootScreenActive = false;
     let authStateVersion = 0;
     auth.onAuthStateChanged(function(user) {
       closeGalleryViewer();
+      directoryProfiles = null;
+      directoryLoadError = null;
+      directoryRenderVersion++;
       if (resolveAuthInitialized) {
         resolveAuthInitialized();
         resolveAuthInitialized = null;
@@ -3082,6 +3085,7 @@ var bootScreenActive = false;
           avatar: typeof saved.avatar === 'string' ? saved.avatar : (user.photoURL || null),
           bio: isFounderAccount ? savedBio : (savedBio === 'Founder of AuDHMe' ? '' : savedBio),
           neurotypes: Array.isArray(saved.neurotypes) ? saved.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
+          liveStatuses: validProfileStatuses(saved.liveStatuses),
           links: Array.isArray(saved.links) ? saved.links : [],
           interestMedia: Array.isArray(saved.interestMedia) ? saved.interestMedia.slice(0, 12) : [],
           communityVisible: !snapshot.exists || saved.communityVisible === true,
@@ -3218,9 +3222,9 @@ var bootScreenActive = false;
       } else if (viewName==='directory') {
         updateSkipTarget('directory-view');
         searchAuthPrompt = false;
-        directoryProfiles=null;
         if (directoryView) { directoryView.style.display='block'; directoryView.classList.remove('hidden'); directoryView.classList.add('active-embed'); }
-        renderCommunityDirectory();
+        const search=document.getElementById('member-search-input');
+        renderCommunityDirectory(search ? search.value : '');
       } else { switchPage('home',true); return; }
       document.querySelectorAll('.audh-links').forEach(function(menu){menu.classList.remove('active');});
       var menuButton=document.querySelector('.audh-hamburger'); if(menuButton)menuButton.setAttribute('aria-expanded','false');
@@ -3240,6 +3244,7 @@ var bootScreenActive = false;
       const founder=profile.uid===FOUNDER_AUTH_UID, badges=document.getElementById('profile-header-badges'), card=document.getElementById('profile-public-view');
       if(card) card.classList.toggle('founder-profile',founder);
       if(badges) badges.innerHTML=(founder?'<span class="profile-founder-badge"><span>✨</span> Sanctuary Founder &amp; Architect</span>':'')+'<span class="profile-member-badge">Sanctuary Member</span>';
+      renderProfileStatuses(profile,isOwner);
       const links=document.getElementById('profile-links-container'); if(links){links.replaceChildren();(Array.isArray(profile.links)?profile.links:[]).forEach(function(link){addProfileLink(links,link);});}
       const settings=document.getElementById('owner-settings-btn'); if(settings) settings.classList.toggle('hidden',!isOwner);
       const back=document.getElementById('community-profile-back'); if(back) back.classList.toggle('hidden',isOwner);
@@ -3257,6 +3262,46 @@ var bootScreenActive = false;
       const uploadView=document.getElementById('profile-gallery-upload-view'); if(uploadView) uploadView.classList.add('hidden');
     }
 
+    function profileStatusCatalog() {
+      return Array.from(document.querySelectorAll('.flip-card')).map(function(card) {
+        const code=card.querySelector('.card-code-mini'), title=card.querySelector('.card-title-mini');
+        return code ? {code:code.textContent.trim(),title:title ? title.textContent.trim() : 'Neuro-Code'} : null;
+      }).filter(Boolean);
+    }
+
+    function validProfileStatuses(statuses) {
+      const allowed=new Set(profileStatusCatalog().map(function(item){return item.code;}));
+      return Array.isArray(statuses) ? Array.from(new Set(statuses.filter(function(code){return allowed.has(code);}))) : [];
+    }
+
+    function renderProfileStatuses(profile,isOwner) {
+      const selected=validProfileStatuses(profile.liveStatuses), catalog=profileStatusCatalog();
+      const display=document.getElementById('profile-live-status'), editor=document.getElementById('owner-status-editor'), options=document.getElementById('profile-status-options');
+      display.replaceChildren();
+      selected.forEach(function(code){const item=catalog.find(function(entry){return entry.code===code;});const badge=document.createElement('span');badge.className='profile-status-badge';badge.textContent=code+' · '+item.title;display.appendChild(badge);});
+      editor.classList.toggle('hidden',!isOwner);
+      editor.open=false;
+      options.replaceChildren();
+      if(isOwner)catalog.forEach(function(item){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.value=item.code;input.checked=selected.includes(item.code);label.append(input,document.createTextNode(' '+item.code+' · '+item.title));options.appendChild(label);});
+    }
+
+    async function saveProfileStatuses() {
+      const user=auth.currentUser, profile=currentUser;
+      if(!user||!profile||profile.uid!==user.uid||profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      const previous=profile.liveStatuses;
+      profile.liveStatuses=validProfileStatuses(Array.from(document.querySelectorAll('#profile-status-options input:checked')).map(function(input){return input.value;}));
+      profileChangePending=true;
+      const button=document.querySelector('#owner-status-editor button');
+      button.disabled=true;
+      try {
+        await persistUserProfile();
+        if(currentUser===profile){renderProfileStatuses(profile,true);showToast('Live status saved.');}
+      } catch(error) {
+        console.error('Live status save failed:',error.code||error.message);
+        if(currentUser===profile){profile.liveStatuses=previous;renderProfileStatuses(profile,true);showToast('Live status could not be saved. Please try again.');}
+      } finally {profileChangePending=false;button.disabled=false;}
+    }
+
     const MAX_PRIVATE_INTEREST_ITEMS = 12;
     const MAX_INTEREST_IMAGE_BYTES = 12 * 1024 * 1024;
     const MAX_INTEREST_VIDEO_BYTES = 30 * 1024 * 1024;
@@ -3268,7 +3313,13 @@ var bootScreenActive = false;
 
     function openGalleryUpload() {
       if(!auth.currentUser||!currentUser||auth.currentUser.uid!==currentUser.uid)return;
-      document.getElementById('interest-media-visibility').value=currentUser.communityVisible?'community':'private';
+      if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
+      const visibility=document.getElementById('interest-media-visibility');
+      visibility.value=currentUser.communityVisible?'community':'private';
+      visibility.disabled=!currentUser.communityVisible;
+      document.getElementById('interest-visibility-notice').textContent=currentUser.communityVisible
+        ? 'Posts not marked private are visible to signed-in members. Members may save shared content.'
+        : 'Your profile is private, so all posts remain hidden. New posts are saved as private.';
       document.getElementById('profile-public-view').classList.add('hidden');
       document.getElementById('profile-gallery-upload-view').classList.remove('hidden');
       document.getElementById('interest-upload-title').focus();
@@ -3625,6 +3676,7 @@ var bootScreenActive = false;
     async function updateInterestMedia(path,changes,message) {
       if(profileChangePending){showToast('Please wait for the current profile change to finish.');return;}
       profileChangePending=true;
+      showToast('Saving gallery visibility…');
       try {
         await storage.ref(path).updateMetadata({customMetadata:{visibility:changes.visibility}});
         currentUser.interestMedia=currentUser.interestMedia.map(function(entry){return entry.path===path?Object.assign({},entry,changes):entry;});
@@ -3759,21 +3811,26 @@ var bootScreenActive = false;
     }
 
     let directoryProfiles=null; let directoryLoadPromise=null; let directoryLoadUserId=null;
+    let directoryRenderVersion=0; let directoryLoadError=null;
     async function renderCommunityDirectory(searchQuery=''){
-      const grid=document.getElementById('members-grid');if(!grid)return;grid.replaceChildren();if(!auth.currentUser){const msg=document.createElement('p');msg.className='profile-gallery-empty';msg.textContent='Sign in to explore profiles shared by Sanctuary members.';grid.appendChild(msg);return;}
+      const grid=document.getElementById('members-grid');if(!grid)return;
+      const renderVersion=++directoryRenderVersion;
+      if(!auth.currentUser){directoryProfiles=null;directoryLoadError=null;grid.replaceChildren();const msg=document.createElement('p');msg.className='profile-gallery-empty';msg.textContent='Sign in to explore profiles shared by Sanctuary members.';grid.appendChild(msg);return;}
       const viewerId=auth.currentUser.uid;
-      const status=document.createElement('p');status.className='directory-status';status.setAttribute('role','status');status.textContent='Loading members…';grid.appendChild(status);
-      try{if(!directoryProfiles){if(directoryLoadPromise&&directoryLoadUserId!==viewerId){await directoryLoadPromise.catch(function(error){console.error('Previous directory request failed:',error.code||error.message);});if(auth.currentUser&&auth.currentUser.uid===viewerId)await renderCommunityDirectory(searchQuery);return;}
-        if(!directoryLoadPromise){directoryLoadUserId=viewerId;directoryLoadPromise=functions.httpsCallable('listCommunityProfiles')().then(function(result){if(!Array.isArray(result.data))throw new Error('Invalid community directory response.');if(auth.currentUser&&auth.currentUser.uid===viewerId)directoryProfiles=result.data;}).finally(function(){directoryLoadPromise=null;directoryLoadUserId=null;});}await directoryLoadPromise;}
-        if(!auth.currentUser||auth.currentUser.uid!==viewerId)return;
+      if(directoryLoadError&&grid.querySelector('[role="alert"]'))return;
+      try{if(!directoryProfiles){
+        if(directoryLoadError)throw directoryLoadError;
+        if(directoryLoadPromise&&directoryLoadUserId!==viewerId){await directoryLoadPromise.catch(function(error){console.error('Previous directory request failed:',error.code||error.message);});if(auth.currentUser&&auth.currentUser.uid===viewerId&&renderVersion===directoryRenderVersion)await renderCommunityDirectory(searchQuery);return;}
+        if(!directoryLoadPromise){grid.replaceChildren();const status=document.createElement('p');status.className='directory-status';status.setAttribute('role','status');status.textContent='Loading members…';grid.appendChild(status);directoryLoadUserId=viewerId;directoryLoadPromise=functions.httpsCallable('listCommunityProfiles')().then(function(result){if(!Array.isArray(result.data))throw new Error('Invalid community directory response.');if(auth.currentUser&&auth.currentUser.uid===viewerId)directoryProfiles=result.data;}).finally(function(){directoryLoadPromise=null;directoryLoadUserId=null;});}await directoryLoadPromise;}
+        if(!auth.currentUser||auth.currentUser.uid!==viewerId||renderVersion!==directoryRenderVersion)return;
         const query=String(searchQuery||'').trim().toLowerCase(),results=(directoryProfiles||[]).filter(function(profile){return !query||String(profile.username||'').toLowerCase().includes(query);});grid.replaceChildren();
         if(!results.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=query?'No shared profiles match that search.':'No profiles have been shared yet. You can choose whether yours is visible on your profile page.';grid.appendChild(empty);return;}
         results.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileAvatarUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
-      }catch(error){directoryProfiles=null;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.textContent='The community directory could not be loaded. Please try again later.';grid.appendChild(fail);console.error('Community directory load failed:',error.code||error.message);}
+      }catch(error){if(renderVersion!==directoryRenderVersion||!auth.currentUser||auth.currentUser.uid!==viewerId)return;directoryProfiles=null;directoryLoadError=error;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.setAttribute('role','alert');fail.textContent='The community directory is unavailable. Check your connection and try again. If this continues, the directory service may need to be deployed.';const retry=document.createElement('button');retry.type='button';retry.className='calm-secondary-button';retry.textContent='Try again';retry.addEventListener('click',function(){directoryLoadError=null;renderCommunityDirectory(document.getElementById('member-search-input').value);});grid.append(fail,retry);console.error('Community directory load failed:',error.code||error.message);}
     }
     async function openCommunityProfile(uid,updateHistory){
       if(!auth.currentUser){openAuthModal('signup');return;}if(typeof uid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(uid)){showToast('That profile link is not valid.');return;}
-      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
+      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,liveStatuses:shared.liveStatuses,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
         const embeds=['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];embeds.forEach(function(id){const el=document.getElementById(id);if(el)el.classList.remove('active-embed');});const directory=document.getElementById('directory-view');if(directory){directory.classList.add('hidden');directory.classList.remove('active-embed');directory.style.display='none';}const page=document.getElementById('profile-page');if(page){page.classList.remove('hidden');page.style.display='block';page.classList.add('active-embed');}updateSkipTarget('profile-page');renderProfile(profile,false);if(updateHistory!==false)history.pushState(null,null,'#member/'+encodeURIComponent(uid));window.scrollTo({top:0,behavior:'instant'});
       }catch(error){showToast('This profile is private or could not be loaded.');console.error('Community profile load failed:',error.code||error.message);}
     }
@@ -3894,16 +3951,16 @@ var bootScreenActive = false;
       const query = event.target.value.trim();
       const directoryView = document.getElementById('directory-view');
 
+      const mainSearchInput = document.getElementById('member-search-input');
+      if (mainSearchInput) mainSearchInput.value = query;
       if (query.length > 0) {
         if (directoryView && directoryView.classList.contains('hidden')) switchView('directory', false);
-        renderCommunityDirectory(query);
+        else renderCommunityDirectory(query);
       } else {
         if (directoryView) { directoryView.classList.add('hidden'); directoryView.classList.remove('active-embed'); }
         switchPage('home', true);
       }
 
-      const mainSearchInput = document.getElementById('member-search-input');
-      if (mainSearchInput) mainSearchInput.value = query;
     }
 
     function handleHeaderSearchKey(event) {
@@ -3980,7 +4037,7 @@ var bootScreenActive = false;
       const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(isGalleryItemSelectedForSharing).slice(0,12):[];
       const sharedPostIds={};
       const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){sharedPostIds[galleryPostId(item)]=true;const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;if(typeof item.description==='string')result.description=item.description.slice(0,500);return result;}),sharedPostIds:sharedPostIds,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
-      if(profileVisible){projection.avatar=profile.avatar||null;projection.bio=String(profile.bio||'').slice(0,150);projection.neurotypes=Array.isArray(profile.neurotypes)?profile.neurotypes.filter(function(type){return availableNeurotypes.includes(type);}):[];projection.links=Array.isArray(profile.links)?profile.links.slice(0,6):[];}
+      if(profileVisible){projection.avatar=profile.avatar||null;projection.bio=String(profile.bio||'').slice(0,150);projection.neurotypes=Array.isArray(profile.neurotypes)?profile.neurotypes.filter(function(type){return availableNeurotypes.includes(type);}):[];projection.liveStatuses=validProfileStatuses(profile.liveStatuses);projection.links=Array.isArray(profile.links)?profile.links.slice(0,6):[];}
       return projection;
     }
 
@@ -3990,7 +4047,7 @@ var bootScreenActive = false;
       return projection?ref.set(projection):ref.delete();
     }
 
-    function persistUserProfile() {
+    function persistUserProfile(visibilityOverride) {
       const user = auth.currentUser;
       if (!user || !currentUser || currentUser.uid !== user.uid) {
         return Promise.reject(new Error('No matching signed-in account.'));
@@ -4001,10 +4058,11 @@ var bootScreenActive = false;
         avatar: currentUser.avatar || null,
         bio: String(currentUser.bio || '').slice(0, 150),
         neurotypes: Array.isArray(currentUser.neurotypes) ? currentUser.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
+        liveStatuses: validProfileStatuses(currentUser.liveStatuses),
         links: Array.isArray(currentUser.links) ? currentUser.links.slice(0, 6) : [],
         lastUsernameChange: Number(currentUser.lastUsernameChange) || null,
         interestMedia: Array.isArray(currentUser.interestMedia) ? currentUser.interestMedia.slice(0, 12) : [],
-        communityVisible: currentUser.communityVisible === true,
+        communityVisible: typeof visibilityOverride === 'boolean' ? visibilityOverride : currentUser.communityVisible === true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       const projection=communityProfileProjection(profile);
@@ -4024,11 +4082,13 @@ var bootScreenActive = false;
         return;
       }
       profileChangePending=true;
-      if(control)control.disabled=true;
+      if(control){control.checked=Boolean(currentUser.communityVisible);control.disabled=true;control.setAttribute('aria-busy','true');}
+      showToast('Saving profile visibility…');
       const previousVisibility=currentUser.communityVisible;
-      currentUser.communityVisible=visible;
       try {
-        await persistUserProfile();
+        await persistUserProfile(visible);
+        if(!currentUser||!auth.currentUser||currentUser.uid!==user.uid||auth.currentUser.uid!==user.uid)return;
+        currentUser.communityVisible=visible;
         renderProfile(currentUser,true);
         showToast(visible?'Your profile and selected gallery items are shared with signed-in members.':'Your profile and entire gallery are private.');
       } catch(error) {
@@ -4051,7 +4111,7 @@ var bootScreenActive = false;
         }
       } finally {
         profileChangePending=false;
-        if(control)control.disabled=false;
+        if(control){control.disabled=false;control.removeAttribute('aria-busy');}
       }
     }
 
@@ -4457,7 +4517,8 @@ var bootScreenActive = false;
         window.location.assign(result.data.url);
       }).catch(function(error) {
         console.error('Checkout session could not be created:', error.code || error.message);
-        showToast('Checkout could not start. Please try again shortly.');
+        const code=String(error.code||'');
+        showToast(code.includes('invalid-argument') || code.includes('failed-precondition') ? error.message : 'Checkout is unavailable. Check your connection and try again; contact the site owner if the problem continues.');
         checkoutInProgress = false;
         if (checkoutButton) checkoutButton.disabled = false;
       });

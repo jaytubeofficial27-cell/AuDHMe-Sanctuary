@@ -5,6 +5,19 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
 
+    function validStatuses(data) {
+      return !data.keys().hasAny(['liveStatuses']) || (data.liveStatuses is list
+        && data.liveStatuses.size() <= 52
+        && data.liveStatuses.hasOnly([
+          'NC-01', 'NC-02', 'NC-10', 'NC-11', 'NC-12', 'NC-13', 'NC-14', 'NC-15', 'NC-16', 'NC-17', 'NC-18', 'NC-19',
+          'NC-20', 'NC-21', 'NC-22', 'NC-23', 'NC-24', 'NC-25', 'NC-26', 'NC-27',
+          'NC-30', 'NC-31', 'NC-32', 'NC-33', 'NC-34', 'NC-35', 'NC-36', 'NC-37',
+          'NC-40', 'NC-41', 'NC-42', 'NC-43', 'NC-44', 'NC-45', 'NC-46', 'NC-47', 'NC-48',
+          'NC-50', 'NC-51', 'NC-52', 'NC-53', 'NC-54', 'NC-55', 'NC-56', 'NC-57', 'NC-58', 'NC-59',
+          'NC-60', 'NC-61', 'NC-62', 'NC-63', 'NC-64'
+        ]));
+    }
+
     function validProfile(data, userId) {
       return data.uid == userId
         && data.username is string && data.username.size() <= 40
@@ -12,7 +25,7 @@ service cloud.firestore {
         && data.neurotypes is list && data.neurotypes.size() <= 15
         && (!data.keys().hasAny(['interestMedia']) || (data.interestMedia is list && data.interestMedia.size() <= 12))
         && (!data.keys().hasAny(['communityVisible']) || data.communityVisible is bool)
-        && data.links is list && data.links.size() <= 6
+        && data.links is list && data.links.size() <= 6 && validStatuses(data)
         && (!data.keys().hasAny(['avatar']) || data.avatar == null
           || (data.avatar is string && data.avatar.size() <= 340000));
     }
@@ -22,13 +35,13 @@ service cloud.firestore {
       allow read: if signedInAs(userId);
       allow create: if signedInAs(userId)
         && request.resource.data.keys().hasOnly([
-          'uid', 'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible'
+          'uid', 'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible', 'liveStatuses'
         ])
         && validProfile(request.resource.data, userId);
       allow update: if signedInAs(userId)
         && validProfile(request.resource.data, userId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible'
+          'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible', 'liveStatuses'
         ]);
       allow delete: if false;
     }
@@ -46,9 +59,10 @@ service cloud.firestore {
         && request.resource.data.username.size() <= 40
         && request.resource.data.interestMedia is list
         && request.resource.data.interestMedia.size() <= 12
+        && validStatuses(request.resource.data)
         && request.resource.data.keys().hasOnly([
           'uid', 'visible', 'profileVisible', 'username', 'avatar', 'bio',
-          'neurotypes', 'links', 'interestMedia', 'sharedPostIds', 'updatedAt'
+          'neurotypes', 'links', 'interestMedia', 'sharedPostIds', 'updatedAt', 'liveStatuses'
         ]);
       allow delete: if signedInAs(userId);
     }
