@@ -6,7 +6,7 @@ Optional reading preferences for warm tone, reduced motion, low-stim reading, an
 
 Neuro-Code cards remain unchanged as communication cards. Their suggested adaptations are optional site-interface preferences, not medical recommendations or assumptions about what a person needs.
 
-New profiles are shared with signed-in Sanctuary members by default; existing profile privacy settings are preserved. Members can make their profiles private and choose whether each gallery post is shared, including sharing selected items while keeping profile details private.
+New profiles are shared with signed-in Sanctuary members by default; existing profile privacy settings are preserved. A private profile hides its entire gallery. When a profile is shared, individually private gallery items remain hidden.
 
 ## Important
 

@@ -3218,6 +3218,7 @@ var bootScreenActive = false;
       } else if (viewName==='directory') {
         updateSkipTarget('directory-view');
         searchAuthPrompt = false;
+        directoryProfiles=null;
         if (directoryView) { directoryView.style.display='block'; directoryView.classList.remove('hidden'); directoryView.classList.add('active-embed'); }
         renderCommunityDirectory();
       } else { switchPage('home',true); return; }
@@ -3243,7 +3244,7 @@ var bootScreenActive = false;
       const settings=document.getElementById('owner-settings-btn'); if(settings) settings.classList.toggle('hidden',!isOwner);
       const back=document.getElementById('community-profile-back'); if(back) back.classList.toggle('hidden',isOwner);
       const context=document.getElementById('profile-context-label'); if(context) context.textContent=isOwner?'My Sanctuary profile':'Community member profile';
-      const summary=document.getElementById('profile-privacy-summary'); if(summary) summary.textContent=isOwner?(profile.communityVisible?'Your profile is visible to signed-in Sanctuary members. Gallery items can still be kept private individually.':'Your profile is private. Items you choose to share can still appear to signed-in Sanctuary members.'):(profile.communityVisible?'Shared by this member with signed-in Sanctuary members.':'This member has shared selected gallery items.');
+      const summary=document.getElementById('profile-privacy-summary'); if(summary) summary.textContent=isOwner?(profile.communityVisible?'Your profile is visible to signed-in Sanctuary members. Gallery items can still be kept private individually.':'Your profile and entire gallery are private. Items marked for sharing will be visible if you share your profile again.'):'Shared by this member with signed-in Sanctuary members.';
       const perk=document.getElementById('owner-perk-box'); if(perk) perk.classList.toggle('hidden',!isOwner);
       const visibility=document.getElementById('profile-community-visible'); if(visibility) visibility.checked=isOwner&&profile.communityVisible===true;
       ['owner-profile-visibility','owner-gallery-controls'].forEach(function(id){const control=document.getElementById(id);if(control)control.classList.toggle('hidden',!isOwner);});
@@ -3292,6 +3293,14 @@ var bootScreenActive = false;
       return typeof item.groupId==='string' && /^[a-zA-Z0-9_-]{1,120}$/.test(item.groupId) ? 'g_'+item.groupId : 's_'+item.path.slice(item.path.lastIndexOf('/')+1);
     }
 
+    function isGalleryItemSelectedForSharing(item) {
+      return !item.archived && item.visibility !== 'private';
+    }
+
+    function isGalleryItemShared(profile,item) {
+      return profile.communityVisible === true && isGalleryItemSelectedForSharing(item);
+    }
+
     function loadGalleryStorageSdk() {
       return import('https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js');
     }
@@ -3307,7 +3316,7 @@ var bootScreenActive = false;
       interestObjectUrls.forEach(function(url){URL.revokeObjectURL(url);}); interestObjectUrls=[]; grid.replaceChildren(); archiveGrid.replaceChildren();
       const validViewer=viewer&&(!isOwner||(currentUser&&currentUser.uid===viewer.uid));
       const items=validViewer&&profile&&Array.isArray(profile.interestMedia)?profile.interestMedia.slice(0,MAX_PRIVATE_INTEREST_ITEMS).filter(function(item){return item&&isInterestMediaPath(item.path,profile.uid);}):[];
-      const visible=items.filter(function(item){return !item.archived&&(isOwner||item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));});
+      const visible=items.filter(function(item){return !item.archived&&(isOwner||isGalleryItemShared(profile,item));});
       const archived=isOwner?items.filter(function(item){return item.archived===true;}):[];
       archive.classList.toggle('hidden',!isOwner||!archived.length);
       if(!archived.length) archive.open=false;
@@ -3330,7 +3339,7 @@ var bootScreenActive = false;
         if(group.length>1){const count=document.createElement('span');count.className='profile-media-count';count.textContent='1 / '+group.length;preview.appendChild(count);}
         const caption=document.createElement('figcaption');caption.textContent=String(item.name||'A special interest').slice(0,100);card.appendChild(caption);
         if(isOwner){
-          const shared=!item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));
+          const shared=isGalleryItemShared(profile,item);
           const state=document.createElement('span');state.className='profile-media-state';state.textContent=item.archived?'Archived':group.length>1?'Multiple items':shared?'Shared':'Private';caption.appendChild(state);
           const menu=document.createElement('details');menu.className='profile-media-menu';
           const trigger=document.createElement('summary');trigger.setAttribute('aria-label','Options for '+String(item.name||'gallery item'));trigger.textContent='⋯';menu.appendChild(trigger);
@@ -3392,12 +3401,12 @@ var bootScreenActive = false;
       edit.replaceChildren();
       edit.classList.toggle('hidden',!state.isOwner||!state.edit);
       if(state.isOwner&&state.edit){
-        const shared=!item.archived&&(item.visibility==='community'||(state.profile.communityVisible===true&&item.visibility!=='private'));
-        const status=document.createElement('p');status.textContent=item.archived?'Archived':shared?'Shared with members':'Private';edit.appendChild(status);
+        const selected=isGalleryItemSelectedForSharing(item),shared=isGalleryItemShared(state.profile,item);
+        const status=document.createElement('p');status.textContent=item.archived?'Archived':shared?'Shared with members':selected?'Private while your profile is private; shared when your profile is shared':'Private';edit.appendChild(status);
         function addAction(label,action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',action);edit.appendChild(button);}
         if(item.archived)addAction('Restore to gallery',function(){closeGalleryViewer();setInterestMediaArchived(item.path,false);});
         else {
-          addAction(shared?'Make private':'Share with members',function(){closeGalleryViewer();setInterestMediaVisibility(item.path,shared?'private':'community');});
+          addAction(selected?'Make private':'Share when profile is shared',function(){closeGalleryViewer();setInterestMediaVisibility(item.path,selected?'private':'community');});
           addAction('Archive',function(){closeGalleryViewer();setInterestMediaArchived(item.path,true);});
         }
         addAction('Delete',async function(){
@@ -3432,7 +3441,7 @@ var bootScreenActive = false;
 
     function openGalleryEngagement(state) {
       const section=document.getElementById('gallery-engagement');
-      const shared=state.items.some(function(item){return !item.archived&&(item.visibility==='community'||(state.profile.communityVisible===true&&item.visibility!=='private'));});
+      const shared=state.items.some(function(item){return isGalleryItemShared(state.profile,item);});
       section.hidden=!shared;
       if(!shared)return;
       const user=auth.currentUser, postId=galleryPostId(state.items[0]);
@@ -3603,7 +3612,7 @@ var bootScreenActive = false;
     async function setInterestMediaVisibility(path,visibility){
       const user=auth.currentUser;if(!user||!currentUser||currentUser.uid!==user.uid||!['private','community'].includes(visibility))return;
       const item=Array.isArray(currentUser.interestMedia)&&currentUser.interestMedia.find(function(entry){return entry.path===path;});if(!item||item.archived||!isInterestMediaPath(path,user.uid))return;
-      await updateInterestMedia(path,{visibility:visibility},visibility==='community'?'This item is shared with signed-in members.':'This item is private to you.');
+      await updateInterestMedia(path,{visibility:visibility},visibility==='community'?(currentUser.communityVisible?'This item is shared with signed-in members.':'This item will be shared when your profile is shared.'):'This item is private to you.');
     }
 
     async function setInterestMediaArchived(path,archived){
@@ -3688,7 +3697,7 @@ var bootScreenActive = false;
         if(captionInput) captionInput.value='';
         if(descriptionInput) descriptionInput.value='';
         renderPrivateInterestGallery();
-        if (status) status.textContent = chosenVisibility==='community'?'Your post was saved and shared with signed-in members.':'Your post was saved privately.';
+        if (status) status.textContent = chosenVisibility==='community'?(currentUser.communityVisible?'Your post was saved and shared with signed-in members.':'Your post was saved privately and will be shared when your profile is shared.'):'Your post was saved privately.';
         renderProfile(currentUser,true);
         showToast('Your profile gallery has been updated.');
       } catch (error) {
@@ -3749,19 +3758,22 @@ var bootScreenActive = false;
       } finally {profileChangePending=false;}
     }
 
-    let directoryProfiles=null; let directoryLoadPromise=null;
+    let directoryProfiles=null; let directoryLoadPromise=null; let directoryLoadUserId=null;
     async function renderCommunityDirectory(searchQuery=''){
       const grid=document.getElementById('members-grid');if(!grid)return;grid.replaceChildren();if(!auth.currentUser){const msg=document.createElement('p');msg.className='profile-gallery-empty';msg.textContent='Sign in to explore profiles shared by Sanctuary members.';grid.appendChild(msg);return;}
+      const viewerId=auth.currentUser.uid;
       const status=document.createElement('p');status.className='directory-status';status.setAttribute('role','status');status.textContent='Loading members…';grid.appendChild(status);
-      try{if(!directoryProfiles){if(!directoryLoadPromise)directoryLoadPromise=db.collection('communityProfiles').where('visible','==',true).limit(50).get().then(function(snapshot){directoryProfiles=snapshot.docs.map(function(doc){return Object.assign({uid:doc.id},doc.data());});}).finally(function(){directoryLoadPromise=null;});await directoryLoadPromise;}
+      try{if(!directoryProfiles){if(directoryLoadPromise&&directoryLoadUserId!==viewerId){await directoryLoadPromise.catch(function(error){console.error('Previous directory request failed:',error.code||error.message);});if(auth.currentUser&&auth.currentUser.uid===viewerId)await renderCommunityDirectory(searchQuery);return;}
+        if(!directoryLoadPromise){directoryLoadUserId=viewerId;directoryLoadPromise=functions.httpsCallable('listCommunityProfiles')().then(function(result){if(!Array.isArray(result.data))throw new Error('Invalid community directory response.');if(auth.currentUser&&auth.currentUser.uid===viewerId)directoryProfiles=result.data;}).finally(function(){directoryLoadPromise=null;directoryLoadUserId=null;});}await directoryLoadPromise;}
+        if(!auth.currentUser||auth.currentUser.uid!==viewerId)return;
         const query=String(searchQuery||'').trim().toLowerCase(),results=(directoryProfiles||[]).filter(function(profile){return !query||String(profile.username||'').toLowerCase().includes(query);});grid.replaceChildren();
-        if(!results.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=query?'No shared profiles match that search.':'No profiles have been shared yet. You can choose whether yours is visible in Account Settings.';grid.appendChild(empty);return;}
+        if(!results.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=query?'No shared profiles match that search.':'No profiles have been shared yet. You can choose whether yours is visible on your profile page.';grid.appendChild(empty);return;}
         results.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileAvatarUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
-      }catch(error){directoryProfiles=null;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.textContent='The community directory could not be loaded. Check that the updated Firestore rules have been deployed.';grid.appendChild(fail);console.error('Community directory load failed:',error.code||error.message);}
+      }catch(error){directoryProfiles=null;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.textContent='The community directory could not be loaded. Please try again later.';grid.appendChild(fail);console.error('Community directory load failed:',error.code||error.message);}
     }
     async function openCommunityProfile(uid,updateHistory){
       if(!auth.currentUser){openAuthModal('signup');return;}if(typeof uid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(uid)){showToast('That profile link is not valid.');return;}
-      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(!snapshot.exists||snapshot.data().visible!==true){showToast('This profile is private or unavailable.');return;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.profileVisible?shared.avatar:null,bio:shared.profileVisible?shared.bio:'',neurotypes:shared.profileVisible?shared.neurotypes:[],links:shared.profileVisible?shared.links:[],communityVisible:shared.profileVisible===true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
+      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
         const embeds=['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];embeds.forEach(function(id){const el=document.getElementById(id);if(el)el.classList.remove('active-embed');});const directory=document.getElementById('directory-view');if(directory){directory.classList.add('hidden');directory.classList.remove('active-embed');directory.style.display='none';}const page=document.getElementById('profile-page');if(page){page.classList.remove('hidden');page.style.display='block';page.classList.add('active-embed');}updateSkipTarget('profile-page');renderProfile(profile,false);if(updateHistory!==false)history.pushState(null,null,'#member/'+encodeURIComponent(uid));window.scrollTo({top:0,behavior:'instant'});
       }catch(error){showToast('This profile is private or could not be loaded.');console.error('Community profile load failed:',error.code||error.message);}
     }
@@ -3963,9 +3975,9 @@ var bootScreenActive = false;
 
     function communityProfileProjection(profile) {
       const user=auth.currentUser; if(!user||!profile||profile.uid!==user.uid) throw new Error('Profile owner mismatch.');
-      const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(function(item){return !item.archived&&(item.visibility==='community'||(profile.communityVisible===true&&item.visibility!=='private'));}).slice(0,12):[];
       const profileVisible=profile.communityVisible===true;
-      if(!profileVisible&&!items.length) return null;
+      if(!profileVisible) return null;
+      const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(isGalleryItemSelectedForSharing).slice(0,12):[];
       const sharedPostIds={};
       const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){sharedPostIds[galleryPostId(item)]=true;const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;if(typeof item.description==='string')result.description=item.description.slice(0,500);return result;}),sharedPostIds:sharedPostIds,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
       if(profileVisible){projection.avatar=profile.avatar||null;projection.bio=String(profile.bio||'').slice(0,150);projection.neurotypes=Array.isArray(profile.neurotypes)?profile.neurotypes.filter(function(type){return availableNeurotypes.includes(type);}):[];projection.links=Array.isArray(profile.links)?profile.links.slice(0,6):[];}
@@ -4013,18 +4025,30 @@ var bootScreenActive = false;
       }
       profileChangePending=true;
       if(control)control.disabled=true;
+      const previousVisibility=currentUser.communityVisible;
       currentUser.communityVisible=visible;
       try {
         await persistUserProfile();
         renderProfile(currentUser,true);
-        showToast(visible?'Your profile is shared with signed-in members.':'Your profile is private. Individually shared items remain visible.');
+        showToast(visible?'Your profile and selected gallery items are shared with signed-in members.':'Your profile and entire gallery are private.');
       } catch(error) {
         console.error('Profile visibility change failed:',error.code||error.message);
-        currentUser.communityVisible=false;
-        try { await persistUserProfile(); }
-        catch(recoveryError) { console.error('Profile privacy recovery failed:',recoveryError.code||recoveryError.message); }
-        renderProfile(currentUser,true);
-        showToast('Profile visibility could not be saved. Please check your settings and try again.');
+        if(currentUser&&auth.currentUser&&currentUser.uid===user.uid&&auth.currentUser.uid===user.uid){
+          try {
+            const saved=await db.collection('users').doc(user.uid).get({source:'server'});
+            if(!saved.exists)throw new Error('Saved profile not found.');
+            if(!currentUser||!auth.currentUser||currentUser.uid!==user.uid||auth.currentUser.uid!==user.uid)return;
+            currentUser.communityVisible=saved.data().communityVisible===true;
+            renderProfile(currentUser,true);
+            showToast('Profile visibility could not be saved. Your saved setting has been restored.');
+          } catch(recoveryError) {
+            console.error('Profile visibility verification failed:',recoveryError.code||recoveryError.message);
+            if(!currentUser||!auth.currentUser||currentUser.uid!==user.uid||auth.currentUser.uid!==user.uid)return;
+            currentUser.communityVisible=previousVisibility;
+            renderProfile(currentUser,true);
+            showToast('Could not verify your profile privacy. Reconnect and refresh to check your saved setting.');
+          }
+        }
       } finally {
         profileChangePending=false;
         if(control)control.disabled=false;

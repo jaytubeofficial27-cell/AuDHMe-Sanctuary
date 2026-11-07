@@ -35,7 +35,9 @@ service cloud.firestore {
 
     match /communityProfiles/{userId} {
       // This projection contains only fields the member chose to share.
-      allow read: if request.auth != null && resource.data.visible == true;
+      allow get: if request.auth != null && resource.data.profileVisible == true
+        && get(/databases/$(database)/documents/users/$(userId)).data.communityVisible == true;
+      allow list: if false;
       allow create, update: if signedInAs(userId)
         && request.resource.data.uid == userId
         && request.resource.data.visible == true
@@ -54,7 +56,9 @@ service cloud.firestore {
     match /galleryEngagement/{ownerId}/posts/{postId} {
       function isSharedPost() {
         return request.auth != null
+          && get(/databases/$(database)/documents/users/$(ownerId)).data.communityVisible == true
           && exists(/databases/$(database)/documents/communityProfiles/$(ownerId))
+          && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.profileVisible == true
           && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.keys().hasAll(['sharedPostIds'])
           && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.sharedPostIds is map
           && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.sharedPostIds.keys().hasAny([postId]);

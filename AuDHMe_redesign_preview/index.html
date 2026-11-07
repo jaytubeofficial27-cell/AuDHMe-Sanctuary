@@ -1483,7 +1483,7 @@
       <button type="button" class="calm-secondary-button" onclick="closeGalleryUpload()">&larr; Back to profile</button>
       <div class="profile-upload-panel">
         <h2 id="interest-upload-title" tabindex="-1">Add to your special-interest gallery</h2>
-        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel. Shared posts are visible to signed-in members, who may save their contents.</p>
+        <p>Up to 12 items, including archived items. Photos: up to 12 MB; videos: up to 30 MB. Files selected together form a carousel. Shared posts are visible to signed-in members only while your profile is shared. Members may save shared content.</p>
         <label for="interest-media-files">Photos or videos</label>
         <input type="file" id="interest-media-files" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
         <label for="interest-media-caption">Title (optional, up to 80 characters)</label>
@@ -1492,7 +1492,7 @@
         <textarea id="interest-media-description" maxlength="500" rows="3" placeholder="Share a little about your special interest"></textarea>
         <label for="interest-media-visibility">Who can see this post?</label>
         <select id="interest-media-visibility">
-          <option value="community">Shared with signed-in members</option>
+          <option value="community">Shared when my profile is shared</option>
           <option value="private">Private to me</option>
         </select>
         <button type="button" class="calm-primary-button" onclick="uploadInterestMedia()">Upload selected files</button>
@@ -1552,7 +1552,7 @@
       </div>
 
       <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
-        <p class="text-xs text-slate-400">Choose whether to share your profile with signed-in members on your profile page. You can share selected gallery items even when your profile is private.</p>
+        <p class="text-xs text-slate-400">Choose whether to share your profile with signed-in members on your profile page. When your profile is private, your entire gallery is private too.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="text-xs text-slate-400 block mb-1">Username / Alias (30-day cooldown):</label>
@@ -1982,6 +1982,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=51"></script>
+  <script src="js/app.js?v=52"></script>
 </body>
 </html>

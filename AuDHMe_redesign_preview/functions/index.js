@@ -42,6 +42,23 @@ function getStripe() {
   return require('stripe')(STRIPE_SECRET_KEY.value());
 }
 
+exports.listCommunityProfiles = onCall({
+  region: 'europe-west2',
+  maxInstances: 5
+}, async (request) => {
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to explore the community.');
+  return db.runTransaction(async (transaction) => {
+    const projections = await transaction.get(db.collection('communityProfiles').where('profileVisible', '==', true).limit(50));
+    if (projections.empty) return [];
+    const profiles = await transaction.getAll(...projections.docs.map((snapshot) => db.collection('users').doc(snapshot.id)));
+    return projections.docs.flatMap((snapshot, index) => {
+      if (!profiles[index].exists || profiles[index].data().communityVisible !== true) return [];
+      const data = snapshot.data();
+      return [{ uid: snapshot.id, username: data.username, avatar: data.avatar || null, bio: data.bio || '', neurotypes: Array.isArray(data.neurotypes) ? data.neurotypes : [], profileVisible: true }];
+    });
+  }, { readOnly: true });
+});
+
 function getSiteUrl() {
   let parsed;
   try {

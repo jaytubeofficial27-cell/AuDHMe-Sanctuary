@@ -19,9 +19,8 @@ service firebase.storage {
 
       allow read: if isGalleryFolder() && (owns(userId)
         || (request.auth != null
-          && ((resource.metadata.visibility == 'community')
-            || (firestore.get(/databases/(default)/documents/users/$(userId)).data.communityVisible == true
-              && resource.metadata.visibility != 'private'))));
+          && firestore.get(/databases/(default)/documents/users/$(userId)).data.communityVisible == true
+          && resource.metadata.visibility != 'private'));
       allow delete: if isGalleryFolder() && owns(userId);
       allow create: if isGalleryFolder() && owns(userId)
         && hasGalleryCapacity(userId)
