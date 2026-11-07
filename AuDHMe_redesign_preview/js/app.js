@@ -376,9 +376,34 @@ var bootScreenActive = false;
       });
     }
 
+    var routeVersion = 0;
+    function hideRouteLoading() {
+      document.getElementById('route-loading').classList.add('hidden');
+    }
+
+    function showRouteLoading(hash) {
+      document.querySelectorAll('.active-embed').forEach(function(element) {
+        element.classList.remove('active-embed');
+      });
+      ['profile-page', 'directory-view'].forEach(function(id) {
+        var element = document.getElementById(id);
+        element.classList.add('hidden');
+        element.style.display = 'none';
+      });
+      var loading = document.getElementById('route-loading');
+      var message = document.getElementById('route-loading-message');
+      message.setAttribute('role', 'status');
+      message.textContent = hash === 'directory' ? 'Loading community directory…' : 'Loading profile…';
+      loading.classList.remove('hidden');
+      updateSkipTarget('route-loading');
+      updateActiveNavigation(hash === 'directory' ? 'directory' : 'profile');
+    }
+
     function switchPage(pageKey, updateHistory) {
       playTactileClick(310, 0.04);
       closeGalleryViewer();
+      routeVersion++;
+      hideRouteLoading();
 
       var allEmbeds = ['embed03', 'embed35', 'embed-store', 'embed13', 'embed09', 'embed41', 'embed07', 'embed06', 'embed11', 'embed04', 'embed15', 'embed16'];
       var targetEmbeds = [];
@@ -437,14 +462,45 @@ var bootScreenActive = false;
     function handleInitialRoute() {
       var rawHash = window.location.hash.replace('#', '');
       var hash = rawHash.toLowerCase();
-      if (rawHash.slice(0,7).toLowerCase() === 'member/') {
-        authInitialized.then(function() { return userProfileReady; }).then(function() {
-          try { openCommunityProfile(decodeURIComponent(rawHash.slice(7)), false); } catch (e) { openCommunityProfile(rawHash.slice(7), false); }
+      var isMemberRoute = rawHash.slice(0,7).toLowerCase() === 'member/';
+      if (isMemberRoute || hash === 'profile' || hash === 'directory') {
+        var pendingVersion = ++routeVersion;
+        var routeUserId;
+        showRouteLoading(hash);
+        authInitialized.then(function() {
+          if (pendingVersion !== routeVersion) return;
+          if (!auth.currentUser) {
+            switchPage('home', false);
+            openAuthModal('signup');
+            return;
+          }
+          routeUserId = auth.currentUser.uid;
+          if (hash === 'profile') return userProfileReady;
+        }).then(function() {
+          if (pendingVersion !== routeVersion) return;
+          if (!auth.currentUser || auth.currentUser.uid !== routeUserId) {
+            handleInitialRoute();
+            return;
+          }
+          if (isMemberRoute) {
+            var uid;
+            try { uid = decodeURIComponent(rawHash.slice(7)); } catch (e) { uid = rawHash.slice(7); }
+            return openCommunityProfile(uid, false, pendingVersion).then(function(opened) {
+              if (!opened && pendingVersion === routeVersion) {
+                var message = document.getElementById('route-loading-message');
+                message.setAttribute('role', 'alert');
+                message.textContent = 'This profile is private or unavailable. Use the navigation to choose another page.';
+              }
+            });
+          }
+          switchView(hash, false);
+        }).catch(function(error) {
+          if (pendingVersion !== routeVersion) return;
+          console.error('Page loading failed:', error.code || error.message);
+          var message = document.getElementById('route-loading-message');
+          message.setAttribute('role', 'alert');
+          message.textContent = 'This page could not be loaded. Please try refreshing or choose another page.';
         });
-        return;
-      }
-      if (hash === 'profile' || hash === 'directory') {
-        authInitialized.then(function() { return userProfileReady; }).then(function() { switchView(hash, false); });
         return;
       }
       var storeRoute = hash.match(/^store\/(core-hoodie|spectrum-hoodie)$/);
@@ -3214,6 +3270,8 @@ var bootScreenActive = false;
         return;
       }
 
+      routeVersion++;
+      hideRouteLoading();
       var allEmbeds = ['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];
       allEmbeds.forEach(function(id) { var el=document.getElementById(id); if (el) el.classList.remove('active-embed'); });
       const profilePage=document.getElementById('profile-page'), directoryView=document.getElementById('directory-view');
@@ -3833,11 +3891,13 @@ var bootScreenActive = false;
         results.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileAvatarUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
       }catch(error){if(renderVersion!==directoryRenderVersion||!auth.currentUser||auth.currentUser.uid!==viewerId)return;directoryProfiles=null;directoryLoadError=error;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.setAttribute('role','alert');fail.textContent='The community directory is unavailable. Check your connection and try again. If this continues, the directory service may need to be deployed.';const retry=document.createElement('button');retry.type='button';retry.className='calm-secondary-button';retry.textContent='Try again';retry.addEventListener('click',function(){directoryLoadError=null;renderCommunityDirectory(document.getElementById('member-search-input').value);});grid.append(fail,retry);console.error('Community directory load failed:',error.code||error.message);}
     }
-    async function openCommunityProfile(uid,updateHistory){
-      if(!auth.currentUser){openAuthModal('signup');return;}if(typeof uid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(uid)){showToast('That profile link is not valid.');return;}
-      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,liveStatuses:shared.liveStatuses,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
-        const embeds=['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];embeds.forEach(function(id){const el=document.getElementById(id);if(el)el.classList.remove('active-embed');});const directory=document.getElementById('directory-view');if(directory){directory.classList.add('hidden');directory.classList.remove('active-embed');directory.style.display='none';}const page=document.getElementById('profile-page');if(page){page.classList.remove('hidden');page.style.display='block';page.classList.add('active-embed');}updateSkipTarget('profile-page');renderProfile(profile,false);if(updateHistory!==false)history.pushState(null,null,'#member/'+encodeURIComponent(uid));window.scrollTo({top:0,behavior:'instant'});
-      }catch(error){showToast('This profile is private or could not be loaded.');console.error('Community profile load failed:',error.code||error.message);}
+    async function openCommunityProfile(uid,updateHistory,pendingVersion){
+      if(!auth.currentUser){openAuthModal('signup');return false;}if(typeof uid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(uid)){showToast('That profile link is not valid.');return false;}
+      const requestVersion = pendingVersion === undefined ? ++routeVersion : pendingVersion;
+      const viewerId = auth.currentUser.uid;
+      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(requestVersion!==routeVersion)return false;if(!auth.currentUser||auth.currentUser.uid!==viewerId){if(pendingVersion!==undefined)handleInitialRoute();return false;}if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return false;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,liveStatuses:shared.liveStatuses,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
+        hideRouteLoading();const embeds=['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];embeds.forEach(function(id){const el=document.getElementById(id);if(el)el.classList.remove('active-embed');});const directory=document.getElementById('directory-view');if(directory){directory.classList.add('hidden');directory.classList.remove('active-embed');directory.style.display='none';}const page=document.getElementById('profile-page');if(page){page.classList.remove('hidden');page.style.display='block';page.classList.add('active-embed');}updateSkipTarget('profile-page');renderProfile(profile,false);if(updateHistory!==false)history.pushState(null,null,'#member/'+encodeURIComponent(uid));window.scrollTo({top:0,behavior:'instant'});return true;
+      }catch(error){if(requestVersion!==routeVersion)return false;showToast('This profile is private or could not be loaded.');console.error('Community profile load failed:',error.code||error.message);return false;}
     }
     function returnToCommunityDirectory(){switchView('directory',true);}
 
