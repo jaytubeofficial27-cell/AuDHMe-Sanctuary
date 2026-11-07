@@ -3530,7 +3530,7 @@ var bootScreenActive = false;
     function openGalleryViewer(items,profile,isOwner,loadPreviewBlob) {
       if(!auth.currentUser||!items.length||(isOwner&&(!currentUser||currentUser.uid!==auth.currentUser.uid)))return;
       const dialog=document.getElementById('profile-gallery-viewer');
-      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,edit:false,index:0,loadPreviewBlob:loadPreviewBlob};
+      galleryViewerState={items:items.slice(),profile:profile,isOwner:isOwner,menuOpen:false,edit:false,index:0,loadPreviewBlob:loadPreviewBlob};
       const state=galleryViewerState;
       document.getElementById('gallery-viewer-view-status').textContent='';
       renderGalleryViewer();
@@ -3547,7 +3547,7 @@ var bootScreenActive = false;
 
     function toggleGalleryViewerOptions() {
       if(!galleryViewerState||!galleryViewerState.isOwner)return;
-      galleryViewerState.edit=!galleryViewerState.edit;
+      galleryViewerState.menuOpen=!galleryViewerState.menuOpen;
       renderGalleryViewerOptions();
     }
 
@@ -3586,9 +3586,22 @@ var bootScreenActive = false;
     function renderGalleryViewerOptions() {
       if(!galleryViewerState)return;
       const state=galleryViewerState,item=state.items[state.index];
-      const edit=document.getElementById('gallery-viewer-edit'),options=document.getElementById('gallery-viewer-options');
+      const edit=document.getElementById('gallery-viewer-edit'),options=document.getElementById('gallery-viewer-options'),menu=document.getElementById('gallery-viewer-menu');
       options.hidden=!state.isOwner;
-      options.setAttribute('aria-expanded',String(state.isOwner&&state.edit));
+      options.setAttribute('aria-expanded',String(state.isOwner&&state.menuOpen));
+      menu.hidden=!state.isOwner||!state.menuOpen;
+      menu.replaceChildren();
+      if(state.isOwner&&state.menuOpen){
+        function addMenuAction(label,action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',action);menu.appendChild(button);}
+        addMenuAction('Edit',function(){state.menuOpen=false;state.edit=true;renderGalleryViewerOptions();edit.querySelector('input').focus();});
+        if(item.archived)addMenuAction('Restore to gallery',function(){closeGalleryViewer();setInterestMediaArchived(item.path,false);});
+        else addMenuAction('Archive',function(){closeGalleryViewer();setInterestMediaArchived(item.path,true);});
+        addMenuAction('Delete',async function(){
+          state.menuOpen=false;renderGalleryViewerOptions();
+          const user=auth.currentUser;
+          if(await confirmSiteAction('Delete gallery item?','This item will be permanently deleted.','Delete')&&galleryViewerState===state&&auth.currentUser&&user&&auth.currentUser.uid===user.uid){closeGalleryViewer();deletePrivateInterestMedia(item.path);}
+        });
+      }
       edit.replaceChildren();
       edit.classList.toggle('hidden',!state.isOwner||!state.edit);
       if(state.isOwner&&state.edit){
@@ -3633,15 +3646,10 @@ var bootScreenActive = false;
           } finally {profileChangePending=false;save.disabled=false;}
         });
         function addAction(label,action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',action);edit.appendChild(button);}
-        if(item.archived)addAction('Restore to gallery',function(){closeGalleryViewer();setInterestMediaArchived(item.path,false);});
-        else {
+        if(!item.archived) {
           addAction(selected?'Make private':'Share when profile is shared',function(){closeGalleryViewer();setInterestMediaVisibility(item.path,selected?'private':'community');});
-          addAction('Archive',function(){closeGalleryViewer();setInterestMediaArchived(item.path,true);});
         }
-        addAction('Delete',async function(){
-          const user=auth.currentUser;
-          if(await confirmSiteAction('Delete gallery item?','This item will be permanently deleted.','Delete')&&galleryViewerState===state&&auth.currentUser&&user&&auth.currentUser.uid===user.uid){closeGalleryViewer();deletePrivateInterestMedia(item.path);}
-        });
+        addAction('Cancel',function(){state.edit=false;renderGalleryViewerOptions();options.focus();});
       }
     }
 
@@ -3649,6 +3657,8 @@ var bootScreenActive = false;
       if(!galleryViewerState)return;
       const next=galleryViewerState.index+direction;
       if(next<0||next>=galleryViewerState.items.length)return;
+      galleryViewerState.menuOpen=false;
+      galleryViewerState.edit=false;
       galleryViewerState.index=next;
       renderGalleryViewer();
     }
@@ -3808,6 +3818,9 @@ var bootScreenActive = false;
       if(event.key==='Escape'){
         const menu=event.target.closest('.gallery-comment-menu[open]');
         if(menu){event.preventDefault();event.stopPropagation();menu.open=false;menu.querySelector('summary').focus();return;}
+        if(galleryViewerState&&galleryViewerState.menuOpen){
+          event.preventDefault();event.stopPropagation();galleryViewerState.menuOpen=false;renderGalleryViewerOptions();document.getElementById('gallery-viewer-options').focus();return;
+        }
         event.preventDefault();event.stopPropagation();closeGalleryViewer();
       }
       else if((event.key==='ArrowLeft'||event.key==='ArrowRight')&&!['VIDEO','TEXTAREA','INPUT'].includes(event.target.tagName)){
@@ -3829,6 +3842,9 @@ var bootScreenActive = false;
     galleryViewerMedia.addEventListener('touchcancel',function(){galleryTouchStart=null;},{passive:true});
 
     document.addEventListener('click',function(event){
+      if(galleryViewerState&&galleryViewerState.menuOpen&&!event.target.closest('.gallery-viewer-options-wrap')){
+        galleryViewerState.menuOpen=false;renderGalleryViewerOptions();
+      }
       document.querySelectorAll('.gallery-comment-menu[open]').forEach(function(menu){if(!menu.contains(event.target))menu.open=false;});
     });
 
