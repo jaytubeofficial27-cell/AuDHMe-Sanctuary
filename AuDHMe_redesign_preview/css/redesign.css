@@ -4539,3 +4539,26 @@ body[data-holiday="bonfire"] #embed07 .flip-card-back {
   #pane-store .store-product-card:hover .store-card-art img { transform:none; }
 }
 body:is(.low-input-active,.low-stim-active,.site-adapt-calm) #pane-store .store-product-card:hover .store-card-art img { transform:none; }
+
+/* Preserve the full closing message and keep compact controls usable on phones. */
+@media (max-width: 900px) {
+  .site-footer-bottom p:last-child {
+    display: block !important;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: left;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-interest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  #audhme-widget-panel {
+    box-sizing: border-box;
+    width: min(310px, calc(100vw - 40px)) !important;
+    max-width: calc(100vw - 40px) !important;
+  }
+}
