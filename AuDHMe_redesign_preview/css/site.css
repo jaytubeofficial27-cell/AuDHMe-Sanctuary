@@ -877,6 +877,34 @@
       text-align: left;
     }
 
+    @media (min-width: 1100px) {
+      .cond-modal-card[data-condition-code="ND-01"] {
+        max-width: 1260px;
+        max-height: calc(100vh - 40px);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+        column-gap: 18px;
+        align-content: start;
+      }
+
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-header,
+      .cond-modal-card[data-condition-code="ND-01"] > h2,
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-summary,
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-codes {
+        grid-column: 1 / -1;
+      }
+
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-header { margin-bottom: 12px; padding-bottom: 8px; }
+      .cond-modal-card[data-condition-code="ND-01"] > h2 { margin-bottom: 4px; }
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-summary,
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-symptoms,
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-details { margin-bottom: 12px; }
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-details { gap: 10px; }
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-details > div { padding: 12px; }
+      .cond-modal-card[data-condition-code="ND-01"] .condition-modal-codes { padding-top: 8px; }
+    }
+
     /* Active Pinned Broadcast Bar */
     #active-neurocode-hud {
       background: #303329;

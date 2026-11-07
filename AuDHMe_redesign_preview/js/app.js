@@ -1677,20 +1677,21 @@ var bootScreenActive = false;
       }).join('');
 
       var content = document.getElementById('condition-modal-content');
+      content.dataset.conditionCode = c.code;
       content.innerHTML =
-        '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">' +
+        '<div class="condition-modal-header flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">' +
           '<span class="organic-badge">' + c.code + ' · ' + c.category.toUpperCase() + ' PROFILE</span>' +
           '<button type="button" aria-label="Close profile" title="Close profile" onclick="closeConditionModal()" class="w-10 h-10 rounded-lg bg-[#252923] border border-slate-700 text-slate-300 hover:text-white hover:border-[#cbb678] text-lg font-bold transition">' +
             '<span aria-hidden="true">✕</span>' +
           '</button>' +
         '</div>' +
         '<h2 class="text-2xl sm:text-3xl font-black text-white mb-2">' + c.name + '</h2>' +
-        '<p class="text-sky-300 text-base font-medium leading-relaxed mb-5">' + c.summary + '</p>' +
-        '<div class="mb-5 p-4 rounded-xl bg-[#252923] border border-slate-800">' +
+        '<p class="condition-modal-summary text-sky-300 text-base font-medium leading-relaxed mb-5">' + c.summary + '</p>' +
+        '<div class="condition-modal-symptoms mb-5 p-4 rounded-xl bg-[#252923] border border-slate-800">' +
           '<div class="font-mono text-xs font-extrabold text-[#cbb678] uppercase tracking-wider mb-2.5">WHAT IT ACTUALLY LOOKS &amp; FEELS LIKE:</div>' +
           '<ul class="space-y-2.5 m-0 p-0 list-none">' + symList + '</ul>' +
         '</div>' +
-        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">' +
+        '<div class="condition-modal-details grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">' +
           '<div class="p-4 rounded-xl bg-[#252923] border border-sky-500/30">' +
             '<div class="font-mono text-xs font-extrabold text-sky-400 uppercase mb-1">01 · INSIDE YOUR HEAD</div>' +
             '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.internalReality + '</p>' +
@@ -1708,7 +1709,7 @@ var bootScreenActive = false;
             '<p class="text-slate-200 text-xs sm:text-sm leading-relaxed m-0">' + c.sanctuaryAdjustment + '</p>' +
           '</div>' +
         '</div>' +
-        '<div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">' +
+        '<div class="condition-modal-codes pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">' +
           '<span class="font-mono text-xs text-slate-400">USE THESE NEURO-CODES WHEN THIS HITS:</span>' +
           '<div class="flex flex-wrap gap-1.5">' + codeBadges + '</div>' +
         '</div>';
