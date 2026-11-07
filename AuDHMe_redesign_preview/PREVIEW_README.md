@@ -4,6 +4,8 @@ This is a separate, modular draft of the AuDHMe Sanctuary site. It carries the o
 
 Optional reading preferences for warm tone, reduced motion, low-stim reading, and text spacing remain available in Sensory Tools. The site also supports temporary, opt-in Neuro-Code adaptations: after flipping a code, visitors can open its separate “Adapt site” action. Each code now presents only its own relevant set of interface actions rather than a shared set of generic checkboxes. Depending on the code, these can include a quiet screen, a one-series view, larger controls, a visible/copyable need statement, sensory-tool access, a one-step task prompt, or an optional focus timer. Visitors can change selections before applying or restore the original site. Choices stay in page memory, not in an account. The Neuro-Pass offers the same opt-in flow.
 
+When live local weather is selected, weather particles remain still while location and current conditions load. If the request fails or takes more than 12 seconds, the seasonal atmosphere is used instead; the weather controls show the status.
+
 Neuro-Code cards remain unchanged as communication cards. Their suggested adaptations are optional site-interface preferences, not medical recommendations or assumptions about what a person needs.
 
 New profiles are shared with signed-in Sanctuary members by default; existing profile privacy settings are preserved. A private profile hides its entire gallery. When a profile is shared, individually private gallery items remain hidden.

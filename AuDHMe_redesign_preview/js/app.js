@@ -1983,6 +1983,11 @@ var bootScreenActive = false;
     var atmoResizeTimer = null;
     var atmoViewportWidth = window.innerWidth;
     var atmoResolved = { time: 'night', season: 'autumn', weather: 'clear', holiday: 'none' };
+    var liveWeatherPending = false;
+    var liveWeatherRequest = 0;
+    var liveWeatherTimer = null;
+    var liveWeatherController = null;
+    var liveWeatherStatus = '';
 
     function loadAtmoPrefs() {
       try {
@@ -2061,42 +2066,76 @@ var bootScreenActive = false;
       return 'clear';
     }
 
+    function cancelLiveWeatherRequest() {
+      liveWeatherRequest++;
+      if (liveWeatherTimer) clearTimeout(liveWeatherTimer);
+      liveWeatherTimer = null;
+      if (liveWeatherController) liveWeatherController.abort();
+      liveWeatherController = null;
+      liveWeatherPending = false;
+    }
+
     function fetchLiveLocalWeather() {
+      cancelLiveWeatherRequest();
+      var request = liveWeatherRequest;
+      liveWeatherPending = true;
+      liveWeatherStatus = 'Checking local weather; animations will begin when it is ready.';
+      atmoState.liveWeatherCondition = '';
       atmoState.liveWeatherIsStorm = false;
-      if (!navigator.geolocation) {
-        atmoState.liveWeatherCondition = '';
+      applySanctuaryAtmosphere(true);
+
+      function finish(condition, isStorm, error) {
+        if (request !== liveWeatherRequest || atmoState.weather !== 'live') return;
+        cancelLiveWeatherRequest();
+        atmoState.liveWeatherCondition = condition;
+        atmoState.liveWeatherIsStorm = isStorm;
+        liveWeatherStatus = error ? 'Live weather unavailable. Showing the seasonal atmosphere instead.' : 'Showing live local weather.';
+        if (error) console.warn('Live weather unavailable:', error.message || error);
         applySanctuaryAtmosphere(true);
+      }
+
+      if (!navigator.geolocation) {
+        finish('', false, 'Location is not available in this browser.');
         return;
       }
+      liveWeatherTimer = setTimeout(function() {
+        finish('', false, 'The location or weather request timed out.');
+      }, 12000);
       navigator.geolocation.getCurrentPosition(function(pos) {
+        if (request !== liveWeatherRequest || atmoState.weather !== 'live') return;
         var lat = pos.coords.latitude.toFixed(2);
         var lon = pos.coords.longitude.toFixed(2);
-        fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true')
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            if (!data || !data.current_weather) return;
-            var code = data.current_weather.weathercode;
-            atmoState.liveWeatherIsStorm = (code >= 95 && code <= 99);
-            if (code >= 71 && code <= 86) atmoState.liveWeatherCondition = 'snow';
-            else if (code >= 51 && code <= 67 || code >= 80 && code <= 82 || code >= 95) atmoState.liveWeatherCondition = 'rain';
-            else if (code >= 45 && code <= 48) atmoState.liveWeatherCondition = 'mist';
-            else atmoState.liveWeatherCondition = 'clear';
-            applySanctuaryAtmosphere(true);
+        liveWeatherController = new AbortController();
+        fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true', { signal: liveWeatherController.signal })
+          .then(function(r) {
+            if (!r.ok) throw new Error('Weather service returned HTTP ' + r.status + '.');
+            return r.json();
           })
-          .catch(function() {
-            atmoState.liveWeatherCondition = '';
-            applySanctuaryAtmosphere(true);
+          .then(function(data) {
+            if (!data || !data.current_weather || typeof data.current_weather.weathercode !== 'number') throw new Error('Weather service returned an invalid response.');
+            var code = data.current_weather.weathercode;
+            var condition = 'clear';
+            if (code >= 71 && code <= 77 || code >= 85 && code <= 86) condition = 'snow';
+            else if (code >= 51 && code <= 67 || code >= 80 && code <= 82 || code >= 95) condition = 'rain';
+            else if (code >= 45 && code <= 48) condition = 'mist';
+            finish(condition, code >= 95 && code <= 99);
+          })
+          .catch(function(error) {
+            finish('', false, error);
           });
-      }, function() {
-        atmoState.liveWeatherCondition = '';
-        applySanctuaryAtmosphere(true);
+      }, function(error) {
+        finish('', false, error);
       });
     }
 
     window.updateSanctuaryAtmosphere = function(key, val) {
       playTactileClick(340, 0.045);
       atmoState[key] = val;
-      if (key === 'weather' && val !== 'live') atmoState.liveWeatherIsStorm = false;
+      if (key === 'weather' && val !== 'live') {
+        cancelLiveWeatherRequest();
+        atmoState.liveWeatherIsStorm = false;
+        liveWeatherStatus = '';
+      }
       saveAtmoPrefs();
       if (key === 'weather' && val === 'live') {
         fetchLiveLocalWeather();
@@ -2123,7 +2162,7 @@ var bootScreenActive = false;
       var rWeather = atmoState.weather;
 
       if (rWeather === 'live') {
-        rWeather = atmoState.liveWeatherCondition || detectDefaultWeather(rSeason, rTime, rHoliday);
+        rWeather = liveWeatherPending ? 'off' : (atmoState.liveWeatherCondition || detectDefaultWeather(rSeason, rTime, rHoliday));
       } else if (rWeather === 'auto') {
         rWeather = detectDefaultWeather(rSeason, rTime, rHoliday);
       }
@@ -2148,12 +2187,14 @@ var bootScreenActive = false;
       var wSel = document.getElementById('atmo-weather-select');
       var hSel = document.getElementById('atmo-holiday-select');
       var toggleEl = document.getElementById('atmo-anim-toggle');
+      var weatherStatus = document.getElementById('atmo-weather-status');
 
       if (tSel) tSel.value = atmoState.time;
       if (sSel) sSel.value = atmoState.season;
       if (wSel) wSel.value = atmoState.weather;
       if (hSel) hSel.value = atmoState.holiday;
       if (toggleEl) toggleEl.checked = atmoState.animationsEnabled;
+      if (weatherStatus) weatherStatus.textContent = (liveWeatherStatus ? liveWeatherStatus + ' ' : '') + 'Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.';
       document.body.classList.toggle('atmo-paused', !atmoState.animationsEnabled);
       syncChristmasLights();
       initChristmasCardSnow();
@@ -2925,9 +2966,10 @@ var bootScreenActive = false;
 
     document.addEventListener('DOMContentLoaded', function() {
       loadAtmoPrefs();
-      applySanctuaryAtmosphere(true);
       if (atmoState.weather === 'live') {
         fetchLiveLocalWeather();
+      } else {
+        applySanctuaryAtmosphere(true);
       }
       setInterval(function() { applySanctuaryAtmosphere(false); }, 60000);
       enhanceAllFlipCards();
