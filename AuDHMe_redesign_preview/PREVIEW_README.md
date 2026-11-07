@@ -6,6 +6,8 @@ Optional reading preferences for warm tone, reduced motion, low-stim reading, an
 
 When live local weather is selected, weather particles remain still while location and current conditions load. If the request fails or takes more than 12 seconds, the seasonal atmosphere is used instead; the weather controls show the status.
 
+When Christmas and snow are both active, falling snow appears over page content, including profiles, without intercepting interactions. Paused animation, low-stimulation and reduced-motion preferences still hide the effect.
+
 Neuro-Code cards remain unchanged as communication cards. Their suggested adaptations are optional site-interface preferences, not medical recommendations or assumptions about what a person needs.
 
 New profiles are shared with signed-in Sanctuary members by default; existing profile privacy settings are preserved. A private profile hides its entire gallery. When a profile is shared, individually private gallery items remain hidden.

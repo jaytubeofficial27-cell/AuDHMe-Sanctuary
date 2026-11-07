@@ -2650,6 +2650,9 @@ body.copy-protection-enabled canvas {
   opacity: 0.72;
   transition: opacity 0.8s ease;
 }
+body[data-holiday="christmas"][data-weather="snow"] #sanctuary-atmosphere-canvas {
+  z-index: 3;
+}
 body[data-holiday="bonfire"] #sanctuary-atmosphere-canvas {
   position: fixed !important;
   bottom: 0 !important;
