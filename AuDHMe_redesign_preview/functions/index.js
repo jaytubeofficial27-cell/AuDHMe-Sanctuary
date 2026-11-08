@@ -10,7 +10,7 @@ const db = admin.firestore();
 const STRIPE_SECRET_KEY = defineSecret('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = defineSecret('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = defineString('SITE_URL', {
-  default: 'https://audhme-sanctuary-b73dd.firebaseapp.com',
+  default: 'https://audhme.org',
   description: 'Canonical HTTPS URL of the hosted AuDHMe HTML page, without query or fragment'
 });
 

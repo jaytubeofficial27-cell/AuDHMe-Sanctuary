@@ -21,7 +21,7 @@ The page uses Firebase Authentication and private Firestore profile documents. S
    firebase deploy --only functions:createCheckoutSession,functions:verifyCheckoutSession,functions:listCommunityProfiles,functions:recordGalleryView,functions:getGalleryViewCounts,functions:deleteGalleryViews --project audhme-sanctuary-b73dd
    ```
 
-   Set `SITE_URL` to the canonical HTTPS URL serving this HTML file when prompted. The default is the root of the Firebase Hosting origin. If the file is served at a named path, include that path.
+   The project-specific functions environment file sets `SITE_URL` to `https://audhme.org`. For another project or hosting address, configure `SITE_URL` to the canonical HTTPS URL serving that project's HTML file; include the path if it is served at a named path.
 
 5. In Stripe Workbench, add a webhook endpoint at:
 
