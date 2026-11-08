@@ -450,8 +450,6 @@ var bootScreenActive = false;
         var el = document.getElementById(id);
         if (el) el.classList.add('active-embed');
       });
-      initChristmasCardSnow();
-
       if (updateHistory) {
         try { history.pushState(null, null, '#' + pageKey); } catch (e) { window.location.hash = pageKey; }
       }
@@ -523,9 +521,21 @@ var bootScreenActive = false;
     var pendingNeuroCodeAdaptation = null;
     var neuroCodeAdaptationReturnFocus = null;
 
+    function groupCardLabel(card) {
+      var code = card.querySelector(':scope > .card-code-badge');
+      var title = card.querySelector(':scope > .card-title');
+      if (!code || !title) return;
+      var label = document.createElement('span');
+      label.className = 'card-label-group';
+      code.before(label);
+      label.append(code, title);
+    }
+
     function enhanceAllFlipCards() {
       document.querySelectorAll('.flip-card').forEach(function(card) {
         if (card.dataset.neuroCodeEnhanced === 'true') return;
+        var front = card.querySelector('.flip-card-front');
+        if (front) groupCardLabel(front);
         card.dataset.neuroCodeEnhanced = 'true';
         card.tabIndex = 0;
         card.setAttribute('role', 'group');
@@ -1662,6 +1672,7 @@ var bootScreenActive = false;
           '<span class="tap-hint">TAP TO OPEN FULL PROFILE &rarr;</span>' +
         '</div>';
       }).join('');
+      mount.querySelectorAll('.cond-compact-card').forEach(groupCardLabel);
     }
 
     function openConditionModal(code) {
@@ -2059,7 +2070,6 @@ var bootScreenActive = false;
 
     function detectDefaultWeather(season, time, holiday) {
       if (holiday === 'bonfire' || holiday === 'halloween') return 'embers';
-      if (holiday === 'christmas') return 'snow';
       if (holiday === 'valentines' || holiday === 'easter') return 'clear';
       if (season === 'winter') return (time === 'night' || time === 'morning') ? 'snow' : 'mist';
       if (season === 'autumn') return 'leaves';
@@ -2153,7 +2163,6 @@ var bootScreenActive = false;
       if (toggleEl) toggleEl.checked = enabled;
       document.body.classList.toggle('atmo-paused', !enabled);
       initAtmosphereCanvas();
-      initChristmasCardSnow();
     };
 
     function applySanctuaryAtmosphere(rebuildParticles) {
@@ -2197,9 +2206,6 @@ var bootScreenActive = false;
       if (toggleEl) toggleEl.checked = atmoState.animationsEnabled;
       if (weatherStatus) weatherStatus.textContent = (liveWeatherStatus ? liveWeatherStatus + ' ' : '') + 'Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.';
       document.body.classList.toggle('atmo-paused', !atmoState.animationsEnabled);
-      syncChristmasLights();
-      initChristmasCardSnow();
-
       var summaryEl = document.getElementById('atmo-active-summary');
       if (summaryEl) {
         var hTag = rHoliday !== 'none' ? ' · ' + rHoliday.toUpperCase() : '';
@@ -2731,113 +2737,6 @@ var bootScreenActive = false;
     }
     window.dismissChristmasCountdown = dismissChristmasCountdown;
 
-    var christmasSnowObserver = null;
-
-    function removeChristmasCardSnow() {
-      document.querySelectorAll('.christmas-card-snow').forEach(function(snow) {
-        snow.remove();
-      });
-    }
-
-    function createChristmasSnowCap(card) {
-      if (card.querySelector(':scope > .christmas-card-snow')) return;
-
-      var shape = Math.floor(Math.random() * 3);
-      var paths = [
-        "M0 18 C26 5 52 29 78 12 C104 0 132 28 158 9 C186 -3 214 27 242 13 C270 0 298 26 326 8 C354 -4 382 25 410 11 C438 -1 466 29 494 12 C522 0 550 27 578 9 C606 -3 634 26 662 11 C690 0 718 28 746 12 C774 1 802 26 830 9 C858 -2 886 25 914 11 C944 0 974 21 1000 8 L1000 41 L972 41 L956 74 C951 87 940 88 934 74 L928 41 L826 41 L812 68 C807 80 796 81 790 68 L782 41 L684 41 L670 56 C665 67 654 68 648 56 L640 41 L548 41 L534 82 C529 95 517 96 511 82 L502 41 L394 41 L380 64 C375 76 364 77 358 64 L346 41 L246 41 L232 55 C227 66 216 67 210 55 L198 41 L102 41 L88 70 C83 82 72 83 66 70 L58 41 L0 41 Z",
-        "M0 12 C30 -2 58 24 88 9 C118 -5 148 25 178 12 C208 1 238 27 268 8 C298 -4 328 26 358 11 C388 -2 418 24 448 7 C478 -5 508 28 538 12 C568 0 598 26 628 8 C658 -4 688 27 718 10 C748 -1 778 24 808 7 C838 -4 868 25 898 10 C930 -3 966 23 1000 7 L1000 40 L974 40 L960 58 C955 69 944 70 938 58 L926 40 L834 40 L820 78 C815 91 803 92 797 78 L784 40 L686 40 L672 64 C667 76 656 77 650 64 L638 40 L540 40 L526 54 C521 65 510 66 504 54 L492 40 L400 40 L386 85 C381 98 369 99 363 85 L350 40 L258 40 L244 62 C239 74 228 75 222 62 L210 40 L112 40 L98 53 C93 64 82 65 76 53 L64 40 L0 40 Z",
-        "M0 21 C34 4 68 36 102 16 C136 -1 170 31 204 14 C238 0 272 34 306 17 C340 3 374 29 408 11 C442 -4 476 32 510 14 C544 0 578 30 612 12 C646 -2 680 31 714 15 C748 1 782 29 816 13 C850 -1 884 28 918 10 C946 0 976 20 1000 9 L1000 42 L970 42 L956 66 C951 78 940 79 934 66 L924 42 L832 42 L818 58 C813 69 802 70 796 58 L786 42 L700 42 L686 88 C681 101 669 102 663 88 L650 42 L562 42 L548 72 C543 84 532 85 526 72 L514 42 L424 42 L410 61 C405 72 394 73 388 61 L376 42 L286 42 L272 54 C267 65 256 66 250 54 L238 42 L146 42 L132 77 C127 89 116 90 110 77 L98 42 L0 42 Z"
-      ];
-      var drift = paths[shape];
-
-      var NS = 'http://www.w3.org/2000/svg';
-      var svg = document.createElementNS(NS, 'svg');
-      svg.classList.add('christmas-card-snow');
-      svg.setAttribute('aria-hidden', 'true');
-      svg.setAttribute('width', '100%');
-      svg.setAttribute('height', '100%');
-      svg.setAttribute('viewBox', '0 0 1000 100');
-      svg.setAttribute('preserveAspectRatio', 'none');
-      svg.style.cssText = 'position:absolute;top:0px;left:0;right:0;width:100%;height:26px;pointer-events:none;z-index:20;overflow:visible;filter:drop-shadow(0 4px 3px rgba(5,12,16,.34));';
-      svg.innerHTML =
-        '<path d="' + drift + '" fill="#f0f6f4"/>' +
-        '<path d="M0 24 C38 8 76 38 116 18 C154 2 194 34 232 20 C270 7 308 40 346 22" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity=".92"/>' +
-        '<path d="M420 20 C458 5 498 34 536 18 C574 4 612 35 650 20" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity=".72"/>';
-      card.appendChild(svg);
-      card.style.position = card.style.position || 'relative';
-    }
-
-    function initChristmasCardSnow() {
-      removeChristmasCardSnow();
-
-      var body = document.body;
-      var christmasAllowed =
-        body.getAttribute('data-holiday') === 'christmas' &&
-        !body.classList.contains('low-stim-active') &&
-        !body.classList.contains('atmo-paused') &&
-        !body.classList.contains('site-adapt-calm') &&
-        !body.classList.contains('low-input-active') &&
-        !body.classList.contains('site-adapt-motion') &&
-        !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
-      if (!christmasAllowed) return;
-
-      var selector = '.orbital-card, .card, .series-block-container, .demand-card, .civic-card, .core-gateway-node';
-      var cards = Array.prototype.slice.call(document.querySelectorAll(selector));
-
-      if (!window.IntersectionObserver) {
-        cards.forEach(function(card) {
-          var rect = card.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) createChristmasSnowCap(card);
-        });
-        return;
-      }
-
-      if (christmasSnowObserver) christmasSnowObserver.disconnect();
-      christmasSnowObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            createChristmasSnowCap(entry.target);
-          } else {
-            var snow = entry.target.querySelector(':scope > .christmas-card-snow');
-            if (snow) snow.remove();
-          }
-        });
-      }, { rootMargin: '80px 0px', threshold: 0.05 });
-
-      cards.forEach(function(card) {
-        var rect = card.getBoundingClientRect ? card.getBoundingClientRect() : null;
-        var rectVisible = rect && rect.width > 0 && rect.height > 0;
-        if (rectVisible && getComputedStyle(card).visibility !== 'hidden') {
-          christmasSnowObserver.observe(card);
-        } else {
-          var snow = card.querySelector(':scope > .christmas-card-snow');
-          if (snow) snow.remove();
-        }
-      });
-    }
-    window.initChristmasCardSnow = initChristmasCardSnow;
-
-    function syncChristmasLights() {
-      var lights = document.getElementById('xmas-lights');
-      var christmasThemeActive = document.body.getAttribute('data-holiday') === 'christmas';
-      var christmasAllowed = christmasThemeActive && !isMotionPaused();
-
-      if (!christmasAllowed) {
-        if (lights) lights.remove();
-      } else if (!lights) {
-        initFestiveDecor();
-      }
-
-      var nav = document.querySelector('.audh-nav-wrapper');
-      if (nav) {
-        document.querySelectorAll('#xmas-lights').forEach(function(strayLights) {
-          if (!nav.contains(strayLights)) strayLights.remove();
-        });
-      }
-    }
-    window.syncChristmasLights = syncChristmasLights;
-
     function initChristmasCountdown() {
       if (xmasCountdownInterval) clearInterval(xmasCountdownInterval);
       updateChristmasCountdown();
@@ -2845,87 +2744,6 @@ var bootScreenActive = false;
     }
 
     function initFestiveDecor() {
-      var nav = document.querySelector('.audh-nav-wrapper');
-      if (nav && !document.getElementById('xmas-lights')) {
-        var NS = 'http://www.w3.org/2000/svg';
-        var holder = document.createElement('div');
-        holder.id = 'xmas-lights';
-        holder.setAttribute('aria-hidden', 'true');
-
-        var cordSvg = document.createElementNS(NS, 'svg');
-        cordSvg.setAttribute('viewBox', '0 0 1000 44');
-        cordSvg.setAttribute('preserveAspectRatio', 'none');
-        cordSvg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:44px;overflow:visible;';
-        var cordPath = document.createElementNS(NS, 'path');
-        var xmasCordY = function(x) {
-          var phase = ((x % 180) + 180) % 180 / 180;
-          return 5 + 20 * Math.pow(Math.sin(Math.PI * phase), 0.78);
-        };
-        var cordD = '';
-        for (var cordX = 0; cordX <= 1000; cordX += 10) {
-          cordD += (cordX === 0 ? 'M ' : ' L ') + cordX + ' ' + xmasCordY(cordX).toFixed(2);
-        }
-        cordPath.setAttribute('d', cordD);
-        cordPath.setAttribute('fill', 'none');
-        cordPath.setAttribute('stroke', '#2d5a3d');
-        cordPath.setAttribute('stroke-width', '3');
-        cordPath.setAttribute('vector-effect', 'non-scaling-stroke');
-        cordSvg.appendChild(cordPath);
-        holder.appendChild(cordSvg);
-
-        var bulbsSvg = document.createElementNS(NS, 'svg');
-        bulbsSvg.setAttribute('viewBox', '0 0 1000 44');
-        bulbsSvg.setAttribute('preserveAspectRatio', 'none');
-        bulbsSvg.setAttribute('class', 'xmas-bulb-svg');
-        bulbsSvg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:44px;overflow:visible;';
-        var defs = document.createElementNS(NS, 'defs');
-        defs.innerHTML =
-          '<filter id="xmas-bulb-glow" x="-300%" y="-300%" width="700%" height="700%">' +
-          '<feGaussianBlur stdDeviation="1.2" result="blur"/>' +
-          '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-        bulbsSvg.appendChild(defs);
-        var lightColors = ['#f87171', '#34d399', '#fbbf24', '#60a5fa', '#f472b6', '#f8fafc'];
-        var bulbIndex = 0;
-        for (var x = 24; x <= 976; x += 34) {
-          var y = xmasCordY(x);
-
-          var socket = document.createElementNS(NS, 'rect');
-          socket.setAttribute('class', 'xmas-socket');
-          socket.setAttribute('x', (x - 3.5).toFixed(2));
-          socket.setAttribute('y', y.toFixed(2));
-          socket.setAttribute('width', '7');
-          socket.setAttribute('height', '5');
-          socket.setAttribute('rx', '1.5');
-          socket.setAttribute('fill', '#26352d');
-          bulbsSvg.appendChild(socket);
-
-          var halo = document.createElementNS(NS, 'ellipse');
-          halo.setAttribute('class', 'xmas-bulb-halo');
-          halo.setAttribute('cx', x.toFixed(2));
-          halo.setAttribute('cy', (y + 11).toFixed(2));
-          halo.setAttribute('rx', '7');
-          halo.setAttribute('ry', '9');
-          halo.setAttribute('fill', lightColors[bulbIndex % lightColors.length]);
-          halo.setAttribute('opacity', '0.42');
-          halo.setAttribute('filter', 'url(#xmas-bulb-glow)');
-          bulbsSvg.appendChild(halo);
-
-          var bulbEl = document.createElementNS(NS, 'ellipse');
-          bulbEl.setAttribute('class', 'xmas-bulb');
-          bulbEl.setAttribute('cx', x.toFixed(2));
-          bulbEl.setAttribute('cy', (y + 11).toFixed(2));
-          bulbEl.setAttribute('rx', '4.2');
-          bulbEl.setAttribute('ry', '7.2');
-          bulbEl.setAttribute('fill', lightColors[bulbIndex % lightColors.length]);
-          bulbEl.style.animationDuration = (3.0 + Math.random() * 2.2).toFixed(2) + 's';
-          bulbEl.style.animationDelay = (Math.random() * 5.0).toFixed(2) + 's';
-          bulbsSvg.appendChild(bulbEl);
-          bulbIndex++;
-        }
-        holder.appendChild(bulbsSvg);
-        nav.appendChild(holder);
-      }
-
       var hero = document.querySelector('.orbital-card.core-gateway-node');
       if (hero && !document.getElementById('halloween-pumpkins')) {
         hero.style.position = hero.style.position || 'relative';
@@ -2962,7 +2780,6 @@ var bootScreenActive = false;
         rays.setAttribute('aria-hidden', 'true');
         document.body.appendChild(rays);
       }
-      syncChristmasLights();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -2979,7 +2796,6 @@ var bootScreenActive = false;
       startGroundingBoot();
       initChristmasCountdown();
       initFestiveDecor();
-      initChristmasCardSnow();
       renderPassport();
       updateAdjustmentLetter();
       updateBattery();
@@ -2997,17 +2813,6 @@ var bootScreenActive = false;
         });
       }
 
-      var snowStateObserver = new MutationObserver(function() {
-        initChristmasCardSnow();
-      });
-      snowStateObserver.observe(document.body, {
-        attributes: true,
-        attributeFilter: ['data-holiday', 'class']
-      });
-      if (window.matchMedia) {
-        window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', initChristmasCardSnow);
-      }
-      
       const adjRecipient = document.getElementById('adjRecipient');
       if (adjRecipient) adjRecipient.addEventListener('change', updateAdjustmentLetter);
       const barrierChecks = document.querySelectorAll('#barrierCheckboxes input[type="checkbox"]');

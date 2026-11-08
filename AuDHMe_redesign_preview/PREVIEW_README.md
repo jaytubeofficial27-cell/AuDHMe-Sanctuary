@@ -6,7 +6,7 @@ Optional reading preferences for warm tone, reduced motion, low-stim reading, an
 
 When live local weather is selected, weather particles remain still while location and current conditions load. If the request fails or takes more than 12 seconds, the seasonal atmosphere is used instead; the weather controls show the status.
 
-When Christmas and snow are both active, falling snow appears over page content, including profiles, without intercepting interactions. Paused animation, low-stimulation and reduced-motion preferences still hide the effect.
+Christmas uses a stationary postcard-inspired design with a window into a decorated living room, a seasonal home welcome, evergreen-and-bauble garland in the navigation, and gift-wrapped Neuro-Code and condition cards with code-and-title tags. The existing Christmas countdown is retained. Weather remains independently selectable, and paused animation, low-stimulation and reduced-motion preferences hide the added festive treatment.
 
 Neuro-Code cards remain unchanged as communication cards. Their suggested adaptations are optional site-interface preferences, not medical recommendations or assumptions about what a person needs.
 

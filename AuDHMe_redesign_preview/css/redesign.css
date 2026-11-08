@@ -2650,9 +2650,6 @@ body.copy-protection-enabled canvas {
   opacity: 0.72;
   transition: opacity 0.8s ease;
 }
-body[data-holiday="christmas"][data-weather="snow"] #sanctuary-atmosphere-canvas {
-  z-index: 3;
-}
 body[data-holiday="bonfire"] #sanctuary-atmosphere-canvas {
   position: fixed !important;
   bottom: 0 !important;
@@ -2712,29 +2709,6 @@ body[data-holiday="halloween"] .demand-card,
 body[data-holiday="halloween"] .civic-card {
   border-top: 2px solid #f97316 !important;
   background: linear-gradient(145deg, #1f1824, #151118) !important;
-}
-
-/* 2. CHRISTMAS / FESTIVE: Pine green cards, red & gold tinsel trim, festive header tag */
-body[data-holiday="christmas"] {
-  --field-bg: #0f1c16;
-  --field-paper: #162820;
-  --field-paper-soft: #1f352a;
-  --field-line: rgba(52, 211, 153, 0.35);
-  --field-brass: #ef4444;
-  --field-moss: #34d399;
-}
-body[data-holiday="christmas"] .audh-logo::after {
-  content: " 🎄✨";
-  font-size: 1.1rem;
-}
-body[data-holiday="christmas"] .audh-nav-wrapper {
-  border-bottom: 1px solid rgba(243, 241, 230, 0.18) !important;
-  background-image: none !important;
-}
-body[data-holiday="christmas"] .orbital-card,
-body[data-holiday="christmas"] .series-block-container {
-  border-top-color: rgba(203, 182, 120, 0.18) !important;
-  box-shadow: none !important;
 }
 
 /* 3. BONFIRE NIGHT (Nov 5): Glowing embers, fiery red-orange trim */
@@ -2917,12 +2891,6 @@ body[data-season="autumn"] #atmo-visual-overlay {
 }
 
 /* Holiday tints */
-body[data-holiday="christmas"] #atmo-visual-overlay {
-  background:
-    radial-gradient(ellipse 100% 45% at 50% -8%, rgba(52, 211, 153, 0.08), transparent 55%),
-    radial-gradient(ellipse 80% 40% at 100% 100%, rgba(248, 113, 113, 0.06), transparent 55%),
-    radial-gradient(ellipse 80% 40% at 0% 100%, rgba(251, 191, 36, 0.05), transparent 55%);
-}
 body[data-holiday="halloween"] #atmo-visual-overlay {
   background: radial-gradient(ellipse 110% 60% at 50% -10%, rgba(249, 115, 22, 0.07), transparent 60%);
 }
@@ -3078,22 +3046,6 @@ body.site-adapt-calm .holiday-countdown-timer {
 /* ==========================================================================
    FESTIVE STRUCTURAL DECORATIONS (added v23)
    ========================================================================== */
-/* Christmas fairy lights strung under the nav bar */
-#xmas-lights { position: absolute; left: 0; right: 0; bottom: -3px; height: 14px; pointer-events: none; z-index: 1001; overflow: visible; display: none; }
-#xmas-lights[hidden] { display: none !important; }
-body[data-holiday="christmas"] #xmas-lights { display: block; }
-.xmas-cord { position: absolute; top: 2px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #2d5a3d, #1e3d2a, #2d5a3d); border-radius: 1px; }
-.xmas-bulb { transform-box: fill-box; transform-origin: center; }
-@media (prefers-reduced-motion: no-preference) {
-  ellipse.xmas-bulb { animation: xmasTwinkle 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  @keyframes xmasTwinkle {
-    0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
-    35% { opacity: 0.48; transform: scale(0.82); filter: brightness(0.72); }
-    58% { opacity: 1; transform: scale(1.16); filter: brightness(1.45); }
-  }
-}
-@media (prefers-reduced-motion: reduce) { .xmas-bulb { animation: none !important; } }
-
 /* Halloween jack-o-lanterns sitting on top of the home sanctuary hero box */
 #halloween-pumpkins { position: absolute; left: 0; right: 0; bottom: 100%; height: 0; pointer-events: none; z-index: 5; display: none; }
 body[data-holiday="halloween"] #halloween-pumpkins { display: block; }
@@ -3118,22 +3070,13 @@ body[data-season="autumn"] #season-decor {
 }
 
 /* Sensory safety: hide structural decor in calm / low-stim / paused modes */
-body.low-stim-active #xmas-lights,
 body.low-stim-active #halloween-pumpkins,
-body.site-adapt-calm #xmas-lights,
 body.site-adapt-calm #halloween-pumpkins,
-body.atmo-paused #xmas-lights,
 body.atmo-paused #halloween-pumpkins { display: none !important; }
 
-/* v24: draped SVG fairy lights + AuDHMe Origin golden glow */
-#xmas-lights { width: 100%; height: 30px; bottom: -16px; overflow: visible; }
-#xmas-lights .xmas-bulb { animation-name: xmasTwinkle; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
 body[data-holiday="founders-day"] #atmo-visual-overlay {
   background: radial-gradient(ellipse 100% 55% at 50% -10%, rgba(212, 175, 55, 0.14), transparent 60%), radial-gradient(circle at 50% 0%, rgba(240, 201, 106, 0.10), transparent 40%);
 }
-
-/* v25 fixes: light clipping, global pumpkins, origin rays, sensory panel height, no logo emoji */
-#xmas-lights { height: 34px; bottom: -18px; }
 
 /* Halloween pumpkins now global (fixed at bottom, visible on every page) */
 #halloween-pumpkins { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 64px !important; z-index: 50 !important; }
@@ -3274,10 +3217,6 @@ body[data-spoons="low"] .low-spoons-banner { display: flex; }
 
 /* Remove holiday emojis next to the logo */
 body[data-holiday] .audh-logo::after { content: none !important; }
-
-/* v26: round HTML bulbs, valentines/easter tints, seasonal nav accents */
-#xmas-lights { height: 24px; bottom: -14px; overflow: visible; }
-#xmas-lights circle.xmas-bulb { display: block; }
 
 body[data-holiday="valentines"] #atmo-visual-overlay {
   background: radial-gradient(ellipse 100% 50% at 50% -10%, rgba(244, 114, 182, 0.12), transparent 60%), radial-gradient(circle at 20% 80%, rgba(248, 113, 113, 0.06), transparent 40%);
@@ -3439,45 +3378,6 @@ p, li, label, input, select, textarea, button, a {
   text-transform: none !important;
 }
 
-/* Christmas lights: hidden by default and contained within the sticky nav header. */
-.audh-nav-wrapper {
-  position: sticky !important;
-  top: 0;
-  overflow: visible;
-}
-
-#xmas-lights {
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: -35px !important;
-  width: 100% !important;
-  height: 44px !important;
-  max-height: 44px !important;
-  overflow: visible !important;
-  pointer-events: none;
-  z-index: 1001;
-  display: none !important;
-}
-
-#xmas-lights ellipse.xmas-bulb {
-  overflow: visible !important;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-body:not([data-holiday="christmas"]) #xmas-lights,
-body:not([data-holiday="christmas"]) #xmas-lights .xmas-bulb {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-}
-
-body.low-stim-active #xmas-lights,
-body.site-adapt-calm #xmas-lights,
-body.low-input-active #xmas-lights,
-body.site-adapt-motion #xmas-lights,
-body.atmo-paused #xmas-lights,
 body.low-stim-active #season-decor,
 body.site-adapt-calm #season-decor,
 body.low-input-active #season-decor,
@@ -3493,80 +3393,9 @@ body.atmo-paused #origin-rays {
 
 @media (prefers-reduced-motion: reduce) {
   #season-decor,
-  #origin-rays,
-  #xmas-lights {
+  #origin-rays {
     display: none !important;
   }
-}
-
-#xmas-lights > svg {
-  height: 44px !important;
-  bottom: 0 !important;
-  top: auto !important;
-}
-
-/* SVG circles are the sole fairy-light implementation. Any stale HTML
-   bulb element is invisible and cannot recreate a flat dot row. */
-#xmas-lights i.xmas-bulb {
-  display: none !important;
-}
-
-/* Christmas snow caps are injected dynamically by the JavaScript snow-cap engine. */
-body[data-holiday="christmas"] .audh-nav-wrapper {
-  overflow: visible !important;
-  border-bottom-color: rgba(243, 241, 230, 0.18) !important;
-}
-
-.christmas-card-snow {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  height: 26px !important;
-  overflow: visible !important;
-  pointer-events: none !important;
-  z-index: 20 !important;
-  filter: drop-shadow(0 4px 3px rgba(5, 12, 16, .34));
-}
-
-body[data-holiday="christmas"] .orbital-card.core-gateway-node > .christmas-card-snow {
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  height: 26px !important;
-  z-index: 20 !important;
-  overflow: visible !important;
-}
-
-body[data-holiday="christmas"] .orbital-card,
-body[data-holiday="christmas"] .card,
-body[data-holiday="christmas"] .series-block-container,
-body[data-holiday="christmas"] .demand-card,
-body[data-holiday="christmas"] .civic-card,
-body[data-holiday="christmas"] .core-gateway-node {
-  position: relative !important;
-  overflow: visible !important;
-}
-
-body.low-stim-active .christmas-card-snow,
-body.atmo-paused .christmas-card-snow,
-body.site-adapt-calm .christmas-card-snow,
-body.low-input-active .christmas-card-snow,
-body.site-adapt-motion .christmas-card-snow,
-body:not([data-holiday="christmas"]) .christmas-card-snow {
-  display: none !important;
-}
-
-body[data-holiday="christmas"] .orbital-card,
-body[data-holiday="christmas"] .card,
-body[data-holiday="christmas"] .series-block-container,
-body[data-holiday="christmas"] .demand-card,
-body[data-holiday="christmas"] .civic-card,
-body[data-holiday="christmas"] .core-gateway-node {
-  position: relative;
-  overflow: visible !important;
 }
 
 /* Home hub: calm, editorial links with no holiday-generated card borders. */
@@ -3738,23 +3567,6 @@ body[data-holiday] #pane-home .orbital-card:not(.core-gateway-node),
     grid-template-columns: 1fr;
     gap: 10px;
   }
-}
-
-/* Final Christmas nav-light rules. The animated bulbs belong only to the
-   nav-attached draped string; no bulb or dot layer is allowed in the canvas. */
-body[data-holiday="christmas"] #xmas-lights {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-body[data-holiday="christmas"] #xmas-lights .xmas-bulb {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  animation-name: xmasTwinkle !important;
-  animation-timing-function: ease-in-out !important;
-  animation-iteration-count: infinite !important;
 }
 
 /* Neuro-Code reading layout: no nested series containers, even series spacing. */
@@ -4589,5 +4401,139 @@ body:is(.low-input-active,.low-stim-active,.site-adapt-calm) #pane-store .store-
     box-sizing: border-box;
     width: min(310px, calc(100vw - 40px)) !important;
     max-width: calc(100vw - 40px) !important;
+  }
+}
+
+/* A Christmas postcard, with all decorative artwork separate from controls. */
+.festive-postcard, .festive-garland { display: none; }
+.card-label-group { display: contents; }
+
+@media (prefers-reduced-motion: no-preference) {
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) {
+    --card-surface: #202b2a;
+  }
+
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) .festive-garland {
+    display: block;
+    width: 100%;
+    height: 46px;
+    pointer-events: none;
+  }
+
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) .festive-postcard {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(120px, 240px);
+    align-items: center;
+    gap: clamp(16px, 4vw, 56px);
+    padding: clamp(22px, 4vw, 44px);
+    border: 1px solid #977761;
+    border-radius: 6px;
+    background: linear-gradient(115deg, #462d31, #37282d 60%, #263437);
+    box-shadow: inset 0 0 0 5px rgba(220, 191, 145, .08);
+  }
+
+  .festive-postcard-label {
+    margin: 0 0 12px;
+    color: #e2c89d;
+    font-size: .73rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .festive-postcard h2 {
+    margin: 0;
+    color: #fff4e3;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.7rem, 3.5vw, 3rem) !important;
+    line-height: 1.12;
+  }
+  .festive-postcard-copy > p:last-child {
+    margin: 12px 0 0;
+    color: #e2d7ca;
+    font-size: 1rem;
+  }
+  .festive-window { display: block; width: 100%; height: auto; }
+
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) .audh-nav-wrapper {
+    border-bottom: 3px double #b49571 !important;
+    background: #302326 !important;
+    background-image: none !important;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .flip-card-back, .cond-compact-card, .profile-info-card, .profile-status-section, .store-product-card) {
+    border-color: rgba(215, 187, 143, .3) !important;
+  }
+
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .cond-compact-card) {
+    position: relative;
+    overflow: hidden;
+    padding: 48px 16px 16px !important;
+    background: #593637 !important;
+    background-image:
+      linear-gradient(90deg, transparent calc(50% - 11px), #b5966c calc(50% - 11px), #d0af7e calc(50% + 11px), transparent calc(50% + 11px)),
+      linear-gradient(0deg, transparent calc(50% - 9px), #a88462 calc(50% - 9px), #c9a576 calc(50% + 9px), transparent calc(50% + 9px)) !important;
+    border: 1px solid #ba9877 !important;
+    border-radius: 12px !important;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) .flip-card.site-active-neuro-code :is(.flip-card-front, .flip-card-back) {
+    border-color: #d7c18d !important;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion).site-highlight-code .flip-card.site-active-neuro-code :is(.flip-card-front, .flip-card-back) {
+    border: 3px solid #e2c77e !important;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .cond-compact-card)::before {
+    content: "";
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 76px;
+    height: 43px;
+    transform: translateX(-50%);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 43'%3E%3Cpath d='M34 22 21 41l10-3 4 4 7-19' fill='%23bc9262' stroke='%239b714c' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M42 22 55 41l-10-3-4 4-7-19' fill='%23d2ac77' stroke='%239b714c' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M35 17C26 9 10 2 6 8 2 14 7 26 15 27c7 1 14-3 20-6Z' fill='%23d5b17f' stroke='%239b714c' stroke-width='1.5'/%3E%3Cpath d='M41 17C50 9 66 2 70 8c4 6-1 18-9 19-7 1-14-3-20-6Z' fill='%23e3c495' stroke='%239b714c' stroke-width='1.5'/%3E%3Cpath d='M12 12c6-1 14 2 20 6M64 12c-6-1-14 2-20 6' fill='none' stroke='%23f4dfbb' stroke-width='1.5' stroke-linecap='round'/%3E%3Crect x='32' y='15' width='12' height='11' rx='4' fill='%23c69d6c' stroke='%239b714c' stroke-width='1.5'/%3E%3Cpath d='M35 17h6' stroke='%23ebd0a6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    pointer-events: none;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .cond-compact-card) > .card-label-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    max-width: min(100%, 250px);
+    padding: 14px 16px 12px;
+    border: 1px solid #ddc49e;
+    border-radius: 5px;
+    background: #f0dfc5;
+    box-shadow: 0 4px 12px rgba(20, 12, 12, .28);
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .cond-compact-card) > .card-label-group::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #9c775a;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .cond-compact-card) .card-label-group :is(.card-code-badge, .card-title) {
+    color: #382b29 !important;
+    text-shadow: none !important;
+    overflow-wrap: anywhere;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) :is(.flip-card-front, .cond-compact-card) > :not(.card-label-group) {
+    color: #fff3e5 !important;
+    text-shadow: 0 1px 3px #241718;
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) .profile-cover {
+    background: radial-gradient(ellipse at 75% 30%, rgba(226, 200, 157, .17), transparent 42%),
+      linear-gradient(110deg, #382a2d, #293637 75%, #514038);
+  }
+  body[data-holiday="christmas"]:not(.atmo-paused):not(.low-stim-active):not(.low-input-active):not(.site-adapt-calm):not(.site-adapt-motion) .audhme-site-footer {
+    border-top: 3px double #967a60;
+    background: #251e21;
+  }
+
+  @media (max-width: 480px) {
+    .festive-postcard { grid-template-columns: minmax(0, 1fr) clamp(92px, 28vw, 120px) !important; }
+    .festive-postcard-copy > p:last-child { font-size: .88rem; }
   }
 }

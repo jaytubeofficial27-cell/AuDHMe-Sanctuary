@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css?v=3">
-  <link rel="stylesheet" href="css/redesign.css?v=77">
+  <link rel="stylesheet" href="css/redesign.css?v=88">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -281,6 +281,23 @@
         </button>
       </div>
     </div>
+    <svg class="festive-garland" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="festive-garland-pattern" width="160" height="46" patternUnits="userSpaceOnUse">
+          <path d="M0 5 Q40 17 80 5 T160 5" fill="none" stroke="#688269" stroke-width="2"/>
+          <path d="M4 6 l-4 9 m14-7 l-2 10 m14-8 l-1 10 m14-9 l1 9 m14-9 l3 9 m13-10 l5 8 m13-9 l-4 8 m14-7 l-2 10 m14-8 l-1 10 m14-9 l1 9 m14-9 l3 9 m13-10 l5 8" fill="none" stroke="#789578" stroke-width="3" stroke-linecap="round"/>
+          <path d="M38 12 v5 M118 12 v9" stroke="#d7bb88" stroke-width="1.5"/>
+          <rect x="34" y="16" width="8" height="4" rx="1" fill="#d7bb88"/>
+          <circle cx="38" cy="27" r="8" fill="#a5534c" stroke="#dfb992" stroke-width="1.5"/>
+          <path d="M35 23 q3-2 5 0" fill="none" stroke="#efd6b0" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="114" y="20" width="8" height="4" rx="1" fill="#d7bb88"/>
+          <circle cx="118" cy="31" r="8" fill="#c69d60" stroke="#ecd5ac" stroke-width="1.5"/>
+          <path d="M115 27 q3-2 5 0" fill="none" stroke="#fff1d2" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="75" cy="10" r="2.5" fill="#c7786d"/><circle cx="81" cy="12" r="2.5" fill="#c7786d"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="46" fill="url(#festive-garland-pattern)"/>
+    </svg>
   </div>
 
   <div id="site-adaptation-modal" class="site-adaptation-modal" role="dialog" aria-modal="true" aria-labelledby="site-adaptation-heading" aria-describedby="site-adaptation-intro" hidden onclick="if(event.target === this) closeNeuroCodeAdaptation()">
@@ -317,6 +334,46 @@
     <div id="pane-home" class="neuro-pane">
       <div class="orbital-cluster-canvas">
 
+        <aside class="festive-postcard" aria-label="A Christmas welcome">
+          <div class="festive-postcard-copy">
+            <p class="festive-postcard-label">A Sanctuary Christmas</p>
+            <h2>Make room for a little wonder.</h2>
+            <p>A quiet place to land, whatever this season looks like for you.</p>
+          </div>
+          <svg class="festive-window" viewBox="0 0 260 232" aria-hidden="true" focusable="false">
+            <defs>
+              <clipPath id="festive-window-opening">
+                <path d="M48 204 V111 A82 82 0 0 1 212 111 V204 Z"/>
+              </clipPath>
+            </defs>
+            <path d="M35 204 V111 A95 95 0 0 1 225 111 V204 Z" fill="#362c2b" stroke="#d3b784" stroke-width="4"/>
+            <g clip-path="url(#festive-window-opening)">
+              <rect x="48" y="25" width="164" height="179" fill="#ad8974"/>
+              <rect x="48" y="176" width="164" height="28" fill="#745446"/>
+              <path d="M48 175 H212" stroke="#d0aa86" stroke-width="3"/>
+              <rect x="65" y="103" width="78" height="73" rx="2" fill="#e2c8a9"/>
+              <rect x="77" y="118" width="54" height="58" rx="2" fill="#694940"/>
+              <path d="M84 176 V146 A20 20 0 0 1 124 146 V176 Z" fill="#302b2a"/>
+              <path d="M91 174 Q88 163 99 154 Q98 162 106 164 Q109 159 109 155 Q119 165 116 174 Z" fill="#d28b50"/>
+              <path d="M98 174 Q96 167 104 163 Q104 168 109 169 Q111 166 111 164 Q116 170 113 174 Z" fill="#f3d09a"/>
+              <rect x="60" y="98" width="88" height="8" rx="2" fill="#f0d7b6"/>
+              <path d="M64 101 Q76 111 88 102 Q100 111 112 102 Q126 111 144 101" fill="none" stroke="#4e7056" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="78" cy="106" r="2.5" fill="#d7a45e"/><circle cx="101" cy="106" r="2.5" fill="#c56b5d"/><circle cx="127" cy="106" r="2.5" fill="#d7a45e"/>
+              <path d="M72 106 V121 Q72 127 78 127 Q84 127 84 121 H78 V106 Z M120 106 V121 Q120 127 126 127 Q132 127 132 121 H126 V106 Z" fill="#9d4f4a" stroke="#efd6b0" stroke-width="2"/>
+              <circle cx="104" cy="70" r="18" fill="none" stroke="#52725a" stroke-width="7"/>
+              <circle cx="93" cy="60" r="2" fill="#d9b36f"/><circle cx="115" cy="61" r="2" fill="#c36d5f"/><circle cx="104" cy="85" r="2" fill="#d9b36f"/>
+              <path d="M98 87 L104 83 L110 87 L108 92 L104 89 L100 92 Z" fill="#a9544d"/>
+              <path d="M204 52 L181 92 H189 L172 120 H181 L160 152 H171 L151 181 H240 V52 Z" fill="#496d53" stroke="#789477" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M190 103 Q203 111 222 103 M180 133 Q200 143 224 132 M170 163 Q196 174 226 161" fill="none" stroke="#d9ba80" stroke-width="2"/>
+              <circle cx="199" cy="91" r="3" fill="#e7c982"/><circle cx="188" cy="119" r="3" fill="#c97768"/><circle cx="205" cy="128" r="3" fill="#e7c982"/><circle cx="181" cy="150" r="3" fill="#e7c982"/><circle cx="200" cy="157" r="3" fill="#c97768"/>
+              <rect x="167" y="179" width="21" height="18" rx="1" fill="#a85750"/><path d="M177.5 179 V197 M167 185 H188" stroke="#e5c595" stroke-width="2"/>
+              <rect x="190" y="184" width="19" height="13" rx="1" fill="#d5b57e"/><path d="M199.5 184 V197 M190 189 H209" stroke="#9e6154" stroke-width="2"/>
+            </g>
+            <path d="M48 204 V111 A82 82 0 0 1 212 111 V204 Z" fill="none" stroke="#efd7b0" stroke-width="3"/>
+            <path d="M130 17 V204 M48 125 H212" fill="none" stroke="#d3b784" stroke-width="5"/>
+            <path d="M25 206 H235" stroke="#d3b784" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </aside>
         <section class="orbital-card core-gateway-node" aria-labelledby="home-title">
           <div class="home-hero-copy">
             <span class="organic-badge">Built By &amp; For Neurodivergent Minds</span>
@@ -2024,6 +2081,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=62"></script>
+  <script src="js/app.js?v=67"></script>
 </body>
 </html>
