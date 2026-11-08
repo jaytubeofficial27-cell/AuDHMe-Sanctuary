@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css?v=3">
-  <link rel="stylesheet" href="css/redesign.css?v=88">
+  <link rel="stylesheet" href="css/redesign.css?v=89">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1462,8 +1462,44 @@
         <button id="owner-settings-btn" onclick="openSettingsView()" class="profile-settings-button">
           <i class="fa-solid fa-sliders" aria-hidden="true"></i> Account settings
         </button>
+        <button id="founder-admin-button" type="button" class="profile-settings-button hidden" aria-expanded="false" aria-controls="founder-admin-panel" onclick="toggleFounderAdminPanel()">
+          Admin settings
+        </button>
       </div>
     </div>
+
+    <section id="founder-admin-panel" class="founder-admin-panel hidden" aria-labelledby="founder-admin-title">
+      <h2 id="founder-admin-title">Atmosphere preview</h2>
+      <p>Preview themes only in this browser. Previews reset when you reload or sign out and do not change anyone else's settings. Sensory and motion preferences still apply.</p>
+      <div class="founder-admin-controls">
+        <label for="admin-season-preview">Season preview
+          <select id="admin-season-preview" onchange="setFounderAtmospherePreview('season', this.value)">
+            <option value="auto">Use my setting</option>
+            <option value="none">Off</option>
+            <option value="spring">Spring</option>
+            <option value="summer">Summer</option>
+            <option value="autumn">Autumn</option>
+            <option value="winter">Winter</option>
+          </select>
+        </label>
+        <label for="admin-holiday-preview">Holiday preview
+          <select id="admin-holiday-preview" onchange="setFounderAtmospherePreview('holiday', this.value)">
+            <option value="auto">Use my setting</option>
+            <option value="none">Off</option>
+            <option value="founders-day">AuDHMe Origin</option>
+            <option value="halloween">Halloween</option>
+            <option value="bonfire">Bonfire Night</option>
+            <option value="christmas">Christmas</option>
+            <option value="new-year">New Year</option>
+            <option value="valentines">Valentine's Day</option>
+            <option value="easter">Easter</option>
+          </select>
+        </label>
+      </div>
+      <p>The Christmas countdown follows the real date, even while previewing.</p>
+      <p id="founder-preview-status" role="status">No preview active.</p>
+      <button type="button" class="calm-secondary-button" onclick="resetFounderAtmospherePreview()">Reset preview</button>
+    </section>
 
     <!-- Profile details remain populated only from the signed-in account or an allowed community share. -->
     <article id="profile-public-view" class="profile-public-view">
@@ -1928,17 +1964,6 @@
           </div>
 
           <div>
-            <label for="atmo-season-select" class="text-[9px] text-slate-400 block mb-0.5">SEASON</label>
-            <select id="atmo-season-select" onchange="updateSanctuaryAtmosphere('season', this.value)" class="w-full bg-[#252923] text-white border border-slate-700 rounded-lg p-1.5 text-[11px]">
-              <option value="auto">Auto (Calendar)</option>
-              <option value="spring">🌸 Spring</option>
-              <option value="summer">🌿 Summer</option>
-              <option value="autumn">🍂 Autumn</option>
-              <option value="winter">❄️ Winter</option>
-            </select>
-          </div>
-
-          <div>
             <label for="atmo-weather-select" class="text-[9px] text-slate-400 block mb-0.5">WEATHER FX</label>
             <select id="atmo-weather-select" onchange="updateSanctuaryAtmosphere('weather', this.value)" class="w-full bg-[#252923] text-white border border-slate-700 rounded-lg p-1.5 text-[11px]">
               <option value="auto">🌦️ Seasonal atmosphere (no location)</option>
@@ -1951,24 +1976,18 @@
             </select>
           </div>
 
-          <div>
-            <label for="atmo-holiday-select" class="text-[9px] text-slate-400 block mb-0.5">HOLIDAY THEME</label>
-            <select id="atmo-holiday-select" onchange="updateSanctuaryAtmosphere('holiday', this.value)" class="w-full bg-[#252923] text-white border border-slate-700 rounded-lg p-1.5 text-[11px]">
-              <option value="auto">Auto (Calendar)</option>
-              <option value="none">None (Standard)</option>
-              <option value="founders-day">🛡️ AuDHMe Origin (Apr 6)</option>
-              <option value="halloween">🎃 Halloween / Samhain</option>
-              <option value="bonfire">🔥 Bonfire Night</option>
-              <option value="christmas">🎄 Christmas / Festive</option>
-              <option value="new-year">🎆 New Year</option>
-              <option value="valentines">💗 Valentine's Day</option>
-              <option value="easter">🐣 Easter</option>
-            </select>
-          </div>
-
           <p id="atmo-weather-status" role="status" class="long-read col-span-2 text-[9px] text-slate-400 leading-snug">Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.</p>
 
         </div>
+
+        <label class="flex items-center justify-between cursor-pointer text-[10px] text-slate-300 font-bold">
+          <span>Seasonal effects (calendar)</span>
+          <input type="checkbox" id="atmo-season-toggle" onchange="updateSanctuaryAtmosphere('season', this.checked ? 'auto' : 'none')" class="accent-[#cbb678] w-4 h-4 cursor-pointer">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer text-[10px] text-slate-300 font-bold">
+          <span>Holiday effects (calendar)</span>
+          <input type="checkbox" id="atmo-holiday-toggle" onchange="updateSanctuaryAtmosphere('holiday', this.checked ? 'auto' : 'none')" class="accent-[#cbb678] w-4 h-4 cursor-pointer">
+        </label>
 
         <div class="flex items-center justify-between pt-1">
           <label for="atmo-anim-toggle" class="text-[10px] text-slate-300 font-bold cursor-pointer">Enable Ambient Animations</label>
@@ -2081,6 +2100,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=67"></script>
+  <script src="js/app.js?v=68"></script>
 </body>
 </html>

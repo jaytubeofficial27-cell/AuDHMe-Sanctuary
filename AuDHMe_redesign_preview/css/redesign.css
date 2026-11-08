@@ -3057,7 +3057,7 @@ body[data-holiday="halloween"] #halloween-pumpkins { display: block; }
 
 /* Seasonal top accent strip — makes seasons visibly distinct */
 #season-decor { position: fixed; top: 0; left: 0; right: 0; pointer-events: none; z-index: 999; height: 8px; display: none; }
-body[data-season] #season-decor { display: block; }
+body[data-season]:not([data-season="none"]) #season-decor { display: block; }
 body[data-season="winter"] #season-decor { background: linear-gradient(180deg, rgba(240, 248, 255, 0.55), transparent); height: 10px; }
 body[data-season="spring"] #season-decor {
   background: radial-gradient(circle at 10% 50%, rgba(244, 194, 201, 0.75) 2px, transparent 3px), radial-gradient(circle at 35% 30%, rgba(212, 197, 226, 0.65) 2px, transparent 3px), radial-gradient(circle at 60% 60%, rgba(244, 194, 201, 0.65) 2px, transparent 3px), radial-gradient(circle at 85% 40%, rgba(181, 212, 194, 0.75) 2px, transparent 3px);
@@ -4395,6 +4395,20 @@ body:is(.low-input-active,.low-stim-active,.site-adapt-calm) #pane-store .store-
 @media (max-width: 700px) {
   .profile-interest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.founder-admin-panel {
+  margin: 0 0 18px;
+  padding: 20px;
+  border: 1px solid rgba(203, 182, 120, .4);
+  border-radius: 16px;
+  background: #202a29;
+  color: #e3e9e4;
+}
+.founder-admin-panel h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.founder-admin-panel p { margin: 8px 0 14px; font-size: .85rem; line-height: 1.5; }
+.founder-admin-controls { display: flex; flex-wrap: wrap; gap: 12px; }
+.founder-admin-controls label { display: grid; gap: 6px; flex: 1 1 180px; font-size: .85rem; font-weight: 700; }
+.founder-admin-controls select { width: 100%; padding: 9px; border: 1px solid #63766b; border-radius: 8px; background: #17201f; color: #fff; }
 
 @media (max-width: 760px) {
   #audhme-widget-panel {

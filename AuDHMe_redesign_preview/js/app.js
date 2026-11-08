@@ -1989,6 +1989,7 @@ var bootScreenActive = false;
       liveWeatherCondition: '',
       liveWeatherIsStorm: false
     };
+    var founderAtmoPreview = { season: 'auto', holiday: 'auto' };
     var atmoParticles = [];
     var atmoSpawnQueue = 0;
     var atmoAnimFrame = null;
@@ -2008,9 +2009,9 @@ var bootScreenActive = false;
           var parsed = JSON.parse(raw);
           if (parsed && typeof parsed === 'object') {
             atmoState.time = parsed.time || 'auto';
-            atmoState.season = parsed.season || 'auto';
+            atmoState.season = parsed.calendarControls === true && parsed.season === 'none' ? 'none' : 'auto';
             atmoState.weather = parsed.weather !== undefined ? parsed.weather : 'live';
-            atmoState.holiday = parsed.holiday || 'auto';
+            atmoState.holiday = parsed.holiday === 'none' ? 'none' : 'auto';
             atmoState.animationsEnabled = parsed.animationsEnabled !== false;
           }
         }
@@ -2024,7 +2025,8 @@ var bootScreenActive = false;
           season: atmoState.season,
           weather: atmoState.weather,
           holiday: atmoState.holiday,
-          animationsEnabled: atmoState.animationsEnabled
+          animationsEnabled: atmoState.animationsEnabled,
+          calendarControls: true
         }));
       } catch (e) {}
     }
@@ -2167,8 +2169,8 @@ var bootScreenActive = false;
 
     function applySanctuaryAtmosphere(rebuildParticles) {
       var rTime = (atmoState.time === 'auto') ? detectTimeOfDay() : atmoState.time;
-      var rSeason = (atmoState.season === 'auto') ? detectSeason() : atmoState.season;
-      var rHoliday = (atmoState.holiday === 'auto') ? detectHoliday() : atmoState.holiday;
+      var rSeason = founderAtmoPreview.season !== 'auto' ? founderAtmoPreview.season : (atmoState.season === 'auto' ? detectSeason() : 'none');
+      var rHoliday = founderAtmoPreview.holiday !== 'auto' ? founderAtmoPreview.holiday : (atmoState.holiday === 'auto' ? detectHoliday() : 'none');
       var rWeather = atmoState.weather;
 
       if (rWeather === 'live') {
@@ -2193,24 +2195,27 @@ var bootScreenActive = false;
       document.body.setAttribute('data-storm', atmoState.liveWeatherIsStorm ? 'true' : 'false');
 
       var tSel = document.getElementById('atmo-time-select');
-      var sSel = document.getElementById('atmo-season-select');
+      var seasonToggle = document.getElementById('atmo-season-toggle');
       var wSel = document.getElementById('atmo-weather-select');
-      var hSel = document.getElementById('atmo-holiday-select');
+      var holidayToggle = document.getElementById('atmo-holiday-toggle');
       var toggleEl = document.getElementById('atmo-anim-toggle');
       var weatherStatus = document.getElementById('atmo-weather-status');
 
       if (tSel) tSel.value = atmoState.time;
-      if (sSel) sSel.value = atmoState.season;
+      if (seasonToggle) seasonToggle.checked = atmoState.season === 'auto';
       if (wSel) wSel.value = atmoState.weather;
-      if (hSel) hSel.value = atmoState.holiday;
+      if (holidayToggle) holidayToggle.checked = atmoState.holiday === 'auto';
       if (toggleEl) toggleEl.checked = atmoState.animationsEnabled;
       if (weatherStatus) weatherStatus.textContent = (liveWeatherStatus ? liveWeatherStatus + ' ' : '') + 'Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.';
       document.body.classList.toggle('atmo-paused', !atmoState.animationsEnabled);
       var summaryEl = document.getElementById('atmo-active-summary');
+      var previewActive = founderAtmoPreview.season !== 'auto' || founderAtmoPreview.holiday !== 'auto';
       if (summaryEl) {
         var hTag = rHoliday !== 'none' ? ' · ' + rHoliday.toUpperCase() : '';
-        summaryEl.textContent = rTime.toUpperCase() + ' · ' + rSeason.toUpperCase() + hTag;
+        summaryEl.textContent = (previewActive ? 'PREVIEW · ' : '') + rTime.toUpperCase() + (rSeason !== 'none' ? ' · ' + rSeason.toUpperCase() : '') + hTag;
       }
+      var previewStatus = document.getElementById('founder-preview-status');
+      if (previewStatus) previewStatus.textContent = previewActive ? 'Preview active in this browser.' : 'No preview active.';
 
       if (rebuildParticles || changed) {
         initAtmosphereCanvas();
@@ -2845,6 +2850,47 @@ var bootScreenActive = false;
       return !!(auth.currentUser && auth.currentUser.uid === FOUNDER_AUTH_UID);
     }
 
+    function clearFounderAtmospherePreview() {
+      founderAtmoPreview.season = 'auto';
+      founderAtmoPreview.holiday = 'auto';
+      document.getElementById('admin-season-preview').value = 'auto';
+      document.getElementById('admin-holiday-preview').value = 'auto';
+      applySanctuaryAtmosphere(true);
+    }
+
+    function toggleFounderAdminPanel() {
+      if (!isFounderCopyExempt()) {
+        showToast('Administrator preview is only available to the founder account.');
+        return;
+      }
+      var panel = document.getElementById('founder-admin-panel');
+      var button = document.getElementById('founder-admin-button');
+      var opening = panel.classList.contains('hidden');
+      panel.classList.toggle('hidden', !opening);
+      button.setAttribute('aria-expanded', String(opening));
+    }
+
+    function setFounderAtmospherePreview(kind, value) {
+      var allowed = {
+        season: ['auto', 'none', 'spring', 'summer', 'autumn', 'winter'],
+        holiday: ['auto', 'none', 'founders-day', 'halloween', 'bonfire', 'christmas', 'new-year', 'valentines', 'easter']
+      };
+      if (!isFounderCopyExempt() || !allowed[kind] || !allowed[kind].includes(value)) {
+        showToast('Unable to apply this administrator preview.');
+        return;
+      }
+      founderAtmoPreview[kind] = value;
+      applySanctuaryAtmosphere(true);
+    }
+
+    function resetFounderAtmospherePreview() {
+      if (!isFounderCopyExempt()) {
+        showToast('Administrator preview is only available to the founder account.');
+        return;
+      }
+      clearFounderAtmospherePreview();
+    }
+
     ['copy', 'cut', 'paste', 'contextmenu', 'dragstart', 'selectstart'].forEach(function(eventName) {
       document.addEventListener(eventName, function(event) {
         if (isFounderCopyExempt()) return;
@@ -2971,6 +3017,12 @@ var bootScreenActive = false;
         resolveAuthInitialized = null;
       }
       document.body.classList.toggle('copy-protection-enabled', !(user && user.uid === FOUNDER_AUTH_UID));
+      if (!user || user.uid !== FOUNDER_AUTH_UID) {
+        document.getElementById('founder-admin-button').classList.add('hidden');
+        document.getElementById('founder-admin-button').setAttribute('aria-expanded', 'false');
+        document.getElementById('founder-admin-panel').classList.add('hidden');
+        clearFounderAtmospherePreview();
+      }
       const version = ++authStateVersion;
       if (!user) {
         currentUser = null;
@@ -3161,6 +3213,12 @@ var bootScreenActive = false;
       renderProfileStatuses(profile,isOwner);
       const links=document.getElementById('profile-links-container'); if(links){links.replaceChildren();(Array.isArray(profile.links)?profile.links:[]).forEach(function(link){addProfileLink(links,link);});}
       const settings=document.getElementById('owner-settings-btn'); if(settings) settings.classList.toggle('hidden',!isOwner);
+      const adminButton=document.getElementById('founder-admin-button');
+      if(adminButton) {
+        adminButton.classList.toggle('hidden', !(isOwner && founder && isFounderCopyExempt()));
+        adminButton.setAttribute('aria-expanded', 'false');
+      }
+      document.getElementById('founder-admin-panel').classList.add('hidden');
       const back=document.getElementById('community-profile-back'); if(back) back.classList.toggle('hidden',isOwner);
       const context=document.getElementById('profile-context-label'); if(context) context.textContent=isOwner?'My Sanctuary profile':'Community member profile';
       const summary=document.getElementById('profile-privacy-summary'); if(summary) summary.textContent=isOwner?(profile.communityVisible?'Your profile is visible to signed-in Sanctuary members. Gallery items can still be kept private individually.':'Your profile and entire gallery are private. Items marked for sharing will be visible if you share your profile again.'):'Shared by this member with signed-in Sanctuary members.';
