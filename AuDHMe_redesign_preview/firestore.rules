@@ -5,6 +5,16 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == userId;
     }
 
+    match /users/{userId}/notifications/{itemId} {
+      allow read: if signedInAs(userId);
+      allow write: if false;
+    }
+
+    match /staffRoles/{userId} {
+      allow get: if signedInAs(userId);
+      allow list, write: if false;
+    }
+
     function validStatuses(data) {
       return !data.keys().hasAny(['liveStatuses']) || (data.liveStatuses is list
         && data.liveStatuses.size() <= 52
@@ -48,7 +58,7 @@ service cloud.firestore {
 
     match /communityProfiles/{userId} {
       // This projection contains only fields the member chose to share.
-      allow get: if request.auth != null && resource.data.profileVisible == true
+      allow get: if request.auth != null && !exists(/databases/$(database)/documents/galleryModeration/$(userId)) && resource.data.profileVisible == true
         && get(/databases/$(database)/documents/users/$(userId)).data.communityVisible == true;
       allow list: if false;
       allow create, update: if signedInAs(userId)
@@ -70,6 +80,7 @@ service cloud.firestore {
     match /galleryEngagement/{ownerId}/posts/{postId} {
       function isSharedPost() {
         return request.auth != null
+          && !exists(/databases/$(database)/documents/galleryModeration/$(ownerId))
           && get(/databases/$(database)/documents/users/$(ownerId)).data.communityVisible == true
           && exists(/databases/$(database)/documents/communityProfiles/$(ownerId))
           && get(/databases/$(database)/documents/communityProfiles/$(ownerId)).data.profileVisible == true

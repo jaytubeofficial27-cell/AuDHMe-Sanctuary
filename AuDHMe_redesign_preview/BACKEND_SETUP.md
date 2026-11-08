@@ -23,6 +23,26 @@ The page uses Firebase Authentication and private Firestore profile documents. S
 
    The project-specific functions environment file sets `SITE_URL` to `https://audhme.org`. For another project or hosting address, configure `SITE_URL` to the canonical HTTPS URL serving that project's HTML file; include the path if it is served at a named path.
 
+   Staff administration is separate and unfinished. Before a future deployment, review the staff functions and rules together and test them against an isolated Firebase project. Deploying the existing checkout and gallery functions above does not deploy the staff functions.
+
+### Local rules tests
+
+The integration suite uses a demo project and the Auth, Firestore and Storage emulators; it does not connect to production. Install Java 11 or newer, then from `functions/` run:
+
+```powershell
+npm ci
+npm test
+npm run test:rules
+```
+
+The emulator tests exercise private profiles and media, notification isolation, denial of direct staff-role and audit writes, matching role records and refreshed Auth claims for staff callables, and a preliminary moderation access gate. Staff functions are invoked directly in the integration test against the Auth and Firestore emulators; the Cloud Functions transport itself is not emulated. They do **not** verify an actual staff-driven quarantine or 365-day cleanup: those features have not been implemented. Do not deploy the staff foundation as the requested complete administration system until quarantine and safe cleanup are implemented and covered by emulator integration tests.
+
+The preliminary gate blocks authenticated Storage access and mutations for an item when its server-controlled moderation item document exists. While the corresponding parent moderation document exists, public profile projection reads, directory listings and post engagement are blocked for the entire profile; this is intentionally broader than a single item. Only trusted server code may create or remove these documents. There are currently no staff functions or controls to manage the gate. In particular, Firebase download-token URLs can bypass authenticated Storage rules, so token revocation, secure cross-service sequencing and recovery still have to be implemented and verified before this can be called quarantine.
+
+The fixed owner account initializes its server-managed owner role and claim when signing in. Other staff claims are derived from the server-managed role record and refreshed when that record changes. Privileged callables require the current record and token claim to agree, so a stale elevated claim is rejected after demotion or revocation; the account must synchronize and refresh its token to obtain a new role. A failed synchronization leaves staff access unavailable and is reported to the member. Changes to Firebase custom claims are separate from Firestore transactions, so verify role-change recovery with dedicated non-production accounts before deployment.
+
+Before deploying, also verify the full invitation/role-revocation flow, confirm privacy notices describe actual access, review the functions and rules together, and test with dedicated non-production accounts. Obtain approval before deploying to the live project.
+
 5. In Stripe Workbench, add a webhook endpoint at:
 
    `https://europe-west2-audhme-sanctuary-b73dd.cloudfunctions.net/stripeWebhook`
@@ -43,6 +63,8 @@ If checkout or the directory is unavailable, inspect the callable function logs 
 ## Privacy rules
 
 `firestore.rules` keeps each `users/{uid}` account profile readable only by its signed-in owner. Opted-in fields are copied into a separate `communityProfiles/{uid}` projection that other signed-in Sanctuary members can read; no profile or media is visible to signed-out visitors. `orders/{sessionId}` (including delivery details needed to fulfil the hoodie order) is readable by the owning account and writable only by the Admin SDK webhook.
+
+The staff directory-audit callable uses the Admin SDK and checks both the caller's current staff role record and matching token claim on each request. The owner and admins can review private profile details for moderation; moderators can only review profiles currently shared by their owner. Every directory-audit request and staff invitation, acceptance, decline or revocation is logged to a server-written audit collection. Profile owners can read their own inbox and staff role, but cannot write either directly. The new staff functions and rules must be deployed together; do not deploy them before communicating this change to members. Gallery moderation, cleanup and site-wide controls are not implemented by this foundation.
 
 ## Google sign-in
 

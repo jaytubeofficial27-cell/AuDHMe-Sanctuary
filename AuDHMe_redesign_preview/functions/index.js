@@ -7,6 +7,7 @@ const { HttpsError, onCall, onRequest } = require('firebase-functions/v2/https')
 
 admin.initializeApp();
 const db = admin.firestore();
+Object.assign(exports, require('./staff')(admin, db, HttpsError, onCall));
 const STRIPE_SECRET_KEY = defineSecret('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = defineSecret('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = defineString('SITE_URL', {
@@ -51,8 +52,9 @@ exports.listCommunityProfiles = onCall({
     const projections = await transaction.get(db.collection('communityProfiles').where('profileVisible', '==', true).limit(50));
     if (projections.empty) return [];
     const profiles = await transaction.getAll(...projections.docs.map((snapshot) => db.collection('users').doc(snapshot.id)));
+    const moderation = await transaction.getAll(...projections.docs.map((snapshot) => db.collection('galleryModeration').doc(snapshot.id)));
     return projections.docs.flatMap((snapshot, index) => {
-      if (!profiles[index].exists || profiles[index].data().communityVisible !== true) return [];
+      if (moderation[index].exists || !profiles[index].exists || profiles[index].data().communityVisible !== true) return [];
       const data = snapshot.data();
       return [{ uid: snapshot.id, username: data.username, avatar: data.avatar || null, bio: data.bio || '', neurotypes: Array.isArray(data.neurotypes) ? data.neurotypes : [], profileVisible: true }];
     });
@@ -78,8 +80,8 @@ exports.recordGalleryView = onCall({ region: 'europe-west2', maxInstances: 5 }, 
   const projection = db.collection('communityProfiles').doc(ownerId);
   const view = galleryViews(ownerId, postId).doc(request.auth.uid);
   await db.runTransaction(async (transaction) => {
-    const [profile, shared, existing] = await transaction.getAll(owner, projection, view);
-    if (!profile.exists || profile.data().communityVisible !== true || !shared.exists ||
+    const [profile, shared, existing, moderated] = await transaction.getAll(owner, projection, view, db.collection('galleryModeration').doc(ownerId));
+    if (moderated.exists || !profile.exists || profile.data().communityVisible !== true || !shared.exists ||
         shared.data().profileVisible !== true || !shared.data().sharedPostIds ||
         shared.data().sharedPostIds[postId] !== true) {
       throw new HttpsError('permission-denied', 'This post is no longer shared.');

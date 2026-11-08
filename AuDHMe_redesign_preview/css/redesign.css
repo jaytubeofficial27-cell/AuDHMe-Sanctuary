@@ -4408,7 +4408,11 @@ body:is(.low-input-active,.low-stim-active,.site-adapt-calm) #pane-store .store-
 .founder-admin-panel p { margin: 8px 0 14px; font-size: .85rem; line-height: 1.5; }
 .founder-admin-controls { display: flex; flex-wrap: wrap; gap: 12px; }
 .founder-admin-controls label { display: grid; gap: 6px; flex: 1 1 180px; font-size: .85rem; font-weight: 700; }
-.founder-admin-controls select { width: 100%; padding: 9px; border: 1px solid #63766b; border-radius: 8px; background: #17201f; color: #fff; }
+.founder-admin-controls select, .founder-admin-controls input { width: 100%; padding: 9px; border: 1px solid #63766b; border-radius: 8px; background: #17201f; color: #fff; }
+.founder-admin-panel h2:not(:first-child) { margin-top: 20px; }
+.founder-admin-panel form button { margin-top: 12px; }
+.staff-list-entry, .profile-inbox-entry { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(203, 182, 120, .2); }
+.staff-list-entry span, .profile-inbox-entry span { flex: 1 1 180px; overflow-wrap: anywhere; }
 
 @media (max-width: 760px) {
   #audhme-widget-panel {

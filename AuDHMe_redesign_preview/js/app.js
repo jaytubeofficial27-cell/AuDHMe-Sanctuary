@@ -2868,9 +2868,32 @@ var bootScreenActive = false;
       applySanctuaryAtmosphere(true);
     }
 
+    let activeStaffRole = null;
+    let staffRoleUnsubscribe = null;
+    let staffClaimReady = false;
+    let staffClaimSyncVersion = 0;
+    let viewingOwnProfile = false;
+    let adminMemberRecords = [];
+    let adminMemberCursor = null;
+
+    function updateAdminAccess() {
+      const allowed = viewingOwnProfile && !!auth.currentUser && staffClaimReady && (isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator');
+      const button = document.getElementById('founder-admin-button');
+      button.classList.toggle('hidden', !allowed);
+      document.getElementById('founder-preview-controls').classList.toggle('hidden', !isFounderCopyExempt());
+      document.getElementById('owner-staff-management').classList.toggle('hidden', !isFounderCopyExempt());
+      if (!allowed) {
+        document.getElementById('founder-admin-panel').classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+        adminMemberRecords = [];
+        document.getElementById('admin-member-list').replaceChildren();
+        document.getElementById('admin-audit-list').replaceChildren();
+      }
+    }
+
     function toggleFounderAdminPanel() {
-      if (!isFounderCopyExempt()) {
-        showToast('Administrator preview is only available to the founder account.');
+      if (!viewingOwnProfile || !auth.currentUser || !staffClaimReady || !(isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator')) {
+        showToast('Staff access is required.');
         return;
       }
       var panel = document.getElementById('founder-admin-panel');
@@ -2878,6 +2901,286 @@ var bootScreenActive = false;
       var opening = panel.classList.contains('hidden');
       panel.classList.toggle('hidden', !opening);
       button.setAttribute('aria-expanded', String(opening));
+      if (opening && isFounderCopyExempt()) loadStaffList();
+    }
+
+    async function syncStaffClaim(user, expectedRole) {
+      const version = ++staffClaimSyncVersion;
+      staffClaimReady = false;
+      updateAdminAccess();
+      try {
+        const existingToken = await user.getIdTokenResult();
+        if (version !== staffClaimSyncVersion || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
+        if (!expectedRole && !existingToken.claims.role) return;
+        const result = await functions.httpsCallable('syncMyStaffClaim')({});
+        const token = await user.getIdTokenResult(true);
+        if (version !== staffClaimSyncVersion || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
+        if (result.data.role !== expectedRole || (token.claims.role || null) !== expectedRole) {
+          throw new Error('Staff role changed while the token was being refreshed.');
+        }
+        staffClaimReady = true;
+        updateAdminAccess();
+      } catch (error) {
+        if (version !== staffClaimSyncVersion) return;
+        console.error('Staff claim synchronization failed:', error.code || error.message);
+        showToast('Staff access could not be verified. Sign out and back in to retry.');
+        updateAdminAccess();
+      }
+    }
+
+    function renderAdminMembers() {
+      const query = document.getElementById('admin-member-search').value.trim().toLowerCase();
+      const list = document.getElementById('admin-member-list');
+      list.replaceChildren();
+      const visible = adminMemberRecords.filter(function(profile) {
+        return (profile.uid + ' ' + profile.username).toLowerCase().includes(query);
+      });
+      if (!visible.length) { list.textContent = 'No loaded profiles match.'; return; }
+      visible.forEach(function(profile) {
+        const row = document.createElement('p');
+        row.textContent = (profile.username || 'Unnamed') + ' (' + profile.uid + ') — ' +
+          (profile.communityVisible ? 'Shared' : 'Private') + ' — ' +
+          (profile.neurotypes.length ? profile.neurotypes.join(', ') : 'No neurotypes selected');
+        list.appendChild(row);
+      });
+    }
+
+    async function loadAdminMembers(reset) {
+      const list = document.getElementById('admin-member-list');
+      const user = auth.currentUser;
+      const requestedRole = isFounderCopyExempt() ? 'owner' : activeStaffRole;
+      if (!user || !(isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator')) return;
+      if (reset) {
+        adminMemberRecords = [];
+        adminMemberCursor = null;
+        document.getElementById('admin-member-next').classList.add('hidden');
+      }
+      list.textContent = 'Loading profiles…';
+      try {
+        const result = await functions.httpsCallable('listModerationProfiles')({ cursor: adminMemberCursor });
+        if (!auth.currentUser || auth.currentUser.uid !== user.uid || requestedRole !== (isFounderCopyExempt() ? 'owner' : activeStaffRole)) return;
+        adminMemberRecords = adminMemberRecords.concat(result.data.profiles);
+        adminMemberCursor = result.data.nextCursor;
+        document.getElementById('admin-member-next').classList.toggle('hidden', !adminMemberCursor);
+        renderAdminMembers();
+      } catch (error) {
+        console.error('Profile audit failed:', error.code || error.message);
+        list.textContent = 'Profiles could not be loaded. Check permissions and backend deployment.';
+      }
+    }
+
+    async function loadAdminAudit() {
+      if (!isFounderCopyExempt()) return;
+      const list = document.getElementById('admin-audit-list');
+      list.textContent = 'Loading audit activity…';
+      try {
+        const result = await functions.httpsCallable('listAdminAudit')({});
+        if (!isFounderCopyExempt()) return;
+        list.replaceChildren();
+        if (!result.data.entries.length) { list.textContent = 'No audit activity yet.'; return; }
+        result.data.entries.forEach(function(entry) {
+          const row = document.createElement('p');
+          row.textContent = (entry.createdAt ? new Date(entry.createdAt).toLocaleString() : 'Time pending') + ' — ' + entry.action + ' — ' + entry.actor + ' → ' + entry.target;
+          list.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Audit list failed:', error.code || error.message);
+        list.textContent = 'Audit activity could not be loaded.';
+      }
+    }
+
+    async function runStaffDiagnostics() {
+      const user = auth.currentUser;
+      const role = isFounderCopyExempt() ? 'owner' : activeStaffRole;
+      if (!user || !['owner', 'admin', 'moderator'].includes(role)) return;
+      const target = document.getElementById('admin-diagnostics');
+      target.textContent = 'Checking…';
+      const start = performance.now();
+      try {
+        const result = await functions.httpsCallable('staffDiagnostics')({});
+        if (!auth.currentUser || auth.currentUser.uid !== user.uid || role !== (isFounderCopyExempt() ? 'owner' : activeStaffRole)) return;
+        const data = result.data;
+        target.replaceChildren();
+        [
+          'Authentication: ' + data.auth,
+          'Firestore: ' + data.firestore + ' (' + data.firestoreMilliseconds + ' ms server-side).',
+          'Callable round trip: ' + Math.round(performance.now() - start) + ' ms.',
+          'Storage: ' + data.storage,
+          'Security rules: ' + data.securityRules,
+          'Weather: ' + (atmoState.weather === 'live' ? (liveWeatherStatus || 'Not checked yet.') : 'Live weather is not selected.') + (liveWeatherDiagnostic ? ' Details: ' + liveWeatherDiagnostic : '')
+        ].forEach(function(text) {
+          const line = document.createElement('p');
+          line.textContent = text;
+          target.appendChild(line);
+        });
+      } catch (error) {
+        console.error('Staff diagnostics failed:', error.code || error.message);
+        target.textContent = 'Diagnostics failed. This does not identify which service is unavailable; check the console and Firebase logs.';
+      }
+    }
+
+    let staffInboxUnsubscribe = null;
+    let staffUnreadUnsubscribe = null;
+    function toggleProfileInbox() {
+      if (!auth.currentUser || !currentUser || currentUser.uid !== auth.currentUser.uid) return;
+      const panel = document.getElementById('profile-inbox');
+      const opening = panel.classList.contains('hidden');
+      panel.classList.toggle('hidden', !opening);
+      document.getElementById('profile-inbox-button').setAttribute('aria-expanded', String(opening));
+    }
+
+    function listenForStaffInbox(user) {
+      if (staffInboxUnsubscribe) staffInboxUnsubscribe();
+      if (staffUnreadUnsubscribe) staffUnreadUnsubscribe();
+      staffInboxUnsubscribe = null;
+      staffUnreadUnsubscribe = null;
+      document.getElementById('profile-inbox-count').textContent = '';
+      document.getElementById('profile-inbox-items').textContent = 'Loading notifications…';
+      if (!user) return;
+      staffUnreadUnsubscribe = db.collection('users').doc(user.uid).collection('notifications').where('read', '==', false).limit(101).onSnapshot(function(snapshot) {
+        if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+        const unread = snapshot.size;
+        document.getElementById('profile-inbox-count').textContent = unread ? '(' + (unread > 100 ? '100+' : unread) + ')' : '';
+      }, function(error) {
+        console.error('Unread notification count failed:', error.code || error.message);
+        document.getElementById('profile-inbox-count').textContent = '(!)';
+      });
+      staffInboxUnsubscribe = db.collection('users').doc(user.uid).collection('notifications').orderBy('createdAt', 'desc').limit(100).onSnapshot(function(snapshot) {
+        if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+        const container = document.getElementById('profile-inbox-items');
+        container.replaceChildren();
+        if (snapshot.empty) { container.textContent = 'No notifications yet.'; return; }
+        snapshot.docs.forEach(function(doc) {
+          const item = doc.data();
+          const row = document.createElement('div');
+          row.className = 'profile-inbox-entry';
+          const text = document.createElement('span');
+          text.textContent = item.type === 'staff-invitation' ? 'Staff invitation: ' + item.role + (item.status ? ' (' + item.status + ')' : '') : item.type === 'staff-revoked' ? 'Your staff access or invitation has been revoked.' : item.type === 'staff-role-changed' ? 'Your staff role is now ' + item.role + '.' : 'Notification';
+          row.appendChild(text);
+          if (item.type === 'staff-invitation' && !item.status) {
+            [true, false].forEach(function(accept) {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'calm-secondary-button';
+              button.textContent = accept ? 'Accept' : 'Decline';
+              button.addEventListener('click', async function() {
+                button.disabled = true;
+                try {
+                  await functions.httpsCallable('respondStaffInvitation')({ invitationId: item.invitationId, accept: accept });
+                  showToast(accept ? 'Staff invitation accepted.' : 'Staff invitation declined.');
+                } catch (error) {
+                  console.error('Staff invitation response failed:', error.code || error.message);
+                  showToast(error.message || 'Unable to respond to the invitation.');
+                } finally { button.disabled = false; }
+              });
+              row.appendChild(button);
+            });
+          } else if (item.read === false) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'calm-secondary-button';
+            button.textContent = 'Mark read';
+            button.addEventListener('click', async function() {
+              button.disabled = true;
+              try {
+                await functions.httpsCallable('markStaffNotificationRead')({ notificationId: doc.id });
+              } catch (error) {
+                console.error('Unable to mark notification read:', error.code || error.message);
+                showToast('Unable to mark the notification as read.');
+                button.disabled = false;
+              }
+            });
+            row.appendChild(button);
+          }
+          container.appendChild(row);
+        });
+      }, function(error) {
+        console.error('Staff inbox failed:', error.code || error.message);
+        document.getElementById('profile-inbox-items').textContent = 'Notifications could not be loaded. Please try again later.';
+        document.getElementById('profile-inbox-count').textContent = '(!)';
+      });
+    }
+
+    async function submitStaffInvite(event) {
+      event.preventDefault();
+      if (!isFounderCopyExempt()) { showToast('Only the owner can invite staff.'); return; }
+      const form = event.currentTarget;
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      try {
+        await functions.httpsCallable('inviteStaff')({ email: document.getElementById('staff-invite-email').value, role: document.getElementById('staff-invite-role').value });
+        form.reset();
+        document.getElementById('staff-management-status').textContent = 'Invitation sent to the member’s inbox.';
+        await loadStaffList();
+      } catch (error) {
+        console.error('Staff invitation failed:', error.code || error.message);
+        document.getElementById('staff-management-status').textContent = error.message || 'Unable to send the invitation.';
+      } finally { button.disabled = false; }
+    }
+
+    async function loadStaffList() {
+      if (!isFounderCopyExempt()) return;
+      const list = document.getElementById('staff-management-list');
+      list.textContent = 'Loading staff…';
+      try {
+        const result = await functions.httpsCallable('listStaff')({});
+        if (!isFounderCopyExempt()) return;
+        list.replaceChildren();
+        const entries = result.data.members.map(function(member) { return { uid: member.uid, role: member.role, status: 'active' }; })
+          .concat(result.data.invitations.map(function(invite) { return { uid: invite.uid, role: invite.role, status: 'invited' }; }));
+        if (!entries.length) { list.textContent = 'No staff or pending invitations.'; return; }
+        entries.forEach(function(entry) {
+          const row = document.createElement('div');
+          row.className = 'staff-list-entry';
+          const text = document.createElement('span');
+          text.textContent = entry.uid + ' — ' + entry.role + ' (' + entry.status + ')';
+          if (entry.uid === FOUNDER_AUTH_UID) {
+            row.appendChild(text);
+            list.appendChild(row);
+            return;
+          }
+          if (entry.status === 'active') {
+            const change = document.createElement('button');
+            change.type = 'button';
+            change.className = 'calm-secondary-button';
+            const nextRole = entry.role === 'admin' ? 'moderator' : 'admin';
+            change.textContent = 'Change to ' + nextRole;
+            change.addEventListener('click', async function() {
+              if (!window.confirm('Change this member’s role to ' + nextRole + '?')) return;
+              change.disabled = true;
+              try {
+                await functions.httpsCallable('changeStaffRole')({ uid: entry.uid, role: nextRole });
+                document.getElementById('staff-management-status').textContent = 'Staff role updated.';
+                await loadStaffList();
+              } catch (error) {
+                console.error('Staff role change failed:', error.code || error.message);
+                document.getElementById('staff-management-status').textContent = error.message || 'Unable to change staff role.';
+                change.disabled = false;
+              }
+            });
+            row.appendChild(change);
+          }
+          const button = document.createElement('button');
+          button.type = 'button'; button.className = 'calm-secondary-button'; button.textContent = 'Revoke';
+          button.addEventListener('click', async function() {
+            if (!window.confirm('Revoke this member’s staff access and pending invitations?')) return;
+            button.disabled = true;
+            try {
+              await functions.httpsCallable('revokeStaff')({ uid: entry.uid });
+              document.getElementById('staff-management-status').textContent = 'Staff access revoked.';
+              await loadStaffList();
+            } catch (error) {
+              console.error('Staff revocation failed:', error.code || error.message);
+              document.getElementById('staff-management-status').textContent = error.message || 'Unable to revoke staff access.';
+              button.disabled = false;
+            }
+          });
+          row.append(text, button); list.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Staff list failed:', error.code || error.message);
+        list.textContent = 'Staff list unavailable. The staff backend may not be deployed.';
+      }
     }
 
     function setFounderAtmospherePreview(kind, value) {
@@ -3024,6 +3327,40 @@ var bootScreenActive = false;
       directoryProfiles = null;
       directoryLoadError = null;
       directoryRenderVersion++;
+      if (staffRoleUnsubscribe) staffRoleUnsubscribe();
+      staffRoleUnsubscribe = null;
+      staffClaimSyncVersion++;
+      staffClaimReady = false;
+      activeStaffRole = null;
+      viewingOwnProfile = false;
+      updateAdminAccess();
+      if (user && user.uid !== FOUNDER_AUTH_UID) {
+        staffRoleUnsubscribe = db.collection('staffRoles').doc(user.uid).onSnapshot(function(snapshot) {
+          if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+          const nextRole = snapshot.exists && ['admin', 'moderator'].includes(snapshot.data().role) ? snapshot.data().role : null;
+          if (nextRole !== activeStaffRole) {
+            adminMemberRecords = [];
+            adminMemberCursor = null;
+            document.getElementById('admin-member-list').replaceChildren();
+            document.getElementById('founder-admin-panel').classList.add('hidden');
+            document.getElementById('founder-admin-button').setAttribute('aria-expanded', 'false');
+          }
+          activeStaffRole = nextRole;
+          updateAdminAccess();
+          syncStaffClaim(user, nextRole);
+        }, function(error) {
+          console.error('Staff role could not be loaded:', error.code || error.message);
+          staffClaimSyncVersion++;
+          staffClaimReady = false;
+          activeStaffRole = null;
+          updateAdminAccess();
+        });
+      }
+      if (user && user.uid === FOUNDER_AUTH_UID) syncStaffClaim(user, 'owner');
+      listenForStaffInbox(user);
+      document.getElementById('profile-inbox').classList.add('hidden');
+      document.getElementById('profile-inbox-button').classList.add('hidden');
+      document.getElementById('profile-inbox-button').setAttribute('aria-expanded', 'false');
       if (resolveAuthInitialized) {
         resolveAuthInitialized();
         resolveAuthInitialized = null;
@@ -3225,15 +3562,16 @@ var bootScreenActive = false;
       renderProfileStatuses(profile,isOwner);
       const links=document.getElementById('profile-links-container'); if(links){links.replaceChildren();(Array.isArray(profile.links)?profile.links:[]).forEach(function(link){addProfileLink(links,link);});}
       const settings=document.getElementById('owner-settings-btn'); if(settings) settings.classList.toggle('hidden',!isOwner);
-      const adminButton=document.getElementById('founder-admin-button');
-      if(adminButton) {
-        adminButton.classList.toggle('hidden', !(isOwner && founder && isFounderCopyExempt()));
-        adminButton.setAttribute('aria-expanded', 'false');
-      }
+      document.getElementById('profile-inbox-button').classList.toggle('hidden', !isOwner);
+      document.getElementById('profile-inbox').classList.add('hidden');
+      document.getElementById('profile-inbox-button').setAttribute('aria-expanded', 'false');
+      viewingOwnProfile = isOwner && !!auth.currentUser && profile.uid === auth.currentUser.uid;
+      updateAdminAccess();
+      document.getElementById('founder-admin-button').setAttribute('aria-expanded', 'false');
       document.getElementById('founder-admin-panel').classList.add('hidden');
       const back=document.getElementById('community-profile-back'); if(back) back.classList.toggle('hidden',isOwner);
       const context=document.getElementById('profile-context-label'); if(context) context.textContent=isOwner?'My Sanctuary profile':'Community member profile';
-      const summary=document.getElementById('profile-privacy-summary'); if(summary) summary.textContent=isOwner?(profile.communityVisible?'Your profile is visible to signed-in Sanctuary members. Gallery items can still be kept private individually.':'Your profile and entire gallery are private. Items marked for sharing will be visible if you share your profile again.'):'Shared by this member with signed-in Sanctuary members.';
+      const summary=document.getElementById('profile-privacy-summary'); if(summary) summary.textContent=isOwner?(profile.communityVisible?'Your profile is visible to signed-in Sanctuary members. Gallery items can still be kept private individually.':'Your profile and gallery are not shared with other members. Items marked for sharing will be visible if you share your profile again.'):'Shared by this member with signed-in Sanctuary members.';
       const perk=document.getElementById('owner-perk-box'); if(perk) perk.classList.toggle('hidden',!isOwner);
       const visibility=document.getElementById('profile-community-visible'); if(visibility) visibility.checked=isOwner&&profile.communityVisible===true;
       ['owner-profile-visibility','owner-gallery-controls'].forEach(function(id){const control=document.getElementById(id);if(control)control.classList.toggle('hidden',!isOwner);});

@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link rel="stylesheet" href="css/site.css?v=3">
-  <link rel="stylesheet" href="css/redesign.css?v=89">
+  <link rel="stylesheet" href="css/redesign.css?v=90">
 </head>
 <body class="copy-protection-enabled">
   <canvas id="sanctuary-atmosphere-canvas" aria-hidden="true"></canvas>
@@ -1462,14 +1462,24 @@
         <button id="owner-settings-btn" onclick="openSettingsView()" class="profile-settings-button">
           <i class="fa-solid fa-sliders" aria-hidden="true"></i> Account settings
         </button>
+        <button id="profile-inbox-button" type="button" class="profile-settings-button hidden" aria-expanded="false" aria-controls="profile-inbox" onclick="toggleProfileInbox()">
+          Inbox <span id="profile-inbox-count" aria-label="unread notifications"></span>
+        </button>
         <button id="founder-admin-button" type="button" class="profile-settings-button hidden" aria-expanded="false" aria-controls="founder-admin-panel" onclick="toggleFounderAdminPanel()">
           Admin settings
         </button>
       </div>
     </div>
 
+    <section id="profile-inbox" class="founder-admin-panel hidden" aria-labelledby="profile-inbox-title">
+      <h2 id="profile-inbox-title">Notifications</h2>
+      <div id="profile-inbox-items" aria-live="polite">Loading notifications…</div>
+    </section>
+
     <section id="founder-admin-panel" class="founder-admin-panel hidden" aria-labelledby="founder-admin-title">
-      <h2 id="founder-admin-title">Atmosphere preview</h2>
+      <h2 id="founder-admin-title">Admin settings</h2>
+      <div id="founder-preview-controls">
+      <h2>Atmosphere preview</h2>
       <p>Preview themes only in this browser. Previews reset when you reload or sign out and do not change anyone else's settings. Sensory and motion preferences still apply.</p>
       <div class="founder-admin-controls">
         <label for="admin-time-preview">Time-of-day preview
@@ -1520,6 +1530,42 @@
       <p>The Christmas countdown follows the real date, even while previewing.</p>
       <p id="founder-preview-status" role="status">No preview active.</p>
       <button type="button" class="calm-secondary-button" onclick="resetFounderAtmospherePreview()">Reset preview</button>
+      </div>
+      <div id="owner-staff-management">
+      <h2>Staff invitations</h2>
+      <p>Invite an existing account with a verified email. Invitations appear in that member's profile inbox and must be accepted before access is granted.</p>
+      <form id="staff-invite-form" onsubmit="submitStaffInvite(event)">
+        <div class="founder-admin-controls">
+          <label for="staff-invite-email">Account email
+            <input id="staff-invite-email" type="email" required autocomplete="off">
+          </label>
+          <label for="staff-invite-role">Role
+            <select id="staff-invite-role">
+              <option value="moderator">Moderator</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="calm-secondary-button">Send invitation</button>
+      </form>
+      <p id="staff-management-status" role="status"></p>
+      <button type="button" class="calm-secondary-button" onclick="loadStaffList()">Refresh staff list</button>
+      <div id="staff-management-list"></div>
+      <h2>Recent audit activity</h2>
+      <button type="button" class="calm-secondary-button" onclick="loadAdminAudit()">Refresh audit</button>
+      <div id="admin-audit-list" aria-live="polite"></div>
+      </div>
+      <h2>Member directory audit</h2>
+      <p>Administrators can review private profile details for moderation. Moderators can review shared profiles only. Access is logged.</p>
+      <label for="admin-member-search">Filter loaded members</label>
+      <input id="admin-member-search" type="search" oninput="renderAdminMembers()" placeholder="Name or account ID">
+      <button type="button" class="calm-secondary-button" onclick="loadAdminMembers(true)">Load members</button>
+      <div id="admin-member-list" aria-live="polite"></div>
+      <button id="admin-member-next" type="button" class="calm-secondary-button hidden" onclick="loadAdminMembers(false)">Load next page</button>
+      <h2>System diagnostics</h2>
+      <p>These checks reflect the current request, not a continuous availability or quota monitor.</p>
+      <button type="button" class="calm-secondary-button" onclick="runStaffDiagnostics()">Run checks</button>
+      <div id="admin-diagnostics" role="status">Not checked.</div>
     </section>
 
     <!-- Profile details remain populated only from the signed-in account or an allowed community share. -->
@@ -1567,7 +1613,8 @@
             <div class="profile-section-heading">
               <div><p class="eyebrow">A space for what you love</p><h2 id="profile-interest-title">Special interests</h2></div>
             </div>
-            <p id="profile-privacy-summary" class="profile-privacy-note">Your profile and gallery are private to your account.</p>
+            <p id="profile-privacy-summary" class="profile-privacy-note">Your profile and gallery are not shared with other members.</p>
+            <p class="profile-privacy-note">Authorized administrators may review private profile details for moderation; access is recorded.</p>
             <p class="profile-privacy-note">Each other member who opens a shared post counts once. Only its owner can see the count.</p>
             <div id="owner-gallery-controls" class="hidden">
               <button type="button" class="profile-gallery-upload-link" onclick="openGalleryUpload()">+ Add photos or videos</button>
@@ -2121,6 +2168,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=69"></script>
+  <script src="js/app.js?v=73"></script>
 </body>
 </html>

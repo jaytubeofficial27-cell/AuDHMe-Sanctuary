@@ -14,6 +14,7 @@ function createFunctions() {
   function collection(path) {
     return {
       doc: (id) => document(path + '/' + id),
+      where: (field, operator, value) => ({ limit: (size) => ({ path, field, value, size }) }),
       count: () => ({ get: async () => ({ data: () => ({ count: entries(path).length }) }) }),
       limit: (size) => ({ get: async () => {
         const docs = entries(path).slice(0, size).map((key) => ({ ref: document(key) }));
@@ -31,6 +32,12 @@ function createFunctions() {
     collection,
     runTransaction: async (callback) => callback({
       getAll: async (...refs) => refs.map((ref) => snapshot(ref.path)),
+      get: async (query) => {
+        const docs = entries(query.path).map((path) => ({
+          id: path.slice(query.path.length + 1), ...snapshot(path)
+        })).filter((doc) => doc.data()[query.field] === query.value).slice(0, query.size);
+        return { docs, empty: docs.length === 0 };
+      },
       create: (ref, data) => documents.set(ref.path, data)
     }),
     batch: () => {
@@ -73,6 +80,15 @@ test('shared post views count distinct members, exclude the owner and are owner 
   assert.equal((await functions.getGalleryViewCounts({ auth: { uid: 'owner' }, data: { postIds: ['g_post'] } })).g_post, 0);
 });
 
+test('directory excludes profiles with a server moderation gate', async () => {
+  const { functions, documents } = createFunctions();
+  documents.set('users/owner', { communityVisible: true });
+  documents.set('communityProfiles/owner', { profileVisible: true, username: 'Member' });
+  assert.equal((await functions.listCommunityProfiles({ auth: { uid: 'visitor' } })).length, 1);
+  documents.set('galleryModeration/owner', { active: 1 });
+  assert.equal((await functions.listCommunityProfiles({ auth: { uid: 'visitor' } })).length, 0);
+});
+
 test('view recording requires authentication and a currently shared post', async () => {
   const { functions, documents } = createFunctions();
   const request = { auth: { uid: 'visitor' }, data: { ownerId: 'owner', postId: 's_old image.jpg' } };
@@ -80,6 +96,9 @@ test('view recording requires authentication and a currently shared post', async
   await assert.rejects(functions.recordGalleryView(request), { code: 'permission-denied' });
   documents.set('users/owner', { communityVisible: true });
   documents.set('communityProfiles/owner', { profileVisible: true, sharedPostIds: { 's_old image.jpg': true } });
+  documents.set('galleryModeration/owner', { active: 1 });
+  await assert.rejects(functions.recordGalleryView(request), { code: 'permission-denied' });
+  documents.delete('galleryModeration/owner');
   await functions.recordGalleryView(request);
   documents.set('users/owner', { communityVisible: false });
   await assert.rejects(functions.recordGalleryView(request), { code: 'permission-denied' });
