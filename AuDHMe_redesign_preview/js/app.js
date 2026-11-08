@@ -1989,7 +1989,7 @@ var bootScreenActive = false;
       liveWeatherCondition: '',
       liveWeatherIsStorm: false
     };
-    var founderAtmoPreview = { season: 'auto', holiday: 'auto' };
+    var founderAtmoPreview = { time: 'auto', season: 'auto', holiday: 'auto', weather: 'auto' };
     var atmoParticles = [];
     var atmoSpawnQueue = 0;
     var atmoAnimFrame = null;
@@ -2001,6 +2001,7 @@ var bootScreenActive = false;
     var liveWeatherTimer = null;
     var liveWeatherController = null;
     var liveWeatherStatus = '';
+    var liveWeatherDiagnostic = '';
 
     function loadAtmoPrefs() {
       try {
@@ -2093,6 +2094,7 @@ var bootScreenActive = false;
       var request = liveWeatherRequest;
       liveWeatherPending = true;
       liveWeatherStatus = 'Checking local weather; animations will begin when it is ready.';
+      liveWeatherDiagnostic = '';
       atmoState.liveWeatherCondition = '';
       atmoState.liveWeatherIsStorm = false;
       applySanctuaryAtmosphere(true);
@@ -2103,6 +2105,7 @@ var bootScreenActive = false;
         atmoState.liveWeatherCondition = condition;
         atmoState.liveWeatherIsStorm = isStorm;
         liveWeatherStatus = error ? 'Live weather unavailable. Showing the seasonal atmosphere instead.' : 'Showing live local weather.';
+        liveWeatherDiagnostic = error ? (typeof error === 'string' ? error : error.message || 'Unknown weather error.') : '';
         if (error) console.warn('Live weather unavailable:', error.message || error);
         applySanctuaryAtmosphere(true);
       }
@@ -2148,6 +2151,7 @@ var bootScreenActive = false;
         cancelLiveWeatherRequest();
         atmoState.liveWeatherIsStorm = false;
         liveWeatherStatus = '';
+        liveWeatherDiagnostic = '';
       }
       saveAtmoPrefs();
       if (key === 'weather' && val === 'live') {
@@ -2168,14 +2172,14 @@ var bootScreenActive = false;
     };
 
     function applySanctuaryAtmosphere(rebuildParticles) {
-      var rTime = (atmoState.time === 'auto') ? detectTimeOfDay() : atmoState.time;
+      var rTime = founderAtmoPreview.time !== 'auto' ? founderAtmoPreview.time : ((atmoState.time === 'auto') ? detectTimeOfDay() : atmoState.time);
       var rSeason = founderAtmoPreview.season !== 'auto' ? founderAtmoPreview.season : (atmoState.season === 'auto' ? detectSeason() : 'none');
       var rHoliday = founderAtmoPreview.holiday !== 'auto' ? founderAtmoPreview.holiday : (atmoState.holiday === 'auto' ? detectHoliday() : 'none');
-      var rWeather = atmoState.weather;
+      var rWeather = founderAtmoPreview.weather === 'auto' ? atmoState.weather : founderAtmoPreview.weather;
 
       if (rWeather === 'live') {
         rWeather = liveWeatherPending ? 'off' : (atmoState.liveWeatherCondition || detectDefaultWeather(rSeason, rTime, rHoliday));
-      } else if (rWeather === 'auto') {
+      } else if (rWeather === 'auto' || rWeather === 'seasonal') {
         rWeather = detectDefaultWeather(rSeason, rTime, rHoliday);
       }
 
@@ -2192,7 +2196,7 @@ var bootScreenActive = false;
       document.body.setAttribute('data-season', rSeason);
       document.body.setAttribute('data-weather', rWeather);
       document.body.setAttribute('data-holiday', rHoliday);
-      document.body.setAttribute('data-storm', atmoState.liveWeatherIsStorm ? 'true' : 'false');
+      document.body.setAttribute('data-storm', founderAtmoPreview.weather === 'auto' && atmoState.weather === 'live' && atmoState.liveWeatherIsStorm ? 'true' : 'false');
 
       var tSel = document.getElementById('atmo-time-select');
       var seasonToggle = document.getElementById('atmo-season-toggle');
@@ -2209,13 +2213,15 @@ var bootScreenActive = false;
       if (weatherStatus) weatherStatus.textContent = (liveWeatherStatus ? liveWeatherStatus + ' ' : '') + 'Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.';
       document.body.classList.toggle('atmo-paused', !atmoState.animationsEnabled);
       var summaryEl = document.getElementById('atmo-active-summary');
-      var previewActive = founderAtmoPreview.season !== 'auto' || founderAtmoPreview.holiday !== 'auto';
+      var previewActive = Object.values(founderAtmoPreview).some(function(value) { return value !== 'auto'; });
       if (summaryEl) {
         var hTag = rHoliday !== 'none' ? ' · ' + rHoliday.toUpperCase() : '';
         summaryEl.textContent = (previewActive ? 'PREVIEW · ' : '') + rTime.toUpperCase() + (rSeason !== 'none' ? ' · ' + rSeason.toUpperCase() : '') + hTag;
       }
       var previewStatus = document.getElementById('founder-preview-status');
       if (previewStatus) previewStatus.textContent = previewActive ? 'Preview active in this browser.' : 'No preview active.';
+      var adminWeatherStatus = document.getElementById('founder-weather-status');
+      if (adminWeatherStatus) adminWeatherStatus.textContent = 'Local weather: ' + (atmoState.weather === 'live' ? (liveWeatherStatus || 'Not checked yet.') : 'Live weather is not selected.') + (liveWeatherDiagnostic ? ' Details: ' + liveWeatherDiagnostic : '');
 
       if (rebuildParticles || changed) {
         initAtmosphereCanvas();
@@ -2274,7 +2280,7 @@ var bootScreenActive = false;
         var ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, width, height);
 
-        if (atmoState.liveWeatherIsStorm && mode === 'rain') {
+        if (document.body.getAttribute('data-storm') === 'true' && mode === 'rain') {
           if (stormFlashAlpha > 0.005) {
             ctx.fillStyle = 'rgba(226, 232, 240, ' + stormFlashAlpha + ')';
             ctx.fillRect(0, 0, width, height);
@@ -2851,10 +2857,14 @@ var bootScreenActive = false;
     }
 
     function clearFounderAtmospherePreview() {
+      founderAtmoPreview.time = 'auto';
       founderAtmoPreview.season = 'auto';
       founderAtmoPreview.holiday = 'auto';
+      founderAtmoPreview.weather = 'auto';
+      document.getElementById('admin-time-preview').value = 'auto';
       document.getElementById('admin-season-preview').value = 'auto';
       document.getElementById('admin-holiday-preview').value = 'auto';
+      document.getElementById('admin-weather-preview').value = 'auto';
       applySanctuaryAtmosphere(true);
     }
 
@@ -2872,8 +2882,10 @@ var bootScreenActive = false;
 
     function setFounderAtmospherePreview(kind, value) {
       var allowed = {
+        time: ['auto', 'morning', 'afternoon', 'evening', 'night'],
         season: ['auto', 'none', 'spring', 'summer', 'autumn', 'winter'],
-        holiday: ['auto', 'none', 'founders-day', 'halloween', 'bonfire', 'christmas', 'new-year', 'valentines', 'easter']
+        holiday: ['auto', 'none', 'founders-day', 'halloween', 'bonfire', 'christmas', 'new-year', 'valentines', 'easter'],
+        weather: ['auto', 'seasonal', 'clear', 'rain', 'snow', 'mist', 'off']
       };
       if (!isFounderCopyExempt() || !allowed[kind] || !allowed[kind].includes(value)) {
         showToast('Unable to apply this administrator preview.');

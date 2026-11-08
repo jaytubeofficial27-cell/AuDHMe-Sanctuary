@@ -1472,6 +1472,15 @@
       <h2 id="founder-admin-title">Atmosphere preview</h2>
       <p>Preview themes only in this browser. Previews reset when you reload or sign out and do not change anyone else's settings. Sensory and motion preferences still apply.</p>
       <div class="founder-admin-controls">
+        <label for="admin-time-preview">Time-of-day preview
+          <select id="admin-time-preview" onchange="setFounderAtmospherePreview('time', this.value)">
+            <option value="auto">Use my setting</option>
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening (2000K)</option>
+            <option value="night">Night</option>
+          </select>
+        </label>
         <label for="admin-season-preview">Season preview
           <select id="admin-season-preview" onchange="setFounderAtmospherePreview('season', this.value)">
             <option value="auto">Use my setting</option>
@@ -1495,7 +1504,19 @@
             <option value="easter">Easter</option>
           </select>
         </label>
+        <label for="admin-weather-preview">Weather preview
+          <select id="admin-weather-preview" onchange="setFounderAtmospherePreview('weather', this.value)">
+            <option value="auto">Use my setting</option>
+            <option value="seasonal">Seasonal atmosphere</option>
+            <option value="clear">Clear</option>
+            <option value="rain">Rain</option>
+            <option value="snow">Snow</option>
+            <option value="mist">Mist</option>
+            <option value="off">Particles off</option>
+          </select>
+        </label>
       </div>
+      <p id="founder-weather-status" role="status">Live weather status is not available yet.</p>
       <p>The Christmas countdown follows the real date, even while previewing.</p>
       <p id="founder-preview-status" role="status">No preview active.</p>
       <button type="button" class="calm-secondary-button" onclick="resetFounderAtmospherePreview()">Reset preview</button>
@@ -2100,6 +2121,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=68"></script>
+  <script src="js/app.js?v=69"></script>
 </body>
 </html>
