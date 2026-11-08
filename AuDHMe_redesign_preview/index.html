@@ -1531,6 +1531,11 @@
       <p id="founder-preview-status" role="status">No preview active.</p>
       <button type="button" class="calm-secondary-button" onclick="resetFounderAtmospherePreview()">Reset preview</button>
       </div>
+      <div id="staff-access-unavailable" class="hidden" role="status">
+        <p id="staff-access-message">Checking staff access…</p>
+        <button id="staff-access-retry" type="button" class="calm-secondary-button hidden" onclick="retryStaffAccess()">Retry staff access</button>
+      </div>
+      <div id="verified-staff-controls" class="hidden">
       <div id="owner-staff-management">
       <h2>Staff invitations</h2>
       <p>Invite an existing account with a verified email. Invitations appear in that member's profile inbox and must be accepted before access is granted.</p>
@@ -1566,6 +1571,7 @@
       <p>These checks reflect the current request, not a continuous availability or quota monitor.</p>
       <button type="button" class="calm-secondary-button" onclick="runStaffDiagnostics()">Run checks</button>
       <div id="admin-diagnostics" role="status">Not checked.</div>
+      </div>
     </section>
 
     <!-- Profile details remain populated only from the signed-in account or an allowed community share. -->
@@ -2168,6 +2174,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js?v=73"></script>
+  <script src="js/app.js?v=74"></script>
 </body>
 </html>

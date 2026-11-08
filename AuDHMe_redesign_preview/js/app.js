@@ -2871,28 +2871,39 @@ var bootScreenActive = false;
     let activeStaffRole = null;
     let staffRoleUnsubscribe = null;
     let staffClaimReady = false;
+    let staffClaimError = false;
     let staffClaimSyncVersion = 0;
     let viewingOwnProfile = false;
     let adminMemberRecords = [];
     let adminMemberCursor = null;
 
     function updateAdminAccess() {
-      const allowed = viewingOwnProfile && !!auth.currentUser && staffClaimReady && (isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator');
+      const founder = isFounderCopyExempt();
+      const verified = viewingOwnProfile && !!auth.currentUser && staffClaimReady && (founder || activeStaffRole === 'admin' || activeStaffRole === 'moderator');
+      const allowed = viewingOwnProfile && !!auth.currentUser && (founder || verified);
       const button = document.getElementById('founder-admin-button');
       button.classList.toggle('hidden', !allowed);
-      document.getElementById('founder-preview-controls').classList.toggle('hidden', !isFounderCopyExempt());
-      document.getElementById('owner-staff-management').classList.toggle('hidden', !isFounderCopyExempt());
-      if (!allowed) {
-        document.getElementById('founder-admin-panel').classList.add('hidden');
-        button.setAttribute('aria-expanded', 'false');
+      document.getElementById('founder-preview-controls').classList.toggle('hidden', !founder);
+      document.getElementById('owner-staff-management').classList.toggle('hidden', !founder);
+      document.getElementById('verified-staff-controls').classList.toggle('hidden', !verified);
+      document.getElementById('staff-access-unavailable').classList.toggle('hidden', !founder || verified);
+      document.getElementById('staff-access-message').textContent = staffClaimError
+        ? 'Staff access could not be verified. The local atmosphere preview is still available; staff controls require the backend to be available.'
+        : 'Checking staff access… The local atmosphere preview is available.';
+      document.getElementById('staff-access-retry').classList.toggle('hidden', !staffClaimError);
+      if (!verified) {
         adminMemberRecords = [];
         document.getElementById('admin-member-list').replaceChildren();
         document.getElementById('admin-audit-list').replaceChildren();
       }
+      if (!allowed) {
+        document.getElementById('founder-admin-panel').classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+      }
     }
 
     function toggleFounderAdminPanel() {
-      if (!viewingOwnProfile || !auth.currentUser || !staffClaimReady || !(isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator')) {
+      if (!viewingOwnProfile || !auth.currentUser || !(isFounderCopyExempt() || (staffClaimReady && (activeStaffRole === 'admin' || activeStaffRole === 'moderator')))) {
         showToast('Staff access is required.');
         return;
       }
@@ -2901,12 +2912,17 @@ var bootScreenActive = false;
       var opening = panel.classList.contains('hidden');
       panel.classList.toggle('hidden', !opening);
       button.setAttribute('aria-expanded', String(opening));
-      if (opening && isFounderCopyExempt()) loadStaffList();
+      if (opening && isFounderCopyExempt() && staffClaimReady) loadStaffList();
+    }
+
+    function retryStaffAccess() {
+      if (auth.currentUser && isFounderCopyExempt()) syncStaffClaim(auth.currentUser, 'owner');
     }
 
     async function syncStaffClaim(user, expectedRole) {
       const version = ++staffClaimSyncVersion;
       staffClaimReady = false;
+      staffClaimError = false;
       updateAdminAccess();
       try {
         const existingToken = await user.getIdTokenResult();
@@ -2920,10 +2936,12 @@ var bootScreenActive = false;
         }
         staffClaimReady = true;
         updateAdminAccess();
+        if (isFounderCopyExempt() && !document.getElementById('founder-admin-panel').classList.contains('hidden')) loadStaffList();
       } catch (error) {
-        if (version !== staffClaimSyncVersion) return;
+        if (version !== staffClaimSyncVersion || !auth.currentUser || auth.currentUser.uid !== user.uid) return;
         console.error('Staff claim synchronization failed:', error.code || error.message);
-        showToast('Staff access could not be verified. Sign out and back in to retry.');
+        staffClaimError = true;
+        if (!isFounderCopyExempt()) showToast('Staff access could not be verified. Sign out and back in to retry.');
         updateAdminAccess();
       }
     }
@@ -3331,6 +3349,7 @@ var bootScreenActive = false;
       staffRoleUnsubscribe = null;
       staffClaimSyncVersion++;
       staffClaimReady = false;
+      staffClaimError = false;
       activeStaffRole = null;
       viewingOwnProfile = false;
       updateAdminAccess();
