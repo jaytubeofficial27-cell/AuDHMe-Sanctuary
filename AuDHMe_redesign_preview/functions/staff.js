@@ -186,9 +186,25 @@ module.exports = function createStaffFunctions(auth, db, firestore, HttpsError, 
       db.collection('staffRoles').orderBy(firestore.FieldPath.documentId()).limit(100).get(),
       db.collection('staffInvitations').where('status', '==', 'pending').limit(100).get()
     ]);
+    const uids = [...new Set(roles.docs.map((doc) => doc.id).concat(invites.docs.map((doc) => doc.data().uid)))];
+    const profileSnapshots = uids.length
+      ? await db.getAll(...uids.map((uid) => db.collection('users').doc(uid)))
+      : [];
+    const names = new Map();
+    profileSnapshots.forEach((snapshot, index) => {
+      const username = snapshot.exists && snapshot.data().username;
+      if (typeof username === 'string' && username.trim()) names.set(uids[index], username.trim());
+    });
+    const missingNames = uids.filter((uid) => !names.has(uid));
+    for (let index = 0; index < missingNames.length; index += 100) {
+      const { users } = await auth.getUsers(missingNames.slice(index, index + 100).map((uid) => ({ uid })));
+      users.forEach((user) => {
+        if (typeof user.displayName === 'string' && user.displayName.trim()) names.set(user.uid, user.displayName.trim());
+      });
+    }
     return {
-      members: roles.docs.map((doc) => ({ uid: doc.id, role: doc.data().role })),
-      invitations: invites.docs.map((doc) => ({ uid: doc.data().uid, role: doc.data().role }))
+      members: roles.docs.map((doc) => ({ uid: doc.id, name: names.get(doc.id) || '', role: doc.data().role })),
+      invitations: invites.docs.map((doc) => ({ uid: doc.data().uid, name: names.get(doc.data().uid) || '', role: doc.data().role }))
     };
   });
 

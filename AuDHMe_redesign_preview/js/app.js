@@ -3355,14 +3355,18 @@ var bootScreenActive = false;
         const result = await functions.httpsCallable('listStaff')({});
         if (!isFounderCopyExempt()) return;
         list.replaceChildren();
-        const entries = result.data.members.map(function(member) { return { uid: member.uid, role: member.role, status: 'active' }; })
-          .concat(result.data.invitations.map(function(invite) { return { uid: invite.uid, role: invite.role, status: 'invited' }; }));
+        const entries = result.data.members.map(function(member) { return { uid: member.uid, name: member.name, role: member.role, status: 'active' }; })
+          .concat(result.data.invitations.map(function(invite) { return { uid: invite.uid, name: invite.name, role: invite.role, status: 'invited' }; }));
         if (!entries.length) { list.textContent = 'No staff or pending invitations.'; return; }
         entries.forEach(function(entry) {
           const row = document.createElement('div');
           row.className = 'staff-list-entry';
           const text = document.createElement('span');
-          text.textContent = entry.uid + ' — ' + entry.role + ' (' + entry.status + ')';
+          text.textContent = (entry.name || 'Unnamed member') + ' — ' + entry.role + ' (' + entry.status + ')';
+          const uid = document.createElement('small');
+          uid.textContent = entry.uid;
+          text.appendChild(document.createElement('br'));
+          text.appendChild(uid);
           if (entry.uid === FOUNDER_AUTH_UID) {
             row.appendChild(text);
             list.appendChild(row);

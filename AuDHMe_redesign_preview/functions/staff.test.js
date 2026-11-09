@@ -10,9 +10,10 @@ function harness() {
   const claims = new Map();
   let nextId = 0;
   const users = {
-    'member@example.test': { uid: 'member', emailVerified: true, disabled: false },
+    'member@example.test': { uid: 'member', displayName: 'Member Name', emailVerified: true, disabled: false },
     'unverified@example.test': { uid: 'unverified', emailVerified: false, disabled: false }
   };
+  users[owner.uid] = { uid: owner.uid, displayName: 'Owner Name' };
   function snap(ref) {
     const data = docs.get(ref.path);
     return { id: ref.id, ref, exists: data !== undefined, data: () => data };
@@ -43,6 +44,7 @@ function harness() {
   }
   const db = {
     collection,
+    getAll: async (...refs) => refs.map(snap),
     runTransaction: async (fn) => {
       const writes = [];
       const tx = {
@@ -67,6 +69,9 @@ function harness() {
   };
   const auth = {
     getUser: async (uid) => ({ uid, customClaims: claims.get(uid) || {} }),
+    getUsers: async (identifiers) => ({
+      users: identifiers.map(({ uid }) => Object.values(users).find((user) => user.uid === uid)).filter(Boolean)
+    }),
     setCustomUserClaims: async (uid, values) => claims.set(uid, values),
     getUserByEmail: async (email) => {
       if (!users[email]) { const error = Error('not found'); error.code = 'auth/user-not-found'; throw error; }
@@ -189,6 +194,17 @@ test('owner access requires both the fixed identity and matching server role', a
   await assert.rejects(functions.listStaff({ auth: owner }), { code: 'permission-denied' });
   await functions.syncMyStaffClaim({ auth: { uid: owner.uid } });
   assert.equal(docs.get('staffRoles/' + owner.uid).role, 'owner');
+});
+
+test('owner staff list resolves profile usernames before Firebase display names', async () => {
+  const { functions, docs } = harness();
+  docs.set('staffRoles/member', { role: 'admin' });
+  docs.set('users/' + owner.uid, { username: 'Owner Profile Name' });
+  const result = await functions.listStaff({ auth: owner });
+  assert.deepEqual(result.members, [
+    { uid: owner.uid, name: 'Owner Profile Name', role: 'owner' },
+    { uid: 'member', name: 'Member Name', role: 'admin' }
+  ]);
 });
 
 test('only the owner can change an active role and changes are audited and notified', async () => {

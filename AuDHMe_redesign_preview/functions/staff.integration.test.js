@@ -33,17 +33,22 @@ test('real emulator claims and server roles must match for staff access', async 
     return { auth: { uid: decoded.uid, token: decoded } };
   }
   try {
-    await serverAuth.createUser({ uid: ownerUid });
-    await serverAuth.createUser({ uid: 'member', email: 'member@example.test', emailVerified: true });
+    await serverAuth.createUser({ uid: ownerUid, displayName: 'Owner Name' });
+    await serverAuth.createUser({ uid: 'member', email: 'member@example.test', emailVerified: true, displayName: 'Member Name' });
     await signIn(ownerUid);
     await assert.rejects(api.listStaff(await request()), { code: 'permission-denied' });
     await api.syncMyStaffClaim(await request());
     const ownerRequest = await request(true);
     assert.equal(ownerRequest.auth.token.role, 'owner');
+    await db.collection('users').doc(ownerUid).set({ username: 'Profile Owner Name' });
+    await db.collection('users').doc('member').set({ username: 'Profile Member Name' });
     await api.inviteStaff({ ...ownerRequest, data: { email: 'member@example.test', role: 'admin' } });
     const invitation = await db.collection('staffInvitations').doc('member').get();
     await signIn('member');
     await api.respondStaffInvitation({ ...await request(), data: { invitationId: invitation.data().invitationId, accept: true } });
+    const staffList = await api.listStaff(ownerRequest);
+    assert.equal(staffList.members.find(({ uid }) => uid === ownerUid).name, 'Profile Owner Name');
+    assert.equal(staffList.members.find(({ uid }) => uid === 'member').name, 'Profile Member Name');
     await assert.rejects(api.staffDiagnostics(await request()), { code: 'permission-denied' });
     await api.syncMyStaffClaim(await request());
     const adminRequest = await request(true);
