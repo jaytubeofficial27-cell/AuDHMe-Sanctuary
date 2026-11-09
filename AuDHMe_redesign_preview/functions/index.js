@@ -1,16 +1,21 @@
 'use strict';
 
-const admin = require('firebase-admin');
+const { initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { FieldPath, FieldValue, Timestamp, getFirestore } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
 const { randomUUID } = require('node:crypto');
 const { defineSecret, defineString } = require('firebase-functions/params');
 const { HttpsError, onCall, onRequest } = require('firebase-functions/v2/https');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 
-admin.initializeApp();
-const db = admin.firestore();
-Object.assign(exports, require('./staff')(admin, db, HttpsError, onCall));
+initializeApp();
+const db = getFirestore();
+Object.assign(exports, require('./staff')(
+  getAuth(), db, { FieldPath, FieldValue }, HttpsError, onCall
+));
 Object.assign(exports, require('./moderation')(
-  admin, db, admin.storage().bucket(), HttpsError, onCall, onSchedule
+  db, getStorage().bucket(), { FieldValue, Timestamp }, HttpsError, onCall, onSchedule
 ));
 const STRIPE_SECRET_KEY = defineSecret('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = defineSecret('STRIPE_WEBHOOK_SECRET');
@@ -90,7 +95,7 @@ exports.recordGalleryView = onCall({ region: 'europe-west2', maxInstances: 5 }, 
         shared.data().sharedPostIds[postId] !== true) {
       throw new HttpsError('permission-denied', 'This post is no longer shared.');
     }
-    if (!existing.exists) transaction.create(view, { recordedAt: admin.firestore.FieldValue.serverTimestamp() });
+    if (!existing.exists) transaction.create(view, { recordedAt: FieldValue.serverTimestamp() });
   });
   return { recorded: true };
 });
@@ -157,7 +162,7 @@ function normalizeItems(items) {
 async function reserveFirstOrderPerk(userId) {
   const userRef = db.collection('users').doc(userId);
   const reservationId = randomUUID();
-  const now = admin.firestore.Timestamp.now();
+  const now = Timestamp.now();
   const staleBefore = now.toMillis() - 24 * 60 * 60 * 1000;
 
   return db.runTransaction(async (transaction) => {
@@ -169,7 +174,7 @@ async function reserveFirstOrderPerk(userId) {
     transaction.update(userRef, {
       perkReservationId: reservationId,
       perkReservationCreatedAt: now,
-      perkReservationSessionId: admin.firestore.FieldValue.delete()
+      perkReservationSessionId: FieldValue.delete()
     });
     return reservationId;
   });
@@ -182,9 +187,9 @@ async function releaseReservation(userId, reservationId) {
     const snapshot = await transaction.get(userRef);
     if (snapshot.exists && snapshot.data().perkReservationId === reservationId) {
       transaction.update(userRef, {
-        perkReservationId: admin.firestore.FieldValue.delete(),
-        perkReservationCreatedAt: admin.firestore.FieldValue.delete(),
-        perkReservationSessionId: admin.firestore.FieldValue.delete()
+        perkReservationId: FieldValue.delete(),
+        perkReservationCreatedAt: FieldValue.delete(),
+        perkReservationSessionId: FieldValue.delete()
       });
     }
   });
@@ -209,7 +214,7 @@ async function markPaidOrder(session) {
     customerEmail: session.customer_details && session.customer_details.email || null,
     shippingDetails: session.shipping_details || null,
     items,
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: FieldValue.serverTimestamp()
   }, { merge: true });
 
   const reservationId = session.metadata.perkReservationId;
@@ -219,10 +224,10 @@ async function markPaidOrder(session) {
     const snapshot = await transaction.get(userRef);
     if (!snapshot.exists || snapshot.data().perkReservationId !== reservationId) return;
     transaction.update(userRef, {
-      perkRedeemedAt: admin.firestore.FieldValue.serverTimestamp(),
-      perkReservationId: admin.firestore.FieldValue.delete(),
-      perkReservationCreatedAt: admin.firestore.FieldValue.delete(),
-      perkReservationSessionId: admin.firestore.FieldValue.delete()
+      perkRedeemedAt: FieldValue.serverTimestamp(),
+      perkReservationId: FieldValue.delete(),
+      perkReservationCreatedAt: FieldValue.delete(),
+      perkReservationSessionId: FieldValue.delete()
     });
   });
 }

@@ -2,7 +2,9 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const admin = require('firebase-admin');
+const { initializeApp: initializeAdminApp, deleteApp: deleteAdminApp } = require('firebase-admin/app');
+const { getAuth: getAdminAuth } = require('firebase-admin/auth');
+const { getFirestore, FieldPath, FieldValue } = require('firebase-admin/firestore');
 const { initializeApp, deleteApp } = require('firebase/app');
 const { getAuth, connectAuthEmulator, signInWithCustomToken, signOut } = require('firebase/auth');
 const { HttpsError } = require('firebase-functions/v2/https');
@@ -15,29 +17,31 @@ test('real emulator claims and server roles must match for staff access', async 
   if (!process.env.FIRESTORE_EMULATOR_HOST || !process.env.FIREBASE_AUTH_EMULATOR_HOST) {
     throw new Error('Run using npm run test:rules with Auth and Firestore emulators.');
   }
-  const server = admin.initializeApp({ projectId }, 'staff-integration');
+  const server = initializeAdminApp({ projectId }, 'staff-integration');
+  const serverAuth = getAdminAuth(server);
+  const db = getFirestore(server);
   const client = initializeApp({ projectId, apiKey: 'emulator-only' }, 'staff-integration');
   const auth = getAuth(client);
   connectAuthEmulator(auth, `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}`, { disableWarnings: true });
-  const api = createStaffFunctions({ auth: () => server.auth(), firestore: admin.firestore }, server.firestore(), HttpsError, (_, fn) => fn);
+  const api = createStaffFunctions(serverAuth, db, { FieldPath, FieldValue }, HttpsError, (_, fn) => fn);
   async function signIn(uid) {
-    await signInWithCustomToken(auth, await server.auth().createCustomToken(uid));
+    await signInWithCustomToken(auth, await serverAuth.createCustomToken(uid));
   }
   async function request(refresh = false) {
     const token = await auth.currentUser.getIdToken(refresh);
-    const decoded = await server.auth().verifyIdToken(token);
+    const decoded = await serverAuth.verifyIdToken(token);
     return { auth: { uid: decoded.uid, token: decoded } };
   }
   try {
-    await server.auth().createUser({ uid: ownerUid });
-    await server.auth().createUser({ uid: 'member', email: 'member@example.test', emailVerified: true });
+    await serverAuth.createUser({ uid: ownerUid });
+    await serverAuth.createUser({ uid: 'member', email: 'member@example.test', emailVerified: true });
     await signIn(ownerUid);
     await assert.rejects(api.listStaff(await request()), { code: 'permission-denied' });
     await api.syncMyStaffClaim(await request());
     const ownerRequest = await request(true);
     assert.equal(ownerRequest.auth.token.role, 'owner');
     await api.inviteStaff({ ...ownerRequest, data: { email: 'member@example.test', role: 'admin' } });
-    const invitation = await server.firestore().collection('staffInvitations').doc('member').get();
+    const invitation = await db.collection('staffInvitations').doc('member').get();
     await signIn('member');
     await api.respondStaffInvitation({ ...await request(), data: { invitationId: invitation.data().invitationId, accept: true } });
     await assert.rejects(api.staffDiagnostics(await request()), { code: 'permission-denied' });
@@ -66,6 +70,6 @@ test('real emulator claims and server roles must match for staff access', async 
   } finally {
     await signOut(auth);
     await deleteApp(client);
-    await server.delete();
+    await deleteAdminApp(server);
   }
 });

@@ -6,9 +6,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const RETENTION_DAYS = 365;
 const ACTIVE_STATES = ['quarantining', 'quarantined', 'restoring', 'expiring'];
 
-module.exports = function createModerationFunctions(admin, db, bucket, HttpsError, onCall, onSchedule) {
+module.exports = function createModerationFunctions(db, bucket, firestore, HttpsError, onCall, onSchedule) {
   const options = { region: 'europe-west2', maxInstances: 5 };
-  const timestamp = () => admin.firestore.FieldValue.serverTimestamp();
+  const timestamp = () => firestore.FieldValue.serverTimestamp();
 
   function requireUser(request) {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to continue.');
@@ -92,8 +92,8 @@ module.exports = function createModerationFunctions(admin, db, bucket, HttpsErro
     const itemRef = parentRef.collection('items').doc(parsed.itemId);
     const sourceFile = bucket.file(path);
     const quarantinePath = 'moderationQuarantine/' + targetUid + '/' + parsed.itemId + '-' + randomUUID();
-    const now = admin.firestore.Timestamp.now();
-    const expiresAt = admin.firestore.Timestamp.fromMillis(now.toMillis() + RETENTION_DAYS * DAY_MS);
+    const now = firestore.Timestamp.now();
+    const expiresAt = firestore.Timestamp.fromMillis(now.toMillis() + RETENTION_DAYS * DAY_MS);
 
     const state = await db.runTransaction(async (transaction) => {
       const { uid, role } = await requireStaff(transaction, request);
@@ -197,7 +197,7 @@ module.exports = function createModerationFunctions(admin, db, bucket, HttpsErro
         const owner = ownerData.get(data.ownerUid);
         if (!owner || !owner.profile || !canReview(role, owner.profile, owner.projection,
             { visibility: data.visibility }, data.visibility === 'community')) return [];
-        if (data.expiresAt && data.expiresAt.toMillis() <= admin.firestore.Timestamp.now().toMillis()) return [];
+        if (data.expiresAt && data.expiresAt.toMillis() <= firestore.Timestamp.now().toMillis()) return [];
         return [{
           id: ref.id, uid: data.ownerUid, path: data.path, name: data.name || '',
           reason: data.reason || '', visibility: data.visibility,
@@ -231,7 +231,7 @@ module.exports = function createModerationFunctions(admin, db, bucket, HttpsErro
         throw new HttpsError('not-found', 'This item is not available to restore.');
       }
       const item = itemSnapshot.data();
-      if (!item.expiresAt || item.expiresAt.toMillis() <= admin.firestore.Timestamp.now().toMillis()) {
+      if (!item.expiresAt || item.expiresAt.toMillis() <= firestore.Timestamp.now().toMillis()) {
         throw new HttpsError('failed-precondition', 'The 365-day retention period has ended; this item is scheduled for permanent deletion.');
       }
       const profile = profileSnapshot.exists ? profileSnapshot.data() : null;
@@ -365,7 +365,7 @@ module.exports = function createModerationFunctions(admin, db, bucket, HttpsErro
     region: 'europe-west2',
     maxInstances: 1
   }, async () => {
-    const now = admin.firestore.Timestamp.now();
+    const now = firestore.Timestamp.now();
     const snapshot = await db.collectionGroup('items').where('expiresAt', '<=', now).limit(100).get();
     let removed = 0;
     for (const item of snapshot.docs) {

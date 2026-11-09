@@ -48,13 +48,20 @@ function createFunctions() {
   class HttpsError extends Error {
     constructor(code, message) { super(message); this.code = code; }
   }
-  const firestore = () => db;
-  firestore.FieldValue = { serverTimestamp: () => 'timestamp' };
+  const firestore = {
+    FieldPath: { documentId: () => '__name__' },
+    FieldValue: { serverTimestamp: () => 'timestamp' }
+  };
+  const auth = {
+    getUser: async () => ({}),
+    getUserByEmail: async () => ({}),
+    setCustomUserClaims: async () => {}
+  };
   const stubs = {
-    'firebase-admin': {
-      initializeApp() {}, firestore,
-      storage: () => ({ bucket: () => ({ file: () => ({}) }) })
-    },
+    'firebase-admin/app': { initializeApp() {} },
+    'firebase-admin/auth': { getAuth: () => auth },
+    'firebase-admin/firestore': { ...firestore, getFirestore: () => db },
+    'firebase-admin/storage': { getStorage: () => ({ bucket: () => ({ file: () => ({}) }) }) },
     'firebase-functions/params': { defineSecret: () => ({}), defineString: () => ({}) },
     'firebase-functions/v2/https': { HttpsError, onCall: (_, fn) => fn, onRequest: (_, fn) => fn },
     'firebase-functions/v2/scheduler': { onSchedule: (_, fn) => fn }

@@ -139,13 +139,13 @@ function harness() {
     static now() { return new Timestamp(nowMs); }
     static fromMillis(value) { return new Timestamp(value); }
   }
-  const firestore = function() {};
-  firestore.FieldValue = { serverTimestamp: () => 'server-time' };
-  firestore.Timestamp = Timestamp;
-  firestore.FieldPath = { documentId: () => '__name__' };
-  const admin = { firestore };
+  const firestore = {
+    FieldValue: { serverTimestamp: () => 'server-time' },
+    Timestamp,
+    FieldPath: { documentId: () => '__name__' }
+  };
   const api = createModerationFunctions(
-    admin, db, { file }, HttpsError,
+    db, { file }, firestore, HttpsError,
     (options, handler) => handler,
     (options, handler) => handler
   );

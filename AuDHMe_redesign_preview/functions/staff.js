@@ -4,9 +4,9 @@ const { randomUUID } = require('node:crypto');
 const OWNER_UID = '4grgpBnKA9ROGhxJ0MoPn3yP3MV2';
 const STAFF_ROLES = ['admin', 'moderator'];
 
-module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
+module.exports = function createStaffFunctions(auth, db, firestore, HttpsError, onCall) {
   const options = { region: 'europe-west2', maxInstances: 5 };
-  const timestamp = () => admin.firestore.FieldValue.serverTimestamp();
+  const timestamp = () => firestore.FieldValue.serverTimestamp();
   const atmosphereKeys = ['localTime', 'calendarSeason', 'calendarHoliday', 'liveWeather'];
 
   function requireUser(request) {
@@ -56,12 +56,12 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
     const snapshot = await roleRef.get();
     const role = snapshot.exists && (uid === OWNER_UID ? snapshot.data().role === 'owner' : STAFF_ROLES.includes(snapshot.data().role))
       ? snapshot.data().role : null;
-    const user = await admin.auth().getUser(uid);
+    const user = await auth.getUser(uid);
     const claims = Object.assign({}, user.customClaims || {});
     if (role) claims.role = role;
     else delete claims.role;
     if ((user.customClaims && user.customClaims.role || null) !== role) {
-      await admin.auth().setCustomUserClaims(uid, claims);
+      await auth.setCustomUserClaims(uid, claims);
     }
     return { role };
   });
@@ -74,7 +74,7 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
     }
     let user;
     try {
-      user = await admin.auth().getUserByEmail(email.trim());
+      user = await auth.getUserByEmail(email.trim());
     } catch (error) {
       if (error.code === 'auth/user-not-found') throw new HttpsError('not-found', 'No registered account uses that email.');
       throw error;
@@ -183,7 +183,7 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
   const listStaff = onCall(options, async (request) => {
     await requireOwner(request);
     const [roles, invites] = await Promise.all([
-      db.collection('staffRoles').orderBy(admin.firestore.FieldPath.documentId()).limit(100).get(),
+      db.collection('staffRoles').orderBy(firestore.FieldPath.documentId()).limit(100).get(),
       db.collection('staffInvitations').where('status', '==', 'pending').limit(100).get()
     ]);
     return {
@@ -206,7 +206,7 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
       if (!['owner', 'admin', 'moderator'].includes(role)) throw new HttpsError('permission-denied', 'Staff access is required.');
       const privateAccess = role !== 'moderator';
       let query = db.collection(privateAccess ? 'users' : 'communityProfiles')
-        .orderBy(admin.firestore.FieldPath.documentId()).limit(51);
+        .orderBy(firestore.FieldPath.documentId()).limit(51);
       if (cursor) query = query.startAfter(cursor);
       const snapshot = await transaction.get(query);
       const page = snapshot.docs.slice(0, 50);

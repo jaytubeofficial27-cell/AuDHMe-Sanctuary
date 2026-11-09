@@ -2,7 +2,9 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const admin = require('firebase-admin');
+const { initializeApp, deleteApp } = require('firebase-admin/app');
+const { getFirestore, FieldValue, Timestamp } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
 const { HttpsError } = require('firebase-functions/v2/https');
 const createModerationFunctions = require('./moderation');
 
@@ -12,14 +14,14 @@ test('emulator quarantine, restore, and retention cleanup use real Firestore and
   if (!process.env.FIRESTORE_EMULATOR_HOST || !process.env.FIREBASE_STORAGE_EMULATOR_HOST) {
     throw new Error('Run using npm run test:rules so Firestore and Storage emulators are available.');
   }
-  const app = admin.initializeApp({
+  const app = initializeApp({
     projectId,
     storageBucket: projectId + '.appspot.com'
   }, 'moderation-integration');
-  const db = app.firestore();
-  const bucket = admin.storage(app).bucket();
+  const db = getFirestore(app);
+  const bucket = getStorage(app).bucket();
   const api = createModerationFunctions(
-    admin, db, bucket, HttpsError, (_, handler) => handler, (_, handler) => handler
+    db, bucket, { FieldValue, Timestamp }, HttpsError, (_, handler) => handler, (_, handler) => handler
   );
   const uid = 'moderation-member';
   const staffUid = 'moderation-admin';
@@ -80,7 +82,7 @@ test('emulator quarantine, restore, and retention cleanup use real Firestore and
     await expiredRef.set({
       ownerUid: uid, path: expiredPath, quarantinePath: expiredArchive,
       postId: 's_expired.png', status: 'quarantined', visibility: 'community',
-      expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() - 1000)
+      expiresAt: Timestamp.fromMillis(Date.now() - 1000)
     });
     await bucket.file(expiredPath).save(Buffer.from('expired source'), { metadata: { contentType: 'image/png' } });
     await bucket.file(expiredArchive).save(Buffer.from('expired quarantine'), { metadata: { contentType: 'image/png' } });
@@ -104,6 +106,6 @@ test('emulator quarantine, restore, and retention cleanup use real Firestore and
     await db.collection('staffRoles').doc(staffUid).delete().catch(() => {});
     await db.collection('users').doc(uid).delete().catch(() => {});
     await db.collection('communityProfiles').doc(uid).delete().catch(() => {});
-    await app.delete();
+    await deleteApp(app);
   }
 });

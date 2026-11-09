@@ -61,19 +61,19 @@ function harness() {
   class HttpsError extends Error {
     constructor(code, message) { super(message); this.code = code; }
   }
-  const firestore = function() {};
-  firestore.FieldValue = { serverTimestamp: () => 'timestamp' };
-  firestore.FieldPath = { documentId: () => '__name__' };
-  const admin = {
-    firestore,
-    auth: () => ({ getUser: async (uid) => ({ uid, customClaims: claims.get(uid) || {} }),
-      setCustomUserClaims: async (uid, values) => claims.set(uid, values),
-      getUserByEmail: async (email) => {
+  const firestore = {
+    FieldValue: { serverTimestamp: () => 'timestamp' },
+    FieldPath: { documentId: () => '__name__' }
+  };
+  const auth = {
+    getUser: async (uid) => ({ uid, customClaims: claims.get(uid) || {} }),
+    setCustomUserClaims: async (uid, values) => claims.set(uid, values),
+    getUserByEmail: async (email) => {
       if (!users[email]) { const error = Error('not found'); error.code = 'auth/user-not-found'; throw error; }
       return users[email];
-    } })
+    }
   };
-  return { functions: createStaffFunctions(admin, db, HttpsError, (_, fn) => fn), docs, claims };
+  return { functions: createStaffFunctions(auth, db, firestore, HttpsError, (_, fn) => fn), docs, claims };
 }
 
 const owner = { uid: '4grgpBnKA9ROGhxJ0MoPn3yP3MV2', token: { role: 'owner' } };
