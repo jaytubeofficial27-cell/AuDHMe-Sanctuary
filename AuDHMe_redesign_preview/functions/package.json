@@ -6,8 +6,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node --test staff.test.js gallery-views.test.js admin-access.test.js",
-    "test:rules": "firebase emulators:exec --project demo-audh-me --config ..\\firebase.test.json --only auth,firestore,storage \"node --test --test-concurrency=1 rules.integration.test.js staff.integration.test.js\""
+    "test": "node --test staff.test.js gallery-views.test.js admin-access.test.js moderation.test.js",
+    "test:rules": "firebase emulators:exec --project demo-audh-me --config ..\\firebase.test.json --only auth,firestore,storage \"node --test --test-concurrency=1 rules.integration.test.js staff.integration.test.js moderation.integration.test.js\""
   },
   "dependencies": {
     "firebase-admin": "^13.4.0",

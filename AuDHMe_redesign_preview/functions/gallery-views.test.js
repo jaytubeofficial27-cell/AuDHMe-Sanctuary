@@ -51,9 +51,13 @@ function createFunctions() {
   const firestore = () => db;
   firestore.FieldValue = { serverTimestamp: () => 'timestamp' };
   const stubs = {
-    'firebase-admin': { initializeApp() {}, firestore },
+    'firebase-admin': {
+      initializeApp() {}, firestore,
+      storage: () => ({ bucket: () => ({ file: () => ({}) }) })
+    },
     'firebase-functions/params': { defineSecret: () => ({}), defineString: () => ({}) },
-    'firebase-functions/v2/https': { HttpsError, onCall: (_, fn) => fn, onRequest: (_, fn) => fn }
+    'firebase-functions/v2/https': { HttpsError, onCall: (_, fn) => fn, onRequest: (_, fn) => fn },
+    'firebase-functions/v2/scheduler': { onSchedule: (_, fn) => fn }
   };
   const exports = {};
   const source = fs.readFileSync(require.resolve('./index.js'), 'utf8');

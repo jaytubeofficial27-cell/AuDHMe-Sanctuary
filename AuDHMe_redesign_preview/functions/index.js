@@ -4,10 +4,14 @@ const admin = require('firebase-admin');
 const { randomUUID } = require('node:crypto');
 const { defineSecret, defineString } = require('firebase-functions/params');
 const { HttpsError, onCall, onRequest } = require('firebase-functions/v2/https');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 
 admin.initializeApp();
 const db = admin.firestore();
 Object.assign(exports, require('./staff')(admin, db, HttpsError, onCall));
+Object.assign(exports, require('./moderation')(
+  admin, db, admin.storage().bucket(), HttpsError, onCall, onSchedule
+));
 const STRIPE_SECRET_KEY = defineSecret('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = defineSecret('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = defineString('SITE_URL', {

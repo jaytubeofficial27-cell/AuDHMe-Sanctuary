@@ -80,6 +80,10 @@ test('non-founder cannot open admin without a verified staff role or on another 
   h.context.update();
   assert.equal(h.element('founder-admin-button').classList.contains('hidden'), false);
   assert.equal(h.element('founder-preview-controls').classList.contains('hidden'), true);
+  assert.equal(h.element('admin-atmosphere-policy').classList.contains('hidden'), true);
+  h.context.setState(true, 'admin', true);
+  h.context.update();
+  assert.equal(h.element('admin-atmosphere-policy').classList.contains('hidden'), false);
   h.context.setState(false, 'moderator', true);
   h.context.update();
   assert.equal(h.element('founder-admin-button').classList.contains('hidden'), true);

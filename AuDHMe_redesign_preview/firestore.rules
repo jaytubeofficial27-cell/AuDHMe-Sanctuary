@@ -15,6 +15,18 @@ service cloud.firestore {
       allow list, write: if false;
     }
 
+    match /siteSettings/{settingId} {
+      allow get: if settingId == 'atmosphere';
+      allow list, write: if false;
+    }
+
+    match /galleryModeration/{userId} {
+      allow read, write: if false;
+      match /items/{itemId} {
+        allow read, write: if false;
+      }
+    }
+
     function validStatuses(data) {
       return !data.keys().hasAny(['liveStatuses']) || (data.liveStatuses is list
         && data.liveStatuses.size() <= 52

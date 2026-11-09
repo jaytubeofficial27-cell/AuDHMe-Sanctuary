@@ -1989,6 +1989,9 @@ var bootScreenActive = false;
       liveWeatherCondition: '',
       liveWeatherIsStorm: false
     };
+    var siteAtmoPolicy = { localTime: true, calendarSeason: true, calendarHoliday: true, liveWeather: true };
+    var siteAtmoPolicyStatus = 'Shared atmosphere policy is using the default settings.';
+    var siteAtmoPolicyLoaded = false;
     var founderAtmoPreview = { time: 'auto', season: 'auto', holiday: 'auto', weather: 'auto' };
     var atmoParticles = [];
     var atmoSpawnQueue = 0;
@@ -2030,6 +2033,65 @@ var bootScreenActive = false;
           calendarControls: true
         }));
       } catch (e) {}
+    }
+
+    function listenForSiteAtmospherePolicy() {
+      db.collection('siteSettings').doc('atmosphere').onSnapshot(function(snapshot) {
+        if (snapshot.exists) {
+          var data = snapshot.data();
+          siteAtmoPolicy = {
+            localTime: data.localTime !== false,
+            calendarSeason: data.calendarSeason !== false,
+            calendarHoliday: data.calendarHoliday !== false,
+            liveWeather: data.liveWeather !== false
+          };
+          siteAtmoPolicyStatus = 'Shared atmosphere policy loaded.';
+        } else {
+          siteAtmoPolicy = { localTime: true, calendarSeason: true, calendarHoliday: true, liveWeather: true };
+          siteAtmoPolicyStatus = 'Shared atmosphere policy is using the default settings.';
+        }
+        siteAtmoPolicyLoaded = true;
+        updateSiteAtmosphereControls();
+        if (!siteAtmoPolicy.liveWeather && atmoState.weather === 'live') {
+          cancelLiveWeatherRequest();
+          liveWeatherStatus = 'Live weather is disabled by the site administrator; using seasonal atmosphere.';
+          liveWeatherDiagnostic = '';
+        } else if (siteAtmoPolicy.liveWeather && atmoState.weather === 'live' && !liveWeatherPending && !atmoState.liveWeatherCondition) {
+          fetchLiveLocalWeather();
+        }
+        applySanctuaryAtmosphere(true);
+      }, function(error) {
+        console.error('Shared atmosphere policy could not be loaded:', error.code || error.message);
+        siteAtmoPolicy.liveWeather = false;
+        siteAtmoPolicyLoaded = true;
+        siteAtmoPolicyStatus = 'Shared atmosphere settings could not be loaded; live weather is paused until settings can be read.';
+        updateSiteAtmosphereControls();
+        if (atmoState.weather === 'live') {
+          cancelLiveWeatherRequest();
+          liveWeatherStatus = 'Live weather is paused because the site atmosphere policy is unavailable.';
+          applySanctuaryAtmosphere(true);
+        }
+      });
+    }
+
+    function updateSiteAtmosphereControls() {
+      var liveOption = document.querySelector('#atmo-weather-select option[value="live"]');
+      if (liveOption) liveOption.disabled = !siteAtmoPolicy.liveWeather;
+      var seasonToggle = document.getElementById('atmo-season-toggle');
+      if (seasonToggle) seasonToggle.disabled = !siteAtmoPolicy.calendarSeason;
+      var holidayToggle = document.getElementById('atmo-holiday-toggle');
+      if (holidayToggle) holidayToggle.disabled = !siteAtmoPolicy.calendarHoliday;
+      var policyStatus = document.getElementById('admin-atmosphere-policy-status');
+      if (policyStatus) policyStatus.textContent = siteAtmoPolicyStatus;
+      [
+        ['admin-policy-local-time', 'localTime'],
+        ['admin-policy-calendar-season', 'calendarSeason'],
+        ['admin-policy-calendar-holiday', 'calendarHoliday'],
+        ['admin-policy-live-weather', 'liveWeather']
+      ].forEach(function(entry) {
+        var control = document.getElementById(entry[0]);
+        if (control) control.checked = siteAtmoPolicy[entry[1]];
+      });
     }
 
     function detectTimeOfDay() {
@@ -2091,6 +2153,17 @@ var bootScreenActive = false;
 
     function fetchLiveLocalWeather() {
       cancelLiveWeatherRequest();
+      if (!siteAtmoPolicyLoaded) {
+        liveWeatherStatus = 'Waiting for the shared atmosphere policy before requesting location.';
+        applySanctuaryAtmosphere(true);
+        return;
+      }
+      if (!siteAtmoPolicy.liveWeather) {
+        liveWeatherStatus = 'Live weather is disabled by the site administrator; using seasonal atmosphere.';
+        liveWeatherDiagnostic = '';
+        applySanctuaryAtmosphere(true);
+        return;
+      }
       var request = liveWeatherRequest;
       liveWeatherPending = true;
       liveWeatherStatus = 'Checking local weather; animations will begin when it is ready.';
@@ -2146,6 +2219,12 @@ var bootScreenActive = false;
 
     window.updateSanctuaryAtmosphere = function(key, val) {
       playTactileClick(340, 0.045);
+      if (key === 'weather' && val === 'live' && !siteAtmoPolicy.liveWeather) {
+        liveWeatherStatus = 'Live weather is disabled by the site administrator.';
+        updateSiteAtmosphereControls();
+        applySanctuaryAtmosphere(true);
+        return;
+      }
       atmoState[key] = val;
       if (key === 'weather' && val !== 'live') {
         cancelLiveWeatherRequest();
@@ -2172,10 +2251,11 @@ var bootScreenActive = false;
     };
 
     function applySanctuaryAtmosphere(rebuildParticles) {
-      var rTime = founderAtmoPreview.time !== 'auto' ? founderAtmoPreview.time : ((atmoState.time === 'auto') ? detectTimeOfDay() : atmoState.time);
-      var rSeason = founderAtmoPreview.season !== 'auto' ? founderAtmoPreview.season : (atmoState.season === 'auto' ? detectSeason() : 'none');
-      var rHoliday = founderAtmoPreview.holiday !== 'auto' ? founderAtmoPreview.holiday : (atmoState.holiday === 'auto' ? detectHoliday() : 'none');
+      var rTime = founderAtmoPreview.time !== 'auto' ? founderAtmoPreview.time : ((atmoState.time === 'auto') ? (siteAtmoPolicy.localTime ? detectTimeOfDay() : 'afternoon') : atmoState.time);
+      var rSeason = founderAtmoPreview.season !== 'auto' ? founderAtmoPreview.season : (atmoState.season === 'auto' && siteAtmoPolicy.calendarSeason ? detectSeason() : 'none');
+      var rHoliday = founderAtmoPreview.holiday !== 'auto' ? founderAtmoPreview.holiday : (atmoState.holiday === 'auto' && siteAtmoPolicy.calendarHoliday ? detectHoliday() : 'none');
       var rWeather = founderAtmoPreview.weather === 'auto' ? atmoState.weather : founderAtmoPreview.weather;
+      if (rWeather === 'live' && !siteAtmoPolicy.liveWeather) rWeather = 'seasonal';
 
       if (rWeather === 'live') {
         rWeather = liveWeatherPending ? 'off' : (atmoState.liveWeatherCondition || detectDefaultWeather(rSeason, rTime, rHoliday));
@@ -2196,7 +2276,7 @@ var bootScreenActive = false;
       document.body.setAttribute('data-season', rSeason);
       document.body.setAttribute('data-weather', rWeather);
       document.body.setAttribute('data-holiday', rHoliday);
-      document.body.setAttribute('data-storm', founderAtmoPreview.weather === 'auto' && atmoState.weather === 'live' && atmoState.liveWeatherIsStorm ? 'true' : 'false');
+      document.body.setAttribute('data-storm', founderAtmoPreview.weather === 'auto' && atmoState.weather === 'live' && siteAtmoPolicy.liveWeather && atmoState.liveWeatherIsStorm ? 'true' : 'false');
 
       var tSel = document.getElementById('atmo-time-select');
       var seasonToggle = document.getElementById('atmo-season-toggle');
@@ -2210,7 +2290,10 @@ var bootScreenActive = false;
       if (wSel) wSel.value = atmoState.weather;
       if (holidayToggle) holidayToggle.checked = atmoState.holiday === 'auto';
       if (toggleEl) toggleEl.checked = atmoState.animationsEnabled;
-      if (weatherStatus) weatherStatus.textContent = (liveWeatherStatus ? liveWeatherStatus + ' ' : '') + 'Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.';
+      if (weatherStatus) weatherStatus.textContent = (liveWeatherStatus ? liveWeatherStatus + ' ' : '') +
+        (siteAtmoPolicy.liveWeather
+          ? 'Live weather is optional. If selected, your browser asks for location permission and rounded coordinates are sent to Open-Meteo for current conditions.'
+          : 'Live weather is disabled site-wide. Your location is not requested; seasonal atmosphere is used instead.');
       document.body.classList.toggle('atmo-paused', !atmoState.animationsEnabled);
       var summaryEl = document.getElementById('atmo-active-summary');
       var previewActive = Object.values(founderAtmoPreview).some(function(value) { return value !== 'auto'; });
@@ -2795,7 +2878,8 @@ var bootScreenActive = false;
 
     document.addEventListener('DOMContentLoaded', function() {
       loadAtmoPrefs();
-      if (atmoState.weather === 'live') {
+      listenForSiteAtmospherePolicy();
+      if (atmoState.weather === 'live' && siteAtmoPolicyLoaded) {
         fetchLiveLocalWeather();
       } else {
         applySanctuaryAtmosphere(true);
@@ -2876,6 +2960,7 @@ var bootScreenActive = false;
     let viewingOwnProfile = false;
     let adminMemberRecords = [];
     let adminMemberCursor = null;
+    let sitePolicySaveVersion = 0;
 
     function updateAdminAccess() {
       const founder = isFounderCopyExempt();
@@ -2886,6 +2971,7 @@ var bootScreenActive = false;
       document.getElementById('founder-preview-controls').classList.toggle('hidden', !founder);
       document.getElementById('owner-staff-management').classList.toggle('hidden', !founder);
       document.getElementById('verified-staff-controls').classList.toggle('hidden', !verified);
+      document.getElementById('admin-atmosphere-policy').classList.toggle('hidden', !(verified && (founder || activeStaffRole === 'admin')));
       document.getElementById('staff-access-unavailable').classList.toggle('hidden', !founder || verified);
       document.getElementById('staff-access-message').textContent = staffClaimError
         ? 'Staff access could not be verified. The local atmosphere preview is still available; staff controls require the backend to be available.'
@@ -2895,6 +2981,7 @@ var bootScreenActive = false;
         adminMemberRecords = [];
         document.getElementById('admin-member-list').replaceChildren();
         document.getElementById('admin-audit-list').replaceChildren();
+        document.getElementById('admin-quarantine-list').replaceChildren();
       }
       if (!allowed) {
         document.getElementById('founder-admin-panel').classList.add('hidden');
@@ -2913,6 +3000,7 @@ var bootScreenActive = false;
       panel.classList.toggle('hidden', !opening);
       button.setAttribute('aria-expanded', String(opening));
       if (opening && isFounderCopyExempt() && staffClaimReady) loadStaffList();
+      if (opening && staffClaimReady) loadGalleryQuarantine();
     }
 
     function retryStaffAccess() {
@@ -2955,12 +3043,135 @@ var bootScreenActive = false;
       });
       if (!visible.length) { list.textContent = 'No loaded profiles match.'; return; }
       visible.forEach(function(profile) {
-        const row = document.createElement('p');
-        row.textContent = (profile.username || 'Unnamed') + ' (' + profile.uid + ') — ' +
+        const row = document.createElement('section');
+        row.className = 'staff-list-entry';
+        const heading = document.createElement('p');
+        heading.textContent = (profile.username || 'Unnamed') + ' (' + profile.uid + ') — ' +
           (profile.communityVisible ? 'Shared' : 'Private') + ' — ' +
           (profile.neurotypes.length ? profile.neurotypes.join(', ') : 'No neurotypes selected');
+        row.appendChild(heading);
+        (Array.isArray(profile.interestMedia) ? profile.interestMedia : []).forEach(function(item) {
+          if (!item || typeof item.path !== 'string' || (activeStaffRole === 'moderator' &&
+              (item.visibility === 'private' || item.archived || !profile.communityVisible))) return;
+          const action = document.createElement('button');
+          action.type = 'button';
+          action.className = 'calm-secondary-button';
+          action.textContent = 'Quarantine ' + (item.name || item.path.split('/').pop());
+          action.addEventListener('click', function() { quarantineGalleryItem(profile.uid, item.path, action); });
+          row.appendChild(action);
+        });
         list.appendChild(row);
       });
+    }
+
+    async function quarantineGalleryItem(uid, path, button) {
+      if (!staffClaimReady || !(isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator')) return;
+      const reason = window.prompt('Why is this gallery item being quarantined?');
+      if (reason === null) return;
+      if (!reason.trim() || reason.trim().length > 500) {
+        showToast('Enter a reason of 1–500 characters.');
+        return;
+      }
+      button.disabled = true;
+      try {
+        await functions.httpsCallable('quarantineGalleryItem')({ uid: uid, path: path, reason: reason.trim() });
+        showToast('Item quarantined. Its download token was revoked.');
+        await Promise.all([loadGalleryQuarantine(), loadAdminMembers(true)]);
+      } catch (error) {
+        console.error('Gallery quarantine failed:', error.code || error.message);
+        showToast(error.message || 'The gallery item could not be quarantined.');
+      } finally { button.disabled = false; }
+    }
+
+    async function loadGalleryQuarantine() {
+      const list = document.getElementById('admin-quarantine-list');
+      if (!staffClaimReady || !(isFounderCopyExempt() || activeStaffRole === 'admin' || activeStaffRole === 'moderator')) return;
+      const user = auth.currentUser;
+      if (!user) return;
+      list.textContent = 'Loading quarantined items…';
+      try {
+        const result = await functions.httpsCallable('listGalleryQuarantine')({});
+        if (!auth.currentUser || auth.currentUser.uid !== user.uid || !staffClaimReady) return;
+        list.replaceChildren();
+        if (!result.data.items.length) { list.textContent = 'No quarantined items are available to review.'; return; }
+        result.data.items.forEach(function(item) {
+          const row = document.createElement('div');
+          row.className = 'staff-list-entry';
+          const label = document.createElement('p');
+          const expiry = item.expiresAt ? new Date(item.expiresAt).toLocaleDateString() : 'expiry unavailable';
+          const status = item.status === 'quarantining' ? 'quarantine needs retry' :
+            item.status === 'restoring' ? 'restore needs retry' : 'permanent deletion after ' + expiry;
+          label.textContent = (item.name || item.path) + ' — account ' + item.uid + ' — ' +
+            item.reason + ' — ' + status;
+          row.appendChild(label);
+          const action = document.createElement('button');
+          action.type = 'button';
+          action.className = 'calm-secondary-button';
+          const retryQuarantine = item.status === 'quarantining';
+          action.textContent = retryQuarantine ? 'Retry quarantine' :
+            item.status === 'restoring' ? 'Resume restore' : 'Restore';
+          action.addEventListener('click', async function() {
+            action.disabled = true;
+            try {
+              if (retryQuarantine) {
+                await functions.httpsCallable('quarantineGalleryItem')({
+                  uid: item.uid, path: item.path, reason: item.reason
+                });
+                showToast('Gallery quarantine completed.');
+              } else {
+                await functions.httpsCallable('restoreGalleryItem')({ uid: item.uid, id: item.id });
+                showToast('Gallery item restored.');
+              }
+              await Promise.all([loadGalleryQuarantine(), loadAdminMembers(true)]);
+            } catch (error) {
+              console.error('Gallery moderation action failed:', error.code || error.message);
+              showToast(error.message || 'The gallery action could not be completed.');
+            } finally { action.disabled = false; }
+          });
+          row.appendChild(action);
+          list.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Gallery quarantine queue failed:', error.code || error.message);
+        list.textContent = 'Quarantined items could not be loaded.';
+      }
+    }
+
+    async function saveSiteAtmospherePolicy() {
+      if (!viewingOwnProfile || !staffClaimReady ||
+          !(isFounderCopyExempt() || activeStaffRole === 'admin')) return;
+      const status = document.getElementById('admin-atmosphere-policy-status');
+      const controls = [
+        ['admin-policy-local-time', 'localTime'],
+        ['admin-policy-calendar-season', 'calendarSeason'],
+        ['admin-policy-calendar-holiday', 'calendarHoliday'],
+        ['admin-policy-live-weather', 'liveWeather']
+      ];
+      const policy = {};
+      controls.forEach(function(entry) {
+        const control = document.getElementById(entry[0]);
+        policy[entry[1]] = control.checked;
+        control.disabled = true;
+      });
+      const version = ++sitePolicySaveVersion;
+      status.textContent = 'Saving shared atmosphere policy…';
+      try {
+        await functions.httpsCallable('updateSiteAtmospherePolicy')({ policy: policy });
+        if (version !== sitePolicySaveVersion) return;
+        siteAtmoPolicy = policy;
+        siteAtmoPolicyStatus = 'Shared atmosphere policy saved.';
+        updateSiteAtmosphereControls();
+        applySanctuaryAtmosphere(true);
+      } catch (error) {
+        if (version !== sitePolicySaveVersion) return;
+        console.error('Shared atmosphere policy update failed:', error.code || error.message);
+        siteAtmoPolicyStatus = error.message || 'Shared atmosphere policy could not be saved.';
+        updateSiteAtmosphereControls();
+      } finally {
+        if (version === sitePolicySaveVersion) {
+          controls.forEach(function(entry) { document.getElementById(entry[0]).disabled = false; });
+        }
+      }
     }
 
     async function loadAdminMembers(reset) {

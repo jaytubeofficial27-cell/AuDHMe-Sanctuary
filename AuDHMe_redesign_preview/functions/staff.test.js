@@ -201,3 +201,32 @@ test('only the owner can change an active role and changes are audited and notif
   assert.ok([...docs.entries()].some(([path, value]) => path.startsWith('users/member/notifications/') && value.type === 'staff-role-changed' && value.read === false));
   await assert.rejects(functions.changeStaffRole({ auth: owner, data: { uid: owner.uid, role: 'admin' } }), { code: 'invalid-argument' });
 });
+
+test('only verified owner and admins can update the per-visitor atmosphere policy', async () => {
+  const { functions, docs } = harness();
+  const policy = { localTime: false, calendarSeason: true, calendarHoliday: false, liveWeather: false };
+  await assert.rejects(functions.updateSiteAtmospherePolicy({ auth: member, data: { policy } }), { code: 'permission-denied' });
+  docs.set('staffRoles/member', { role: 'moderator' });
+  await assert.rejects(functions.updateSiteAtmospherePolicy({
+    auth: { ...member, token: { role: 'moderator' } }, data: { policy }
+  }), { code: 'permission-denied' });
+  docs.set('staffRoles/member', { role: 'admin' });
+  await assert.rejects(functions.updateSiteAtmospherePolicy({
+    auth: { ...member, token: { role: 'moderator' } }, data: { policy }
+  }), { code: 'permission-denied' });
+  const result = await functions.updateSiteAtmospherePolicy({
+    auth: { ...member, token: { role: 'admin' } }, data: { policy }
+  });
+  assert.deepEqual(result.policy, policy);
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(docs.get('siteSettings/atmosphere')).filter(([key]) =>
+      ['localTime', 'calendarSeason', 'calendarHoliday', 'liveWeather'].includes(key))),
+    policy
+  );
+  assert.ok([...docs.entries()].some(([path, value]) =>
+    path.startsWith('adminAudit/') && value.action === 'site.atmosphere_updated'
+  ));
+  await assert.rejects(functions.updateSiteAtmospherePolicy({
+    auth: owner, data: { policy: { ...policy, unknown: true } }
+  }), { code: 'invalid-argument' });
+});

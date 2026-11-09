@@ -7,6 +7,7 @@ const STAFF_ROLES = ['admin', 'moderator'];
 module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
   const options = { region: 'europe-west2', maxInstances: 5 };
   const timestamp = () => admin.firestore.FieldValue.serverTimestamp();
+  const atmosphereKeys = ['localTime', 'calendarSeason', 'calendarHoliday', 'liveWeather'];
 
   function requireUser(request) {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to continue.');
@@ -220,7 +221,18 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
           uid: doc.id,
           username: typeof data.username === 'string' ? data.username : '',
           neurotypes: Array.isArray(data.neurotypes) ? data.neurotypes.filter((value) => typeof value === 'string').slice(0, 15) : [],
-          communityVisible: privateAccess ? data.communityVisible === true : true
+          communityVisible: privateAccess ? data.communityVisible === true : true,
+          interestMedia: Array.isArray(data.interestMedia)
+            ? data.interestMedia.filter((item) => item && typeof item.path === 'string' &&
+              item.path.startsWith('users/' + doc.id + '/') && !item.path.slice(('users/' + doc.id + '/').length).includes('/'))
+              .slice(0, 12).map((item) => ({
+                path: item.path,
+                name: typeof item.name === 'string' ? item.name.slice(0, 100) : '',
+                type: typeof item.type === 'string' ? item.type.slice(0, 100) : '',
+                visibility: item.visibility === 'private' ? 'private' : 'community',
+                archived: item.archived === true
+              }))
+            : []
         }];
       });
       audit(transaction, 'profiles.reviewed', uid, privateAccess ? 'all' : 'shared', { cursor: cursor || '', count: results.length });
@@ -236,6 +248,38 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
       return { action: data.action, actor: data.actor, target: data.target,
         createdAt: data.createdAt ? data.createdAt.toMillis() : null };
     }) };
+  });
+
+  const updateSiteAtmospherePolicy = onCall(options, async (request) => {
+    const uid = requireUser(request);
+    const policy = request.data && request.data.policy;
+    if (!policy || typeof policy !== 'object' ||
+        Object.keys(policy).length !== atmosphereKeys.length ||
+        !atmosphereKeys.every((key) => typeof policy[key] === 'boolean')) {
+      throw new HttpsError('invalid-argument', 'Choose a value for each atmosphere setting.');
+    }
+    await db.runTransaction(async (transaction) => {
+      const [roleSnapshot, settingsSnapshot] = await transaction.getAll(
+        db.collection('staffRoles').doc(uid),
+        db.collection('siteSettings').doc('atmosphere')
+      );
+      const role = roleSnapshot.exists && roleSnapshot.data().role;
+      if (!request.auth.token || request.auth.token.role !== role ||
+          (role === 'owner' && uid !== OWNER_UID) || !['owner', 'admin'].includes(role)) {
+        throw new HttpsError('permission-denied', 'Verified owner or admin access is required.');
+      }
+      const saved = Object.fromEntries(atmosphereKeys.map((key) => [key, policy[key]]));
+      transaction.set(db.collection('siteSettings').doc('atmosphere'), {
+        ...saved, updatedAt: timestamp()
+      });
+      audit(transaction, 'site.atmosphere_updated', uid, 'atmosphere', {
+        previous: settingsSnapshot.exists
+          ? Object.fromEntries(atmosphereKeys.map((key) => [key, settingsSnapshot.data()[key] === true]))
+          : Object.fromEntries(atmosphereKeys.map((key) => [key, true])),
+        policy: saved
+      });
+    });
+    return { updated: true, policy: Object.fromEntries(atmosphereKeys.map((key) => [key, policy[key]])) };
   });
 
   const staffDiagnostics = onCall(options, async (request) => {
@@ -259,5 +303,5 @@ module.exports = function createStaffFunctions(admin, db, HttpsError, onCall) {
     });
   });
 
-  return { getStaffRole, syncMyStaffClaim, inviteStaff, respondStaffInvitation, revokeStaff, changeStaffRole, markStaffNotificationRead, listStaff, listModerationProfiles, listAdminAudit, staffDiagnostics };
+  return { getStaffRole, syncMyStaffClaim, inviteStaff, respondStaffInvitation, revokeStaff, changeStaffRole, markStaffNotificationRead, listStaff, listModerationProfiles, listAdminAudit, updateSiteAtmospherePolicy, staffDiagnostics };
 };

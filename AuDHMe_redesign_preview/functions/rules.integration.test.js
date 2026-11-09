@@ -34,6 +34,9 @@ beforeEach(async () => {
     await setDoc(doc(db, 'staffRoles/moderator'), { role: 'moderator' });
     await setDoc(doc(db, 'users/member/notifications/notice'), { read: false, type: 'staff-revoked' });
     await setDoc(doc(db, 'adminAudit/log'), { action: 'staff.revoked', actor: 'owner' });
+    await setDoc(doc(db, 'siteSettings/atmosphere'), {
+      localTime: true, calendarSeason: true, calendarHoliday: true, liveWeather: true
+    });
   });
 });
 
@@ -68,6 +71,17 @@ test('direct deletion and undeveloped moderation or cleanup writes fail closed',
     await assertFails(setDoc(doc(db, 'ghostCleanup/member'), { delete: true }));
     await assertFails(setDoc(doc(db, 'globalConfig/features'), { maintenance: true }));
   }
+});
+
+test('atmosphere policy is publicly readable while moderation state is server-only', async () => {
+  const publicDb = env.unauthenticatedContext().firestore();
+  const memberDb = env.authenticatedContext('member').firestore();
+  const adminDb = env.authenticatedContext('admin', { role: 'admin' }).firestore();
+  await assertSucceeds(getDoc(doc(publicDb, 'siteSettings/atmosphere')));
+  await assertFails(setDoc(doc(memberDb, 'siteSettings/atmosphere'), { liveWeather: false }));
+  await assertFails(setDoc(doc(adminDb, 'siteSettings/atmosphere'), { liveWeather: false }));
+  await assertFails(getDoc(doc(memberDb, 'galleryModeration/member')));
+  await assertFails(setDoc(doc(adminDb, 'galleryModeration/member/items/gallery~item.png'), { status: 'quarantined' }));
 });
 
 test('private gallery files cannot be read by another member or moderator', async () => {

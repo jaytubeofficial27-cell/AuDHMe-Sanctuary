@@ -1536,6 +1536,17 @@
         <button id="staff-access-retry" type="button" class="calm-secondary-button hidden" onclick="retryStaffAccess()">Retry staff access</button>
       </div>
       <div id="verified-staff-controls" class="hidden">
+      <section id="admin-atmosphere-policy" class="hidden" aria-labelledby="admin-atmosphere-policy-title">
+        <h2 id="admin-atmosphere-policy-title">Per-visitor atmosphere policy</h2>
+        <p>These controls enable automatic local adaptation; each visitor’s preferences and sensory settings still apply. Live weather remains opt-in and location stays in that visitor’s browser.</p>
+        <div class="founder-admin-controls">
+          <label><input id="admin-policy-local-time" type="checkbox" onchange="saveSiteAtmospherePolicy()"> Use each visitor’s local time</label>
+          <label><input id="admin-policy-calendar-season" type="checkbox" onchange="saveSiteAtmospherePolicy()"> Use each visitor’s calendar season</label>
+          <label><input id="admin-policy-calendar-holiday" type="checkbox" onchange="saveSiteAtmospherePolicy()"> Use each visitor’s calendar holidays</label>
+          <label><input id="admin-policy-live-weather" type="checkbox" onchange="saveSiteAtmospherePolicy()"> Allow live local weather when a visitor opts in</label>
+        </div>
+        <p id="admin-atmosphere-policy-status" role="status">Loading shared atmosphere policy…</p>
+      </section>
       <div id="owner-staff-management">
       <h2>Staff invitations</h2>
       <p>Invite an existing account with a verified email. Invitations appear in that member's profile inbox and must be accepted before access is granted.</p>
@@ -1567,6 +1578,10 @@
       <button type="button" class="calm-secondary-button" onclick="loadAdminMembers(true)">Load members</button>
       <div id="admin-member-list" aria-live="polite"></div>
       <button id="admin-member-next" type="button" class="calm-secondary-button hidden" onclick="loadAdminMembers(false)">Load next page</button>
+      <h2>Gallery moderation</h2>
+      <p>Quarantine revokes the file’s download token and moves it to private storage. Staff can restore it; unresolved quarantines are permanently deleted 365 days after quarantine.</p>
+      <button type="button" class="calm-secondary-button" onclick="loadGalleryQuarantine()">Refresh quarantined items</button>
+      <div id="admin-quarantine-list" aria-live="polite">Quarantine queue not loaded.</div>
       <h2>System diagnostics</h2>
       <p>These checks reflect the current request, not a continuous availability or quota monitor.</p>
       <button type="button" class="calm-secondary-button" onclick="runStaffDiagnostics()">Run checks</button>
