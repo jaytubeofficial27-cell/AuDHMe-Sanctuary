@@ -17,6 +17,7 @@ Object.assign(exports, require('./staff')(
 Object.assign(exports, require('./moderation')(
   db, getStorage().bucket(), { FieldValue, Timestamp }, HttpsError, onCall, onSchedule
 ));
+Object.assign(exports, require('./confessions')(db, { FieldValue }, HttpsError, onCall));
 const STRIPE_SECRET_KEY = defineSecret('STRIPE_SECRET_KEY');
 const STRIPE_WEBHOOK_SECRET = defineSecret('STRIPE_WEBHOOK_SECRET');
 const SITE_URL = defineString('SITE_URL', {

@@ -4,6 +4,11 @@ service cloud.firestore {
     function signedInAs(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
+    function expectedAuthorName(uid) {
+      let user = get(/databases/$(database)/documents/users/$(uid)).data;
+      return (user.keys().hasAny(['displayName']) && user.displayName is string && user.displayName.size() > 0)
+        ? user.displayName : user.username;
+    }
 
     match /users/{userId}/notifications/{itemId} {
       allow read: if signedInAs(userId);
@@ -47,6 +52,7 @@ service cloud.firestore {
         && data.neurotypes is list && data.neurotypes.size() <= 15
         && (!data.keys().hasAny(['interestMedia']) || (data.interestMedia is list && data.interestMedia.size() <= 12))
         && (!data.keys().hasAny(['communityVisible']) || data.communityVisible is bool)
+        && (!data.keys().hasAny(['displayName']) || (data.displayName is string && data.displayName.size() <= 40))
         && data.links is list && data.links.size() <= 6 && validStatuses(data)
         && (!data.keys().hasAny(['avatar']) || data.avatar == null
           || (data.avatar is string && data.avatar.size() <= 340000));
@@ -57,13 +63,13 @@ service cloud.firestore {
       allow read: if signedInAs(userId);
       allow create: if signedInAs(userId)
         && request.resource.data.keys().hasOnly([
-          'uid', 'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible', 'liveStatuses'
+          'uid', 'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible', 'liveStatuses', 'displayName'
         ])
         && validProfile(request.resource.data, userId);
       allow update: if signedInAs(userId)
         && validProfile(request.resource.data, userId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible', 'liveStatuses'
+          'username', 'avatar', 'bio', 'neurotypes', 'links', 'lastUsernameChange', 'updatedAt', 'interestMedia', 'communityVisible', 'liveStatuses', 'displayName'
         ]);
       allow delete: if false;
     }
@@ -84,7 +90,7 @@ service cloud.firestore {
         && validStatuses(request.resource.data)
         && request.resource.data.keys().hasOnly([
           'uid', 'visible', 'profileVisible', 'username', 'avatar', 'bio',
-          'neurotypes', 'links', 'interestMedia', 'sharedPostIds', 'updatedAt', 'liveStatuses'
+          'neurotypes', 'links', 'interestMedia', 'sharedPostIds', 'updatedAt', 'liveStatuses', 'displayName'
         ]);
       allow delete: if signedInAs(userId);
     }
@@ -121,7 +127,7 @@ service cloud.firestore {
           && request.resource.data.keys().hasOnly(['uid', 'authorName', 'text', 'createdAt', 'replyTo', 'replyToName'])
           && request.resource.data.uid == request.auth.uid
           && request.resource.data.authorName is string
-          && request.resource.data.authorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.username
+          && request.resource.data.authorName == expectedAuthorName(request.auth.uid)
           && request.resource.data.text is string
           && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
           && request.resource.data.createdAt == request.time
@@ -137,6 +143,40 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text'])
           && request.resource.data.text is string
           && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500;
+        match /likes/{likerId} {
+          allow read: if isSharedPost() || signedInAs(ownerId);
+          allow create: if isSharedPost() && signedInAs(likerId)
+            && request.resource.data.keys().hasOnly(['uid'])
+            && request.resource.data.uid == likerId;
+          allow delete: if signedInAs(likerId) || signedInAs(ownerId);
+          allow update: if false;
+        }
+      }
+    }
+    match /confessionAuthors/{confessionId} {
+      // Private author linkage; accessible only through callable functions.
+      allow read, write: if false;
+    }
+    match /confessions/{confessionId} {
+      allow read: if request.auth != null && resource.data.status == 'visible';
+      allow create, update, delete: if false;
+      match /supports/{uid} {
+        allow read: if request.auth != null && get(/databases/$(database)/documents/confessions/$(confessionId)).data.status == 'visible';
+        allow create: if signedInAs(uid)
+          && request.resource.data.keys().hasOnly(['uid'])
+          && request.resource.data.uid == uid;
+        allow delete: if signedInAs(uid);
+        allow update: if false;
+      }
+      match /comments/{commentId} {
+        allow read: if request.auth != null && get(/databases/$(database)/documents/confessions/$(confessionId)).data.status == 'visible';
+        allow create: if request.auth != null
+          && get(/databases/$(database)/documents/confessions/$(confessionId)).data.status == 'visible'
+          && request.resource.data.keys().hasOnly(['text', 'createdAt'])
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
       }
     }
 

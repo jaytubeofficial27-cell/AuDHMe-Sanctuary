@@ -358,6 +358,34 @@ var bootScreenActive = false;
       });
     });
 
+    function closeMobileNav() {
+      var links = document.querySelector('.audh-links');
+      if (links) links.classList.remove('active');
+      var button = document.querySelector('.audh-hamburger');
+      if (button) button.setAttribute('aria-expanded', 'false');
+      document.querySelectorAll('.audh-links .group.open').forEach(function(group) {
+        group.classList.remove('open');
+        var trigger = group.querySelector('[aria-haspopup="true"]');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      });
+    }
+    document.addEventListener('click', function(event) {
+      var links = document.querySelector('.audh-links');
+      if (!links || !links.classList.contains('active')) return;
+      var hamburger = document.querySelector('.audh-hamburger');
+      if (links.contains(event.target) || (hamburger && hamburger.contains(event.target))) return;
+      closeMobileNav();
+    });
+    document.addEventListener('keydown', function(event) {
+      if (event.key !== 'Escape') return;
+      var links = document.querySelector('.audh-links');
+      if (links && links.classList.contains('active')) {
+        closeMobileNav();
+        var hamburger = document.querySelector('.audh-hamburger');
+        if (hamburger) hamburger.focus();
+      }
+    });
+
     function updateSkipTarget(targetId) {
       var skipLink = document.querySelector('.skip-link');
       var target = document.getElementById(targetId);
@@ -385,7 +413,7 @@ var bootScreenActive = false;
       document.querySelectorAll('.active-embed').forEach(function(element) {
         element.classList.remove('active-embed');
       });
-      ['profile-page', 'directory-view'].forEach(function(id) {
+      ['profile-page', 'directory-view', 'confessions-view'].forEach(function(id) {
         var element = document.getElementById(id);
         element.classList.add('hidden');
         element.style.display = 'none';
@@ -393,7 +421,7 @@ var bootScreenActive = false;
       var loading = document.getElementById('route-loading');
       var message = document.getElementById('route-loading-message');
       message.setAttribute('role', 'status');
-      message.textContent = hash === 'directory' ? 'Loading community directory…' : 'Loading profile…';
+      message.textContent = hash === 'directory' ? 'Loading community directory…' : (hash === 'confessions' ? 'Loading confessions…' : 'Loading profile…');
       loading.classList.remove('hidden');
       updateSkipTarget('route-loading');
       updateActiveNavigation(hash === 'directory' ? 'directory' : 'profile');
@@ -428,6 +456,7 @@ var bootScreenActive = false;
       const directoryView = document.getElementById('directory-view');
       if (profilePage) { profilePage.classList.add('hidden'); profilePage.classList.remove('active-embed'); profilePage.style.display = 'none'; }
       if (directoryView) { directoryView.classList.add('hidden'); directoryView.classList.remove('active-embed'); directoryView.style.display = 'none'; }
+      var confessionsViewSp=document.getElementById('confessions-view'); if(confessionsViewSp){confessionsViewSp.classList.add('hidden');confessionsViewSp.classList.remove('active-embed');confessionsViewSp.style.display='none';}
 
       updateActiveNavigation(pageKey);
 
@@ -462,7 +491,7 @@ var bootScreenActive = false;
       var rawHash = window.location.hash.replace('#', '');
       var hash = rawHash.toLowerCase();
       var isMemberRoute = rawHash.slice(0,7).toLowerCase() === 'member/';
-      if (isMemberRoute || hash === 'profile' || hash === 'directory') {
+      if (isMemberRoute || hash === 'profile' || hash === 'directory' || hash === 'confessions') {
         var pendingVersion = ++routeVersion;
         var routeUserId;
         showRouteLoading(hash);
@@ -3039,14 +3068,14 @@ var bootScreenActive = false;
       const list = document.getElementById('admin-member-list');
       list.replaceChildren();
       const visible = adminMemberRecords.filter(function(profile) {
-        return (profile.uid + ' ' + profile.username).toLowerCase().includes(query);
+        return (profile.uid + ' ' + profile.username + ' ' + (profile.displayName || '')).toLowerCase().includes(query);
       });
       if (!visible.length) { list.textContent = 'No loaded profiles match.'; return; }
       visible.forEach(function(profile) {
         const row = document.createElement('section');
         row.className = 'staff-list-entry';
         const heading = document.createElement('p');
-        heading.textContent = (profile.username || 'Unnamed') + ' (' + profile.uid + ') — ' +
+        heading.textContent = (profile.displayName || profile.username || 'Unnamed') + ' (' + profile.uid + ') — ' +
           (profile.communityVisible ? 'Shared' : 'Private') + ' — ' +
           (profile.neurotypes.length ? profile.neurotypes.join(', ') : 'No neurotypes selected');
         row.appendChild(heading);
@@ -3626,6 +3655,7 @@ var bootScreenActive = false;
           uid: user.uid,
           email: user.email || '',
           username: typeof saved.username === 'string' && saved.username.trim() ? saved.username.trim() : (user.displayName || (user.email || '').split('@')[0]),
+          displayName: typeof saved.displayName === 'string' && saved.displayName.trim() ? saved.displayName.trim().slice(0,40) : null,
           avatar: typeof saved.avatar === 'string' ? saved.avatar : (user.photoURL || null),
           bio: isFounderAccount ? savedBio : (savedBio === 'Founder of AuDHMe' ? '' : savedBio),
           neurotypes: Array.isArray(saved.neurotypes) ? saved.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
@@ -3651,6 +3681,7 @@ var bootScreenActive = false;
           uid: user.uid,
           email: user.email || '',
           username: user.displayName || (user.email || '').split('@')[0],
+          displayName: null,
           avatar: user.photoURL || null,
           bio: '', neurotypes: [], links: [], interestMedia: [], communityVisible: false, perkRedeemedAt: null
         };
@@ -3706,7 +3737,7 @@ var bootScreenActive = false;
         if (currentUser) switchView('profile');
         else openAuthModal('signup');
       });
-      const buttonLabel = currentUser ? (currentUser.username || currentUser.email.split('@')[0]) : 'Sign Up / In';
+      const buttonLabel = currentUser ? (currentUser.displayName || currentUser.username || currentUser.email.split('@')[0]) : 'Sign Up / In';
       button.setAttribute('aria-label', buttonLabel);
       button.innerHTML = '<i class="fa-regular fa-circle-user" aria-hidden="true"></i><span></span>';
       button.querySelector('span').textContent = buttonLabel;
@@ -3754,6 +3785,10 @@ var bootScreenActive = false;
         openAuthModal('signup');
         return;
       }
+      if (viewName === 'confessions' && !auth.currentUser) {
+        openAuthModal('signup');
+        return;
+      }
 
       routeVersion++;
       hideRouteLoading();
@@ -3762,6 +3797,7 @@ var bootScreenActive = false;
       const profilePage=document.getElementById('profile-page'), directoryView=document.getElementById('directory-view');
       if (profilePage) { profilePage.classList.add('hidden'); profilePage.classList.remove('active-embed'); profilePage.style.display='none'; }
       if (directoryView) { directoryView.classList.add('hidden'); directoryView.classList.remove('active-embed'); directoryView.style.display='none'; }
+      var confessionsViewSv=document.getElementById('confessions-view'); if(confessionsViewSv){confessionsViewSv.classList.add('hidden');confessionsViewSv.classList.remove('active-embed');confessionsViewSv.style.display='none';}
       if (viewName==='profile') {
         updateSkipTarget('profile-page');
         if (profilePage) { profilePage.style.display='block'; profilePage.classList.remove('hidden'); profilePage.classList.add('active-embed'); }
@@ -3772,6 +3808,11 @@ var bootScreenActive = false;
         if (directoryView) { directoryView.style.display='block'; directoryView.classList.remove('hidden'); directoryView.classList.add('active-embed'); }
         const search=document.getElementById('member-search-input');
         renderCommunityDirectory(search ? search.value : '');
+      } else if (viewName==='confessions') {
+        updateSkipTarget('confessions-view');
+        var cv=document.getElementById('confessions-view');
+        if(cv){cv.style.display='block';cv.classList.remove('hidden');cv.classList.add('active-embed');}
+        renderConfessions();
       } else { switchPage('home',true); return; }
       updateActiveNavigation(viewName);
       document.querySelectorAll('.audh-links').forEach(function(menu){menu.classList.remove('active');});
@@ -3785,9 +3826,9 @@ var bootScreenActive = false;
       profile=profile||currentUser; isOwner=isOwner!==false; if(!profile)return;
       closeGalleryViewer();
       const statusDialog=document.getElementById('profile-status-dialog');if(statusDialog.open)statusDialog.close();
-      const usernameEl=document.getElementById('profile-display-username'); if(usernameEl) usernameEl.textContent=profile.username||'Sanctuary member';
+      const usernameEl=document.getElementById('profile-display-username'); if(usernameEl) usernameEl.textContent=profile.displayName||profile.username||'Sanctuary member';
       const avatarWrap=document.getElementById('profile-view-avatar-wrap');
-      if(avatarWrap) { const avatarUrl=safeProfileAvatarUrl(profile.avatar); if(avatarUrl) { const image=document.createElement('img'); image.src=avatarUrl; image.alt='Profile picture'; image.className='w-full h-full object-cover'; avatarWrap.replaceChildren(image); } else { const fallback=document.createElement('span'); fallback.className='text-3xl font-bold text-[#cbb678]'; fallback.textContent=(profile.username||'A').charAt(0).toUpperCase(); avatarWrap.replaceChildren(fallback); } }
+      if(avatarWrap) { const avatarUrl=safeProfileAvatarUrl(profile.avatar); if(avatarUrl) { const image=document.createElement('img'); image.src=avatarUrl; image.alt='Profile picture'; image.className='w-full h-full object-cover'; avatarWrap.replaceChildren(image); } else { const fallback=document.createElement('span'); fallback.className='text-3xl font-bold text-[#cbb678]'; fallback.textContent=(profile.displayName||profile.username||'A').charAt(0).toUpperCase(); avatarWrap.replaceChildren(fallback); } }
       const bioEl=document.getElementById('profile-view-bio'); if(bioEl) bioEl.textContent=profile.bio||'No bio added yet.';
       const types=document.getElementById('profile-view-neurotypes'); if(types) { types.replaceChildren(); const list=Array.isArray(profile.neurotypes)?profile.neurotypes:[]; if(!list.length) { const empty=document.createElement('span'); empty.className='text-xs text-slate-400 italic'; empty.textContent='No neurotypes selected'; types.appendChild(empty); } else list.forEach(function(type){const badge=document.createElement('span');badge.className='profile-neurotype-badge';badge.textContent=String(type);types.appendChild(badge);}); }
       const founder=profile.uid===FOUNDER_AUTH_UID, badges=document.getElementById('profile-header-badges'), card=document.getElementById('profile-public-view');
@@ -4207,7 +4248,7 @@ var bootScreenActive = false;
       const more=document.getElementById('gallery-comments-more'), form=document.getElementById('gallery-comment-form');
       const input=document.getElementById('gallery-comment-input'), commentButton=form.querySelector('[type="submit"]');
       const replyContext=document.getElementById('gallery-reply-context'), replyLabel=document.getElementById('gallery-reply-label');
-      let liked=false, cursor=null, loading=false, submitting=false, replyTo=null;
+      let liked=false, cursor=null, loading=false, submitting=false, replyTo=null, expandedThreads=new Set();
       function active(){return galleryViewerState===state&&auth.currentUser&&auth.currentUser.uid===user.uid;}
       function showError(message,error){console.error(message,error.code||error.message);if(active())status.textContent=message;}
       function clearReply(){replyTo=null;replyContext.hidden=true;replyLabel.textContent='';input.placeholder='Add a comment…';}
@@ -4223,75 +4264,112 @@ var bootScreenActive = false;
         count.textContent=total+' '+(total===1?'like':'likes');
         likeButton.disabled=false;
       }
+      function buildCommentArticle(doc, data, likesMap){
+        const article=document.createElement('article');article.className='gallery-comment';article.dataset.commentId=doc.id;article.tabIndex=-1;
+        const header=document.createElement('div');header.className='gallery-comment-header';
+        const name=document.createElement('strong');name.textContent=data.authorName;
+        header.appendChild(name);
+        const menu=document.createElement('details');menu.className='gallery-comment-menu';
+        const trigger=document.createElement('summary');trigger.textContent='⋯';trigger.setAttribute('aria-label','Comment options for '+data.authorName);
+        menu.appendChild(trigger);
+        const actions=document.createElement('div');actions.className='gallery-comment-actions';
+        function action(label,handler){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;handler();});actions.appendChild(button);}
+        if(data.uid===user.uid||state.profile.uid===user.uid){
+          action('Delete',async function(){
+            if(!await confirmSiteAction('Delete comment?','This comment will be permanently deleted.','Delete')||!active())return;
+            try {await doc.ref.delete();if(active())await loadComments(false);}
+            catch(error){showError('Comment could not be deleted.',error);}
+          });
+        }
+        if(data.uid===user.uid){
+          action('Edit',function(){
+            const edit=document.createElement('form');edit.className='gallery-comment-edit';
+            const field=document.createElement('input');field.type='text';field.maxLength=500;field.required=true;field.value=data.text;field.setAttribute('aria-label','Edit comment');
+            const save=document.createElement('button');save.type='submit';save.textContent='Save';
+            const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';
+            cancel.addEventListener('click',function(){edit.replaceWith(text);});
+            edit.addEventListener('submit',async function(event){
+              event.preventDefault();const value=field.value.trim();
+              if(!value){status.textContent='Write a comment first.';return;}
+              save.disabled=true;cancel.disabled=true;
+              try {await doc.ref.update({text:value});if(active())await loadComments(false);}
+              catch(error){showError('Comment could not be edited.',error);save.disabled=false;cancel.disabled=false;}
+            });
+            edit.append(field,save,cancel);text.replaceWith(edit);field.focus();
+          });
+        }
+        action('Copy',async function(){
+          try {
+            if(!navigator.clipboard||!navigator.clipboard.writeText)throw new Error('Clipboard access is unavailable.');
+            await navigator.clipboard.writeText(data.text);
+            if(active())status.textContent='Comment copied.';
+          } catch(error){showError('Comment could not be copied.',error);}
+        });
+        menu.appendChild(actions);header.appendChild(menu);article.appendChild(header);
+        if(typeof data.replyTo==='string'&&typeof data.replyToName==='string'){
+          const context=document.createElement('button');context.type='button';context.className='gallery-comment-reply-to';context.textContent='↳ Reply to '+data.replyToName;
+          context.addEventListener('click',function(){
+            const original=Array.from(list.querySelectorAll('.gallery-comment')).find(function(element){return element.dataset.commentId===data.replyTo;});
+            if(original){original.scrollIntoView({block:'nearest'});original.focus();}
+            else status.textContent='The original comment is not loaded or has been deleted.';
+          });
+          article.appendChild(context);
+        }
+        const text=document.createElement('p');text.textContent=data.text;
+        article.appendChild(text);
+        const row=document.createElement('div');row.className='gallery-comment-like-row';
+        const likeInfo=likesMap.get(doc.id)||{count:0,liked:false};
+        const likeBtn=document.createElement('button');likeBtn.type='button';likeBtn.className='gallery-comment-like';likeBtn.setAttribute('aria-pressed',String(likeInfo.liked));likeBtn.textContent=likeInfo.liked?'♥':'♡';likeBtn.setAttribute('aria-label',likeInfo.liked?'Unlike comment':'Like comment');
+        const likeCount=document.createElement('span');likeCount.className='gallery-comment-like-count';likeCount.textContent=likeInfo.count+' '+(likeInfo.count===1?'like':'likes');
+        likeBtn.addEventListener('click',async function(){
+          likeBtn.disabled=true;
+          try{
+            const likesRef=doc.ref.collection('likes');
+            if(likeInfo.liked){await likesRef.doc(user.uid).delete();likeInfo.count=Math.max(0,likeInfo.count-1);likeInfo.liked=false;}
+            else{await likesRef.doc(user.uid).set({uid:user.uid});likeInfo.count++;likeInfo.liked=true;}
+            likeBtn.setAttribute('aria-pressed',String(likeInfo.liked));likeBtn.textContent=likeInfo.liked?'♥':'♡';likeBtn.setAttribute('aria-label',likeInfo.liked?'Unlike comment':'Like comment');
+            likeCount.textContent=likeInfo.count+' '+(likeInfo.count===1?'like':'likes');
+          }catch(error){showError('Comment like could not be updated.',error);}
+          finally{if(active())likeBtn.disabled=false;}
+        });
+        const reply=document.createElement('button');reply.type='button';reply.className='gallery-comment-reply';reply.textContent='Reply';reply.setAttribute('aria-label','Reply to '+data.authorName);
+        reply.addEventListener('click',function(){replyTo={id:doc.id,name:data.authorName};replyLabel.textContent='Replying to '+data.authorName;replyContext.hidden=false;input.placeholder='Write a reply…';input.focus();});
+        row.append(likeBtn,likeCount,reply);
+        article.appendChild(row);
+        return article;
+      }
       async function loadComments(append){
         if(loading)return;
         loading=true;more.disabled=true;commentButton.disabled=true;
         try {
-          let query=comments.orderBy('createdAt','desc').limit(20);
-          if(append&&cursor)query=query.startAfter(cursor);
-          const snapshot=await query.get();
+          const snapshot=await comments.orderBy('createdAt','desc').limit(300).get();
           if(!active())return;
-          if(!append)list.replaceChildren();
-          snapshot.docs.forEach(function(doc){
-            const data=doc.data(),article=document.createElement('article');article.className='gallery-comment';article.dataset.commentId=doc.id;article.tabIndex=-1;
-            const header=document.createElement('div');header.className='gallery-comment-header';
-            const name=document.createElement('strong');name.textContent=data.authorName;
-            header.appendChild(name);
-            const menu=document.createElement('details');menu.className='gallery-comment-menu';
-            const trigger=document.createElement('summary');trigger.textContent='⋯';trigger.setAttribute('aria-label','Comment options for '+data.authorName);
-            menu.appendChild(trigger);
-            const actions=document.createElement('div');actions.className='gallery-comment-actions';
-            function action(label,handler){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',function(){menu.open=false;handler();});actions.appendChild(button);}
-            if(data.uid===user.uid||state.profile.uid===user.uid){
-              action('Delete',async function(){
-                if(!await confirmSiteAction('Delete comment?','This comment will be permanently deleted.','Delete')||!active())return;
-                try {await doc.ref.delete();if(active())await loadComments(false);}
-                catch(error){showError('Comment could not be deleted.',error);}
-              });
-            }
-            if(data.uid===user.uid){
-              action('Edit',function(){
-                const edit=document.createElement('form');edit.className='gallery-comment-edit';
-                const field=document.createElement('input');field.type='text';field.maxLength=500;field.required=true;field.value=data.text;field.setAttribute('aria-label','Edit comment');
-                const save=document.createElement('button');save.type='submit';save.textContent='Save';
-                const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';
-                cancel.addEventListener('click',function(){edit.replaceWith(text);});
-                edit.addEventListener('submit',async function(event){
-                  event.preventDefault();const value=field.value.trim();
-                  if(!value){status.textContent='Write a comment first.';return;}
-                  save.disabled=true;cancel.disabled=true;
-                  try {await doc.ref.update({text:value});if(active())await loadComments(false);}
-                  catch(error){showError('Comment could not be edited.',error);save.disabled=false;cancel.disabled=false;}
-                });
-                edit.append(field,save,cancel);text.replaceWith(edit);field.focus();
-              });
-            }
-            action('Copy',async function(){
-              try {
-                if(!navigator.clipboard||!navigator.clipboard.writeText)throw new Error('Clipboard access is unavailable.');
-                await navigator.clipboard.writeText(data.text);
-                if(active())status.textContent='Comment copied.';
-              } catch(error){showError('Comment could not be copied.',error);}
-            });
-            menu.appendChild(actions);header.appendChild(menu);article.appendChild(header);
-            if(typeof data.replyTo==='string'&&typeof data.replyToName==='string'){
-              const context=document.createElement('button');context.type='button';context.className='gallery-comment-reply-to';context.textContent='↳ Reply to '+data.replyToName;
-              context.addEventListener('click',function(){
-                const original=Array.from(list.children).find(function(element){return element.dataset.commentId===data.replyTo;});
-                if(original){original.scrollIntoView({block:'nearest'});original.focus();}
-                else status.textContent='The original comment is not loaded or has been deleted.';
-              });
-              article.appendChild(context);
-            }
-            const text=document.createElement('p');text.textContent=data.text;
-            article.appendChild(text);
-            const reply=document.createElement('button');reply.type='button';reply.className='gallery-comment-reply';reply.textContent='Reply';reply.setAttribute('aria-label','Reply to '+data.authorName);
-            reply.addEventListener('click',function(){replyTo={id:doc.id,name:data.authorName};replyLabel.textContent='Replying to '+data.authorName;replyContext.hidden=false;input.placeholder='Write a reply…';input.focus();});
-            article.appendChild(reply);
+          const docs=snapshot.docs;
+          const byId=new Map();
+          docs.forEach(function(doc){byId.set(doc.id,{doc:doc,data:doc.data()});});
+          function rootOf(entry){let cur=entry;let guard=0;while(cur&&typeof cur.data.replyTo==='string'&&byId.has(cur.data.replyTo)&&guard++<20){cur=byId.get(cur.data.replyTo);}return cur;}
+          const topLevel=[];const repliesOf=new Map();
+          docs.forEach(function(doc){const entry=byId.get(doc.id);if(typeof entry.data.replyTo==='string'){const root=rootOf(entry);if(root&&root.doc.id!==entry.doc.id){if(!repliesOf.has(root.doc.id))repliesOf.set(root.doc.id,[]);repliesOf.get(root.doc.id).push(entry);return;}}topLevel.push(entry);});
+          const likesMap=new Map();
+          await Promise.all(docs.map(function(doc){return doc.ref.collection('likes').get().then(function(snap){likesMap.set(doc.id,{count:snap.size,liked:snap.docs.some(function(d){return d.id===user.uid;})});}).catch(function(){likesMap.set(doc.id,{count:0,liked:false});});}));
+          list.replaceChildren();
+          topLevel.forEach(function(entry){
+            const article=buildCommentArticle(entry.doc,entry.data,likesMap);
             list.appendChild(article);
+            const replies=(repliesOf.get(entry.doc.id)||[]).slice().sort(function(a,b){const ta=a.data.createdAt&&a.data.createdAt.toMillis?a.data.createdAt.toMillis():0;const tb=b.data.createdAt&&b.data.createdAt.toMillis?b.data.createdAt.toMillis():0;return ta-tb;});
+            if(!replies.length)return;
+            const thread=document.createElement('div');thread.className='gallery-comment-thread';
+            const isOpen=expandedThreads.has(entry.doc.id);
+            thread.hidden=!isOpen;
+            replies.forEach(function(r){thread.appendChild(buildCommentArticle(r.doc,r.data,likesMap));});
+            const toggle=document.createElement('button');toggle.type='button';toggle.className='gallery-comment-replies-toggle';
+            function label(){return (thread.hidden?'Show ':'Hide ')+replies.length+' '+(replies.length===1?'reply':'replies');}
+            toggle.textContent=label();
+            toggle.addEventListener('click',function(){thread.hidden=!thread.hidden;if(thread.hidden)expandedThreads.delete(entry.doc.id);else expandedThreads.add(entry.doc.id);toggle.textContent=label();});
+            list.appendChild(toggle);
+            list.appendChild(thread);
           });
-          cursor=snapshot.docs.length?snapshot.docs[snapshot.docs.length-1]:cursor;
-          more.hidden=snapshot.size<20;
+          more.hidden=true;
           status.textContent=list.children.length?'':'No comments yet.';
         } catch(error){showError('Comments could not be loaded.',error);}
         finally{loading=false;if(active()){more.disabled=false;commentButton.disabled=submitting;}}
@@ -4313,10 +4391,11 @@ var bootScreenActive = false;
           const profileSnapshot=await db.collection('users').doc(user.uid).get();
           if(!active())return;
           if(!profileSnapshot.exists||typeof profileSnapshot.data().username!=='string')throw new Error('Your saved profile name is unavailable.');
-          const comment={uid:user.uid,authorName:profileSnapshot.data().username,text:text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+          const authorName=profileSnapshot.data().displayName||profileSnapshot.data().username;
+          const comment={uid:user.uid,authorName:authorName,text:text,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
           if(target){comment.replyTo=target.id;comment.replyToName=target.name;}
           await comments.add(comment);
-          if(active()){input.value='';clearReply();await loadComments(false);}
+          if(active()){input.value='';clearReply();if(target)expandedThreads.add(target.id);await loadComments(false);}
         } catch(error){showError(target?'Reply could not be posted. The comment may have been removed.':'Comment could not be posted.',error);}
         finally{submitting=false;if(active())commentButton.disabled=loading;}
       };
@@ -4517,6 +4596,7 @@ var bootScreenActive = false;
 
     let directoryProfiles=null; let directoryLoadPromise=null; let directoryLoadUserId=null;
     let directoryRenderVersion=0; let directoryLoadError=null;
+    let directoryPage=1; let directoryLastQuery=''; const DIRECTORY_PAGE_SIZE=24;
     async function renderCommunityDirectory(searchQuery=''){
       const grid=document.getElementById('members-grid');if(!grid)return;
       const renderVersion=++directoryRenderVersion;
@@ -4528,17 +4608,21 @@ var bootScreenActive = false;
         if(directoryLoadPromise&&directoryLoadUserId!==viewerId){await directoryLoadPromise.catch(function(error){console.error('Previous directory request failed:',error.code||error.message);});if(auth.currentUser&&auth.currentUser.uid===viewerId&&renderVersion===directoryRenderVersion)await renderCommunityDirectory(searchQuery);return;}
         if(!directoryLoadPromise){grid.replaceChildren();const status=document.createElement('p');status.className='directory-status';status.setAttribute('role','status');status.textContent='Loading members…';grid.appendChild(status);directoryLoadUserId=viewerId;directoryLoadPromise=functions.httpsCallable('listCommunityProfiles')().then(function(result){if(!Array.isArray(result.data))throw new Error('Invalid community directory response.');if(auth.currentUser&&auth.currentUser.uid===viewerId)directoryProfiles=result.data;}).finally(function(){directoryLoadPromise=null;directoryLoadUserId=null;});}await directoryLoadPromise;}
         if(!auth.currentUser||auth.currentUser.uid!==viewerId||renderVersion!==directoryRenderVersion)return;
-        const query=String(searchQuery||'').trim().toLowerCase(),results=(directoryProfiles||[]).filter(function(profile){return !query||String(profile.username||'').toLowerCase().includes(query);});grid.replaceChildren();
+        const rawQuery=String(searchQuery||'').trim();
+        if(rawQuery!==directoryLastQuery){directoryPage=1;directoryLastQuery=rawQuery;}
+        const query=rawQuery.toLowerCase(),results=(directoryProfiles||[]).filter(function(profile){return !query||String(profile.username||'').toLowerCase().includes(query)||String(profile.displayName||'').toLowerCase().includes(query);});grid.replaceChildren();
         if(!results.length){const empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent=query?'No shared profiles match that search.':'No profiles have been shared yet. You can choose whether yours is visible on your profile page.';grid.appendChild(empty);return;}
-        results.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileAvatarUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
+        const visible=results.slice(0,directoryPage*DIRECTORY_PAGE_SIZE);
+        visible.forEach(function(profile){const card=document.createElement('article');card.className='community-profile-card';const avatarUrl=safeProfileAvatarUrl(profile.avatar);if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='';avatar.className='community-profile-avatar';card.appendChild(avatar);}const body=document.createElement('div');body.className='community-profile-card-body';const name=document.createElement('h3');name.textContent=String(profile.displayName||profile.username||'Sanctuary member').slice(0,40);body.appendChild(name);const bio=document.createElement('p');bio.textContent=profile.profileVisible?String(profile.bio||'A member of the Sanctuary community.').slice(0,150):'A member sharing special-interest media.';body.appendChild(bio);const types=document.createElement('p');types.className='community-profile-types';types.textContent=profile.profileVisible?(Array.isArray(profile.neurotypes)?profile.neurotypes:[]).slice(0,5).join(' · '):'';body.appendChild(types);const button=document.createElement('button');button.type='button';button.className='calm-secondary-button';button.textContent='Open profile';button.addEventListener('click',function(){openCommunityProfile(profile.uid,true);});body.appendChild(button);card.appendChild(body);grid.appendChild(card);});
+        if(visible.length<results.length){const more=document.createElement('button');more.type='button';more.className='directory-load-more';more.textContent='Load more members ('+(results.length-visible.length)+' remaining)';more.addEventListener('click',function(){directoryPage++;renderCommunityDirectory(rawQuery);});grid.appendChild(more);}
       }catch(error){if(renderVersion!==directoryRenderVersion||!auth.currentUser||auth.currentUser.uid!==viewerId)return;directoryProfiles=null;directoryLoadError=error;grid.replaceChildren();const fail=document.createElement('p');fail.className='profile-gallery-empty';fail.setAttribute('role','alert');fail.textContent='The community directory is unavailable. Check your connection and try again. If this continues, the directory service may need to be deployed.';const retry=document.createElement('button');retry.type='button';retry.className='calm-secondary-button';retry.textContent='Try again';retry.addEventListener('click',function(){directoryLoadError=null;renderCommunityDirectory(document.getElementById('member-search-input').value);});grid.append(fail,retry);console.error('Community directory load failed:',error.code||error.message);}
     }
     async function openCommunityProfile(uid,updateHistory,pendingVersion){
       if(!auth.currentUser){openAuthModal('signup');return false;}if(typeof uid!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(uid)){showToast('That profile link is not valid.');return false;}
       const requestVersion = pendingVersion === undefined ? ++routeVersion : pendingVersion;
       const viewerId = auth.currentUser.uid;
-      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(requestVersion!==routeVersion)return false;if(!auth.currentUser||auth.currentUser.uid!==viewerId){if(pendingVersion!==undefined)handleInitialRoute();return false;}if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return false;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,liveStatuses:shared.liveStatuses,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
-        hideRouteLoading();const embeds=['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];embeds.forEach(function(id){const el=document.getElementById(id);if(el)el.classList.remove('active-embed');});const directory=document.getElementById('directory-view');if(directory){directory.classList.add('hidden');directory.classList.remove('active-embed');directory.style.display='none';}const page=document.getElementById('profile-page');if(page){page.classList.remove('hidden');page.style.display='block';page.classList.add('active-embed');}updateSkipTarget('profile-page');renderProfile(profile,false);if(updateHistory!==false)history.pushState(null,null,'#member/'+encodeURIComponent(uid));window.scrollTo({top:0,behavior:'instant'});return true;
+      try{const snapshot=await db.collection('communityProfiles').doc(uid).get();if(requestVersion!==routeVersion)return false;if(!auth.currentUser||auth.currentUser.uid!==viewerId){if(pendingVersion!==undefined)handleInitialRoute();return false;}if(!snapshot.exists||snapshot.data().visible!==true||snapshot.data().profileVisible!==true){showToast('This profile is private or unavailable.');return false;}const shared=snapshot.data();const profile={uid:snapshot.id,username:shared.username,displayName:typeof shared.displayName==='string'?shared.displayName:null,avatar:shared.avatar,bio:shared.bio,neurotypes:shared.neurotypes,liveStatuses:shared.liveStatuses,links:shared.links,communityVisible:true,interestMedia:Array.isArray(shared.interestMedia)?shared.interestMedia:[]};
+        hideRouteLoading();const embeds=['embed03','embed35','embed-store','embed13','embed09','embed41','embed07','embed06','embed11','embed04','embed15','embed16'];embeds.forEach(function(id){const el=document.getElementById(id);if(el)el.classList.remove('active-embed');});const directory=document.getElementById('directory-view');if(directory){directory.classList.add('hidden');directory.classList.remove('active-embed');directory.style.display='none';}const cvOcp=document.getElementById('confessions-view');if(cvOcp){cvOcp.classList.add('hidden');cvOcp.classList.remove('active-embed');cvOcp.style.display='none';}const page=document.getElementById('profile-page');if(page){page.classList.remove('hidden');page.style.display='block';page.classList.add('active-embed');}updateSkipTarget('profile-page');renderProfile(profile,false);if(updateHistory!==false)history.pushState(null,null,'#member/'+encodeURIComponent(uid));window.scrollTo({top:0,behavior:'instant'});return true;
       }catch(error){if(requestVersion!==routeVersion)return false;showToast('This profile is private or could not be loaded.');console.error('Community profile load failed:',error.code||error.message);return false;}
     }
     function returnToCommunityDirectory(){switchView('directory',true);}
@@ -4701,6 +4785,8 @@ var bootScreenActive = false;
       const emailInput = document.getElementById('edit-email');
       
       if (usernameInput) usernameInput.value = currentUser.username || '';
+      const displayNameInput = document.getElementById('edit-display-name');
+      if (displayNameInput) displayNameInput.value = currentUser.displayName || '';
       if (emailInput) emailInput.value = currentUser.email || '';
       
       const bioInput = document.getElementById('edit-bio');
@@ -4743,7 +4829,7 @@ var bootScreenActive = false;
       if(!profileVisible) return null;
       const items=Array.isArray(profile.interestMedia)?profile.interestMedia.filter(isGalleryItemSelectedForSharing).slice(0,12):[];
       const sharedPostIds={};
-      const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),interestMedia:items.map(function(item){sharedPostIds[galleryPostId(item)]=true;const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;if(typeof item.description==='string')result.description=item.description.slice(0,500);return result;}),sharedPostIds:sharedPostIds,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+      const projection={uid:user.uid,visible:true,profileVisible:profileVisible,username:String(profile.username||'Sanctuary member').slice(0,40),displayName:typeof profile.displayName==='string'&&profile.displayName.trim()?String(profile.displayName).trim().slice(0,40):null,interestMedia:items.map(function(item){sharedPostIds[galleryPostId(item)]=true;const result={path:item.path,type:item.type,name:item.name,visibility:item.visibility};if(typeof item.groupId==='string'&&item.groupId)result.groupId=item.groupId;if(typeof item.description==='string')result.description=item.description.slice(0,500);return result;}),sharedPostIds:sharedPostIds,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
       if(profileVisible){projection.avatar=profile.avatar||null;projection.bio=String(profile.bio||'').slice(0,150);projection.neurotypes=Array.isArray(profile.neurotypes)?profile.neurotypes.filter(function(type){return availableNeurotypes.includes(type);}):[];projection.liveStatuses=validProfileStatuses(profile.liveStatuses);projection.links=Array.isArray(profile.links)?profile.links.slice(0,6):[];}
       return projection;
     }
@@ -4762,6 +4848,7 @@ var bootScreenActive = false;
       const profile = {
         uid: user.uid,
         username: String(currentUser.username || '').trim().slice(0, 40),
+        displayName: typeof currentUser.displayName === 'string' && currentUser.displayName.trim() ? currentUser.displayName.trim().slice(0, 40) : null,
         avatar: currentUser.avatar || null,
         bio: String(currentUser.bio || '').slice(0, 150),
         neurotypes: Array.isArray(currentUser.neurotypes) ? currentUser.neurotypes.filter(function(type) { return availableNeurotypes.includes(type); }) : [],
@@ -4829,9 +4916,11 @@ var bootScreenActive = false;
       const profile=currentUser,user=auth.currentUser;
 
       const usernameInput = document.getElementById('edit-username');
+      const displayNameInput = document.getElementById('edit-display-name');
       const avatarFileInput = document.getElementById('edit-avatar-file');
       const bioInput = document.getElementById('edit-bio');
       const newUsername = usernameInput ? usernameInput.value.trim() : currentUser.username;
+      const newDisplayName = displayNameInput ? displayNameInput.value.trim().slice(0, 40) : (currentUser.displayName || '');
       const newBio = bioInput ? bioInput.value.trim() : currentUser.bio;
       const newNeurotypes = getSelectedCheckboxes('edit-neurotypes-container');
       const file = avatarFileInput && avatarFileInput.files ? avatarFileInput.files[0] : null;
@@ -4867,6 +4956,7 @@ var bootScreenActive = false;
       }
 
       currentUser.email = auth.currentUser.email || '';
+      currentUser.displayName = newDisplayName || null;
       currentUser.bio = newBio;
       currentUser.neurotypes = newNeurotypes;
       currentUser.links = links;
@@ -5118,6 +5208,8 @@ var bootScreenActive = false;
       e.preventDefault();
       const usernameInput = document.getElementById('onboard-username');
       const username = usernameInput ? usernameInput.value.trim() : '';
+      const displayNameInput = document.getElementById('onboard-display-name');
+      const displayName = displayNameInput ? displayNameInput.value.trim().slice(0, 40) : '';
       const neurotypes = getSelectedCheckboxes('onboard-neurotypes-container');
       const user = auth.currentUser;
       if (!user || !username) {
@@ -5130,6 +5222,7 @@ var bootScreenActive = false;
           currentUser = {
             uid: user.uid, email: user.email || '',
             username: user.displayName || (user.email || '').split('@')[0],
+            displayName: null,
             avatar: user.photoURL || null,
             bio: user.uid === FOUNDER_AUTH_UID ? 'Founder of AuDHMe' : '',
             neurotypes: [], links: [], interestMedia: [], perkRedeemedAt: null
@@ -5137,6 +5230,7 @@ var bootScreenActive = false;
         }
         const previous = Object.assign({}, currentUser);
         currentUser.username = username.slice(0, 40);
+        currentUser.displayName = displayName || null;
         currentUser.neurotypes = neurotypes.filter(function(type) { return availableNeurotypes.includes(type); });
         return Promise.all([
           user.updateProfile({ displayName: currentUser.username }),
@@ -5229,6 +5323,149 @@ var bootScreenActive = false;
         checkoutInProgress = false;
         if (checkoutButton) checkoutButton.disabled = false;
       });
+    }
+
+    var confessionsCursor=null, confessionsLoading=false, confessionsAllLoaded=false, confessionsRenderVersion=0, confessionsListenersAttached=false;
+    var CONFESSIONS_PAGE_SIZE=10;
+    function getMyConfessionIds(){try{var raw=localStorage.getItem('audhme_my_confessions');var arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr.filter(function(x){return typeof x==='string';}):[];}catch(e){return [];}}
+    function addMyConfessionId(id){var ids=getMyConfessionIds();if(ids.indexOf(id)===-1)ids.push(id);try{localStorage.setItem('audhme_my_confessions',JSON.stringify(ids));}catch(e){}}
+    function removeMyConfessionId(id){var ids=getMyConfessionIds().filter(function(x){return x!==id;});try{localStorage.setItem('audhme_my_confessions',JSON.stringify(ids));}catch(e){}}
+    function formatConfessionDate(ts){try{if(ts&&ts.toDate)return ts.toDate().toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}catch(e){}return 'Recently';}
+    function attachConfessionListeners(){
+      if(confessionsListenersAttached)return; confessionsListenersAttached=true;
+      var input=document.getElementById('confession-input');
+      var counter=document.getElementById('confession-counter');
+      var submit=document.getElementById('confession-submit');
+      if(input&&counter)input.addEventListener('input',function(){counter.textContent=input.value.length+' / 1000';});
+      if(submit)submit.addEventListener('click',submitConfession);
+      var more=document.getElementById('confessions-load-more');
+      if(more)more.addEventListener('click',function(){loadConfessions(true);});
+    }
+    async function submitConfession(){
+      var input=document.getElementById('confession-input');
+      var submit=document.getElementById('confession-submit');
+      var status=document.getElementById('confession-status');
+      var text=input?input.value.trim():'';
+      if(!auth.currentUser){if(status)status.textContent='Sign in to share.';return;}
+      if(!text){if(status)status.textContent='Write something first.';return;}
+      if(submit)submit.disabled=true;
+      try{
+        var result=await functions.httpsCallable('createConfession')({text:text.slice(0,1000)});
+        if(result&&result.data&&result.data.id)addMyConfessionId(result.data.id);
+        if(input)input.value='';
+        var counter=document.getElementById('confession-counter');if(counter)counter.textContent='0 / 1000';
+        if(status)status.textContent='Shared anonymously. Thank you for trusting the community.';
+        confessionsCursor=null;confessionsAllLoaded=false;
+        loadConfessions(false);
+      }catch(error){console.error('Confession could not be shared:',error.code||error.message);if(status)status.textContent='That could not be shared. Check your connection and try again.';}
+      finally{if(submit)submit.disabled=false;}
+    }
+    async function toggleConfessionSupport(id,button,countEl){
+      if(!auth.currentUser)return;
+      button.disabled=true;
+      try{
+        var ref=db.collection('confessions').doc(id).collection('supports').doc(auth.currentUser.uid);
+        var snap=await ref.get();
+        var count=parseInt((countEl.textContent||'0').replace(/[^0-9]/g,''),10)||0;
+        if(snap.exists){await ref.delete();count=Math.max(0,count-1);button.setAttribute('aria-pressed','false');button.textContent='♡ Support';}
+        else{await ref.set({uid:auth.currentUser.uid});count++;button.setAttribute('aria-pressed','true');button.textContent='♥ Supported';}
+        countEl.textContent=count+' '+(count===1?'support':'supports');
+      }catch(error){console.error('Support could not be updated:',error.code||error.message);}
+      finally{button.disabled=false;}
+    }
+    async function deleteConfessionItem(id,card){
+      if(!auth.currentUser)return;
+      if(!await confirmSiteAction('Delete this confession?','It will be permanently removed.','Delete'))return;
+      try{await functions.httpsCallable('deleteConfession')({id:id});removeMyConfessionId(id);if(card&&card.parentNode)card.parentNode.removeChild(card);}
+      catch(error){console.error('Confession could not be deleted:',error.code||error.message);showToast('That confession could not be deleted.');}
+    }
+    async function loadConfessionComments(id,container,statusEl){
+      if(!auth.currentUser)return;
+      try{
+        var snap=await db.collection('confessions').doc(id).collection('comments').orderBy('createdAt','desc').limit(50).get();
+        container.replaceChildren();
+        if(!snap.size){var empty=document.createElement('p');empty.className='text-xs text-slate-400';empty.textContent='No supportive notes yet. Be the first.';container.appendChild(empty);}
+        else snap.docs.forEach(function(doc){var data=doc.data();var wrap=document.createElement('div');wrap.className='confession-comment';var who=document.createElement('span');who.className='who';who.textContent='Supporter';var p=document.createElement('p');p.textContent=data.text;wrap.append(who,p);container.appendChild(wrap);});
+      }catch(error){console.error('Confession comments could not be loaded:',error.code||error.message);if(statusEl)statusEl.textContent='Supportive notes could not be loaded.';}
+    }
+    async function submitConfessionComment(id,input,list,statusEl){
+      var text=input?input.value.trim():'';
+      if(!auth.currentUser||!text)return;
+      input.disabled=true;
+      try{
+        await db.collection('confessions').doc(id).collection('comments').add({text:text.slice(0,500),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+        input.value='';
+        loadConfessionComments(id,list,statusEl);
+      }catch(error){console.error('Confession comment could not be posted:',error.code||error.message);if(statusEl)statusEl.textContent='That note could not be posted.';}
+      finally{input.disabled=false;}
+    }
+    function renderConfessionCard(doc,myIds){
+      var data=doc.data();
+      var card=document.createElement('article');card.className='confession-card';
+      var text=document.createElement('p');text.className='confession-text';text.textContent=data.text;
+      var meta=document.createElement('p');meta.className='confession-meta';meta.textContent='Shared anonymously · '+formatConfessionDate(data.createdAt);
+      var actions=document.createElement('div');actions.className='confession-actions';
+      var supportBtn=document.createElement('button');supportBtn.type='button';supportBtn.className='confession-support-btn';supportBtn.setAttribute('aria-pressed','false');supportBtn.textContent='♡ Support';
+      var supportCount=document.createElement('span');supportCount.className='gallery-comment-like-count';supportCount.textContent='0 supports';
+      supportBtn.addEventListener('click',function(){toggleConfessionSupport(doc.id,supportBtn,supportCount);});
+      db.collection('confessions').doc(doc.id).collection('supports').get().then(function(snap){var count=snap.size;var liked=auth.currentUser&&snap.docs.some(function(d){return d.id===auth.currentUser.uid;});supportCount.textContent=count+' '+(count===1?'support':'supports');supportBtn.setAttribute('aria-pressed',String(liked));supportBtn.textContent=liked?'♥ Supported':'♡ Support';}).catch(function(){});
+      var expandBtn=document.createElement('button');expandBtn.type='button';expandBtn.className='confession-expand-btn';expandBtn.textContent='Show supportive notes';
+      var commentsWrap=document.createElement('div');commentsWrap.className='confession-comments';commentsWrap.style.display='none';
+      var commentsList=document.createElement('div');commentsList.className='confession-comments-list';
+      var commentForm=document.createElement('form');commentForm.className='confession-comment-form';
+      var commentInput=document.createElement('input');commentInput.type='text';commentInput.maxLength=500;commentInput.placeholder='Leave a supportive note (anonymous)…';commentInput.setAttribute('aria-label','Supportive note');
+      var commentSend=document.createElement('button');commentSend.type='submit';commentSend.className='calm-secondary-button';commentSend.textContent='Send';
+      var commentStatus=document.createElement('p');commentStatus.className='text-xs text-slate-400 mt-1';
+      commentForm.append(commentInput,commentSend);
+      commentForm.addEventListener('submit',function(e){e.preventDefault();submitConfessionComment(doc.id,commentInput,commentsList,commentStatus);});
+      commentsWrap.append(commentsList,commentForm,commentStatus);
+      var commentsLoaded=false;
+      expandBtn.addEventListener('click',function(){var hidden=commentsWrap.style.display==='none';commentsWrap.style.display=hidden?'block':'none';expandBtn.textContent=hidden?'Hide supportive notes':'Show supportive notes';if(hidden&&!commentsLoaded){commentsLoaded=true;loadConfessionComments(doc.id,commentsList,commentStatus);}});
+      actions.append(supportBtn,supportCount,expandBtn);
+      if(myIds.indexOf(doc.id)!==-1){var delBtn=document.createElement('button');delBtn.type='button';delBtn.className='confession-delete-btn';delBtn.textContent='Delete (yours)';delBtn.addEventListener('click',function(){deleteConfessionItem(doc.id,card);});actions.appendChild(delBtn);}
+      card.append(text,meta,actions,commentsWrap);
+      return card;
+    }
+    async function loadConfessions(append){
+      if(confessionsLoading)return;
+      var list=document.getElementById('confessions-list');
+      var more=document.getElementById('confessions-load-more');
+      var status=document.getElementById('confession-status');
+      if(!list)return;
+      confessionsLoading=true;if(more)more.disabled=true;
+      var version=++confessionsRenderVersion;
+      try{
+        var query=db.collection('confessions').where('status','==','visible').orderBy('createdAt','desc').limit(CONFESSIONS_PAGE_SIZE);
+        if(append&&confessionsCursor)query=query.startAfter(confessionsCursor);
+        var snap=await query.get();
+        if(version!==confessionsRenderVersion||!auth.currentUser)return;
+        var myIds=getMyConfessionIds();
+        if(!append)list.replaceChildren();
+        if(!snap.size&&!append){var empty=document.createElement('p');empty.className='profile-gallery-empty';empty.textContent='No confessions shared yet. Be the first to share something anonymously.';list.appendChild(empty);}
+        else snap.docs.forEach(function(doc){list.appendChild(renderConfessionCard(doc,myIds));});
+        confessionsCursor=snap.docs.length?snap.docs[snap.docs.length-1]:confessionsCursor;
+        confessionsAllLoaded=snap.size<CONFESSIONS_PAGE_SIZE;
+        if(more){more.hidden=confessionsAllLoaded;more.disabled=false;more.textContent='Load more';}
+      }catch(error){console.error('Confessions could not be loaded:',error.code||error.message);if(status)status.textContent='Confessions could not be loaded. Check your connection and try again.';if(more){more.hidden=true;more.disabled=false;}}
+      finally{confessionsLoading=false;}
+    }
+    function renderConfessions(){
+      attachConfessionListeners();
+      var signedOut=document.getElementById('confessions-signed-out');
+      var composer=document.getElementById('confessions-composer-wrap');
+      var list=document.getElementById('confessions-list');
+      var more=document.getElementById('confessions-load-more');
+      if(!auth.currentUser){
+        if(signedOut)signedOut.classList.remove('hidden');
+        if(composer)composer.classList.add('hidden');
+        if(list)list.replaceChildren();
+        if(more)more.classList.add('hidden');
+        return;
+      }
+      if(signedOut)signedOut.classList.add('hidden');
+      if(composer)composer.classList.remove('hidden');
+      confessionsCursor=null;confessionsAllLoaded=false;
+      loadConfessions(false);
     }
 
     updateUI();

@@ -37,8 +37,8 @@ button, a, input, select, textarea { outline-offset: 3px; }
 .audh-links .group:not(.dismissed):focus-within ul,
 .audh-links .group.open:not(.dismissed) ul { display: flex !important; }
 .audh-links .group.dismissed ul { display: none !important; }
-#embed03, #embed35, #embed-store, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04, #embed15, #embed16, #profile-page, #directory-view { display: none !important; }
-#embed03.active-embed, #embed35.active-embed, #embed-store.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed, #embed15.active-embed, #embed16.active-embed, #profile-page.active-embed, #directory-view.active-embed { display: block !important; animation: calmSanctuaryReveal .18s ease-out; }
+#embed03, #embed35, #embed-store, #embed13, #embed09, #embed41, #embed07, #embed06, #embed11, #embed04, #embed15, #embed16, #profile-page, #directory-view, #confessions-view { display: none !important; }
+#embed03.active-embed, #embed35.active-embed, #embed-store.active-embed, #embed13.active-embed, #embed09.active-embed, #embed41.active-embed, #embed07.active-embed, #embed06.active-embed, #embed11.active-embed, #embed04.active-embed, #embed15.active-embed, #embed16.active-embed, #profile-page.active-embed, #directory-view.active-embed, #confessions-view.active-embed { display: block !important; animation: calmSanctuaryReveal .18s ease-out; }
 
 /* Level, consistent vertical margins and widths across all page panes */
 .neuro-pane, #pane-home, #pane-neuroverse, #pane-store, #pane-build, #pane-toolkit, #pane-legal, .petition-master-container, .civic-master-container, .creator-master-container, .encyclopedia-master-container {
@@ -4555,3 +4555,54 @@ body:is(.low-input-active,.low-stim-active,.site-adapt-calm) #pane-store .store-
     .festive-postcard-copy > p:last-child { font-size: .88rem; }
   }
 }
+
+/* ===== Mobile nav polish: 44px targets, smooth open/close (reduced-motion respected globally) ===== */
+.audh-hamburger { min-width: 44px; min-height: 44px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+.audh-links a, .audh-links button, .audh-links .group ul a { min-height: 44px; }
+@keyframes audhNavSlideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 1024px) {
+  .audh-links.active { animation: audhNavSlideDown .18s ease-out; }
+  .audh-links .group.open:not(.dismissed) ul, .audh-links .group:not(.dismissed):focus-within ul { animation: audhNavSlideDown .15s ease-out; }
+}
+.audh-links .group:not(.dismissed):hover ul { animation: audhNavSlideDown .15s ease-out; }
+
+/* ===== Community directory pagination ===== */
+.directory-load-more { display: block; margin: 8px auto 0; min-height: 48px; padding: 10px 22px; border: 1px solid rgba(183,190,150,.35); border-radius: 12px; background: #24332f; color: #e9eee9; font-weight: 700; cursor: pointer; }
+.directory-load-more:disabled { opacity: .6; cursor: wait; }
+
+/* ===== Gallery comment threading + per-comment likes ===== */
+.gallery-comment-thread { margin-left: 18px; padding-left: 14px; border-left: 2px solid rgba(183,190,150,.2); }
+.gallery-comment-replies-toggle { min-height: 32px; padding: 0; border: 0; background: transparent; color: #9cbab0; font-size: .78rem; cursor: pointer; }
+.gallery-comment-replies-toggle:hover { color: #e4d5a5; text-decoration: underline; }
+.gallery-comment-like-row { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+.gallery-comment-like { min-height: 32px; padding: 0 8px 0 0; border: 0; background: transparent; color: #b6c8c0; font-size: .85rem; cursor: pointer; }
+.gallery-comment-like:hover { color: #e4d5a5; }
+.gallery-comment-like[aria-pressed="true"] { color: #e08a9a; }
+.gallery-comment-like-count { font-size: .76rem; color: #9cbab0; }
+
+/* ===== Anonymous Confessions view ===== */
+#confessions-view { width: min(100% - 32px, 820px); max-width: 820px; margin: 20px auto 60px; padding: clamp(12px, 2vw, 24px); }
+.confessions-crisis-banner { padding: 16px 18px; border: 1px solid rgba(197,170,97,.4); border-radius: 16px; background: linear-gradient(125deg, rgba(197,169,106,.12), rgba(156,199,189,.1)); margin-bottom: 20px; }
+.confessions-crisis-banner h2 { margin: 0 0 6px; font-size: 1rem; color: #e9eee9; }
+.confessions-crisis-banner p { margin: 4px 0; font-size: .88rem; color: #c4cfca; }
+.confessions-crisis-banner .helplines { font-weight: 700; color: #d7c58d; }
+.confession-composer { margin-bottom: 24px; padding: 18px; border: 1px solid rgba(183,190,150,.25); border-radius: 18px; background: #182321; }
+.confession-composer textarea { width: 100%; min-height: 96px; padding: 12px; border: 1px solid rgba(183,190,150,.25); border-radius: 12px; background: #111a19; color: #eef1ed; resize: vertical; }
+.confession-composer .counter { font-size: .75rem; color: #9cbab0; text-align: right; margin-top: 4px; }
+.confession-card { padding: 18px; border: 1px solid rgba(183,190,150,.22); border-radius: 18px; background: #182321; margin-bottom: 14px; }
+.confession-text { white-space: pre-wrap; overflow-wrap: anywhere; color: #e9eee9; line-height: 1.7; margin: 0 0 10px; }
+.confession-meta { font-size: .75rem; color: #9cbab0; margin-bottom: 8px; }
+.confession-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.confession-support-btn { min-height: 40px; padding: 6px 14px; border: 1px solid rgba(224,138,154,.4); border-radius: 999px; background: transparent; color: #e08a9a; cursor: pointer; font-weight: 700; }
+.confession-support-btn[aria-pressed="true"] { background: rgba(224,138,154,.18); }
+.confession-expand-btn, .confession-delete-btn { min-height: 36px; padding: 0; border: 0; background: transparent; color: #b6c8c0; font-size: .82rem; cursor: pointer; }
+.confession-expand-btn:hover, .confession-delete-btn:hover { color: #e4d5a5; text-decoration: underline; }
+.confession-comments { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(183,190,150,.18); }
+.confession-comment { padding: 8px 0; border-top: 1px dashed rgba(183,190,150,.15); overflow-wrap: anywhere; }
+.confession-comment .who { font-size: .75rem; color: #d7c58d; font-weight: 700; }
+.confession-comment p { margin: 2px 0 0; font-size: .9rem; color: #c4cfca; white-space: pre-wrap; }
+.confession-comment-form { display: flex; gap: 8px; margin-top: 10px; }
+.confession-comment-form input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid rgba(183,190,150,.25); border-radius: 10px; background: #111a19; color: #eef1ed; }
+.confession-load-more { display: block; margin: 12px auto 0; min-height: 48px; padding: 10px 22px; border: 1px solid rgba(183,190,150,.35); border-radius: 12px; background: #24332f; color: #e9eee9; font-weight: 700; cursor: pointer; }
+.confession-load-more:disabled { opacity: .6; cursor: wait; }
+.confessions-signed-out { padding: 24px; text-align: center; border: 1px dashed rgba(183,190,150,.3); border-radius: 18px; color: #c4cfca; }

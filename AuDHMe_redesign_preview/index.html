@@ -186,6 +186,7 @@
           <ul class="absolute top-full left-0 bg-[#292c25] border border-[#cbb678]/30 rounded-xl py-2 w-44 shadow-2xl flex-col z-50">
             <li><a href="#neuroverse" data-target="neuroverse" onclick="closeNavGroup(this); switchPage('neuroverse', true); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">The Neuroverse</a></li>
             <li><a href="#directory" data-target="directory" onclick="closeNavGroup(this); switchView('directory'); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">Community Directory</a></li>
+            <li><a href="#confessions" data-target="confessions" onclick="closeNavGroup(this); switchView('confessions'); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">Confessions</a></li>
             <li><a href="#petition" data-target="petition" onclick="closeNavGroup(this); switchPage('petition', true); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">The Petition</a></li>
             <li><a href="#civic" data-target="civic" onclick="closeNavGroup(this); switchPage('civic', true); return false;" class="nav-item block px-4 py-2 text-xs text-slate-300 hover:text-white hover:bg-[#303329]">Civic &amp; Passes</a></li>
           </ul>
@@ -1780,13 +1781,18 @@
         <p class="text-xs text-slate-400">Choose whether to share your profile with signed-in members on your profile page. When your profile is private, your entire gallery is private too.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="text-xs text-slate-400 block mb-1">Username / Alias (30-day cooldown):</label>
+            <label class="text-xs text-slate-400 block mb-1">Username / Alias (30-day cooldown, used for @mentions):</label>
             <input type="text" id="edit-username" required class="w-full bg-[#252923] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#cbb678]">
           </div>
           <div>
             <label class="text-xs text-slate-400 block mb-1">Account Email (managed by your sign-in provider):</label>
             <input type="email" id="edit-email" readonly class="w-full bg-[#252923] border border-slate-700 rounded-lg p-2.5 text-sm text-slate-400 outline-none">
           </div>
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Display name (shown publicly, optional, max 40 chars):</label>
+          <input type="text" id="edit-display-name" maxlength="40" placeholder="e.g. Sam — leave blank to use your username" class="w-full bg-[#252923] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#cbb678]">
         </div>
 
         <div>
@@ -1868,6 +1874,43 @@
     </div>
 
     <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+
+  <!-- ================= PAGE: ANONYMOUS CONFESSIONS ================= -->
+  <div id="confessions-view" class="hidden" style="padding: 24px 16px;">
+    <header class="directory-header">
+      <div>
+        <p class="eyebrow">Anonymous sanctuary</p>
+        <h1>Confessions</h1>
+        <p>Share something anonymously. No names are collected here, and only you can delete confessions you created on this device.</p>
+      </div>
+      <span class="directory-access-note">For signed-in members</span>
+    </header>
+
+    <div class="confessions-crisis-banner" role="note">
+      <h2>You are not alone 💛</h2>
+      <p>If you are in crisis or having thoughts of self-harm, please reach out — support is available and you deserve care.</p>
+      <p class="helplines">UK &amp; Ireland: Samaritans 116 123 (free, 24/7) · US &amp; Canada: call or text 988 · Text HOME to 741741 (US) for the Crisis Text Line.</p>
+      <p>Take your time, breathe, and be gentle with yourself. Sharing here is always optional, and you can stop anytime.</p>
+    </div>
+
+    <div id="confessions-signed-out" class="confessions-signed-out hidden">
+      <p>Confessions are shared anonymously by signed-in Sanctuary members.</p>
+      <button type="button" onclick="openAuthModal('signup')" class="calm-secondary-button mt-3">Sign in to read &amp; share</button>
+    </div>
+
+    <div id="confessions-composer-wrap" class="confession-composer hidden">
+      <label for="confession-input" class="text-xs text-slate-400 block mb-1">Share anonymously (max 1000 characters):</label>
+      <textarea id="confession-input" maxlength="1000" placeholder="Write something you've been carrying… your name is never shown."></textarea>
+      <div class="flex justify-between items-center mt-2">
+        <span id="confession-counter" class="counter">0 / 1000</span>
+        <button type="button" id="confession-submit" class="calm-primary-button">Share anonymously</button>
+      </div>
+      <p id="confession-status" role="status" class="text-xs text-slate-400 mt-2"></p>
+    </div>
+
+    <div id="confessions-list"></div>
+    <button type="button" id="confessions-load-more" class="confession-load-more hidden">Load more</button>
   </div>
 
   <!-- Basket Modal -->
@@ -1970,8 +2013,12 @@
       
       <form onsubmit="handleOnboardingSubmit(event)" class="space-y-4">
         <div>
-          <label class="text-xs text-slate-400 block mb-1">Choose Username / Alias:</label>
+          <label class="text-xs text-slate-400 block mb-1">Choose Username / Alias (used for @mentions):</label>
           <input type="text" id="onboard-username" required placeholder="e.g. Jason" class="w-full bg-[#252923] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#cbb678]">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Display name (shown publicly, optional, max 40 chars):</label>
+          <input type="text" id="onboard-display-name" maxlength="40" placeholder="e.g. Sam — leave blank to use your username" class="w-full bg-[#252923] border border-slate-700 rounded-lg p-2.5 text-sm text-white outline-none focus:border-[#cbb678]">
         </div>
         <div>
           <label class="text-xs text-slate-400 block mb-1">Select Your Neurotypes & Profiles (Select all that apply):</label>
